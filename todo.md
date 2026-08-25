@@ -3,3 +3,10 @@
 - [x] Criar a seção interativa Ferramentas do Narrador.
 - [x] Validar os geradores em desktop e mobile.
 - [ ] Salvar checkpoint e entregar a atualização.
+- [ ] Modelar o relógio visual de consequências por facção.
+- [ ] Adicionar filtros interativos de tom aos ganchos de aventura.
+- [ ] Persistir ganchos e NPCs favoritos no armazenamento local.
+- [x] Modelar o relógio visual de consequências por facção.
+- [x] Adicionar filtros interativos de tom aos ganchos de aventura.
+- [x] Persistir ganchos e NPCs favoritos no armazenamento local.
+- [x] Validar os novos controles e atualizar o checkpoint.
