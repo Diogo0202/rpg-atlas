@@ -1,6 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { campaignsRouter } from "./routers/campaigns";
 import { charactersRouter } from "./routers/characters";
+import { libraryRouter } from "./routers/library";
 import { systemsRouter } from "./routers/systems";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -22,6 +23,7 @@ export const appRouter = router({
   systems: systemsRouter,
   campaigns: campaignsRouter,
   characters: charactersRouter,
+  library: libraryRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -99,9 +99,50 @@ export const diceRolls = mysqlTable("diceRolls", {
   index("dice_rolls_roller_idx").on(table.rollerId),
 ]);
 
+/** Biblioteca pesquisável de ameaças, NPCs, facções e entidades. */
+export const antagonists = mysqlTable("antagonists", {
+  id: int("id").autoincrement().primaryKey(),
+  ownerId: int("ownerId").references(() => users.id, { onDelete: "set null" }),
+  campaignId: int("campaignId").references(() => campaigns.id, { onDelete: "set null" }),
+  systemId: varchar("systemId", { length: 64 }).notNull().references(() => rpgSystems.id),
+  name: varchar("name", { length: 160 }).notNull(),
+  creatureType: mysqlEnum("creatureType", ["vampire", "werewolf", "mage", "mortal", "faction", "entity", "other"]).notNull(),
+  threatLevel: mysqlEnum("threatLevel", ["minor", "moderate", "major", "critical", "cataclysmic"]).notNull(),
+  summary: text("summary").notNull(),
+  hooks: json("hooks").$type<string[]>().notNull(),
+  sourceTitle: varchar("sourceTitle", { length: 255 }),
+  sourceUrl: text("sourceUrl"),
+  visibility: mysqlEnum("visibility", ["private", "campaign", "public"]).default("public").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  index("antagonists_system_idx").on(table.systemId),
+  index("antagonists_type_idx").on(table.creatureType),
+  index("antagonists_threat_idx").on(table.threatLevel),
+]);
+
+/** Metadados dos materiais fornecidos pela pasta do Drive; os arquivos permanecem na origem. */
+export const sourceDocuments = mysqlTable("sourceDocuments", {
+  id: int("id").autoincrement().primaryKey(),
+  ownerId: int("ownerId").references(() => users.id, { onDelete: "set null" }),
+  title: varchar("title", { length: 255 }).notNull(),
+  category: mysqlEnum("category", ["guide", "setting", "antagonist", "rules", "supplement", "folder", "asset"]).notNull(),
+  driveFileId: varchar("driveFileId", { length: 128 }).notNull().unique(),
+  sourceUrl: text("sourceUrl").notNull(),
+  mimeType: varchar("mimeType", { length: 128 }),
+  integrationStatus: mysqlEnum("integrationStatus", ["referenced", "cataloged", "integrated"]).default("referenced").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  index("source_documents_category_idx").on(table.category),
+]);
+
 export type RpgSystem = typeof rpgSystems.$inferSelect;
 export type Campaign = typeof campaigns.$inferSelect;
 export type CampaignMember = typeof campaignMembers.$inferSelect;
 export type Character = typeof characters.$inferSelect;
 export type InsertCharacter = typeof characters.$inferInsert;
 export type DiceRoll = typeof diceRolls.$inferSelect;
+export type Antagonist = typeof antagonists.$inferSelect;
+export type SourceDocument = typeof sourceDocuments.$inferSelect;

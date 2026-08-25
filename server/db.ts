@@ -1,6 +1,6 @@
-import { desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { campaignMembers, campaigns, characters, diceRolls, InsertUser, rpgSystems, users } from "../drizzle/schema";
+import { antagonists, campaignMembers, campaigns, characters, diceRolls, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -165,4 +165,24 @@ export async function recordDiceRollForUser(input: {
   const db = await getDb();
   if (!db) throw new Error("Banco de dados indisponível.");
   await db.insert(diceRolls).values(input);
+}
+
+export async function listAntagonists(filters?: {
+  systemId?: string;
+  creatureType?: "vampire" | "werewolf" | "mage" | "mortal" | "faction" | "entity" | "other";
+  threatLevel?: "minor" | "moderate" | "major" | "critical" | "cataclysmic";
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  const clauses = [eq(antagonists.visibility, "public")];
+  if (filters?.systemId) clauses.push(eq(antagonists.systemId, filters.systemId));
+  if (filters?.creatureType) clauses.push(eq(antagonists.creatureType, filters.creatureType));
+  if (filters?.threatLevel) clauses.push(eq(antagonists.threatLevel, filters.threatLevel));
+  return db.select().from(antagonists).where(and(...clauses)).orderBy(asc(antagonists.threatLevel), asc(antagonists.name));
+}
+
+export async function listSourceDocuments() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(sourceDocuments).orderBy(asc(sourceDocuments.category), asc(sourceDocuments.title));
 }

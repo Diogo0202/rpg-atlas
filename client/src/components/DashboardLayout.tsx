@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { startLogin } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { BookOpen, LayoutDashboard, LogOut, PanelLeft, ScrollText } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, PanelLeft, ScrollText, Skull } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -30,7 +30,8 @@ import { Button } from "./ui/button";
 const menuItems = [
   { number: "01", icon: BookOpen, label: "Atlas público", path: "/" },
   { number: "02", icon: LayoutDashboard, label: "Santuário", path: "/santuario" },
-  { number: "03", icon: ScrollText, label: "Registro vivo", path: "/santuario" },
+  { number: "03", icon: Skull, label: "Antagonistas", path: "/biblioteca" },
+  { number: "04", icon: ScrollText, label: "Registro vivo", path: "/santuario" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -177,7 +178,7 @@ function DashboardLayoutContent({
             </div>
           </SidebarHeader>
 
-          <div className="mx-auto mt-5 grid h-[72px] w-[72px] place-items-center border border-[#b55b32]/70 bg-[#111312] font-serif text-3xl text-[#eae3d5] group-data-[collapsible=icon]:hidden">V</div>
+          <div className="relative mx-auto mt-5 grid h-[72px] w-[72px] place-items-center border border-[#b55b32]/70 bg-[#111312] font-serif text-3xl text-[#eae3d5] group-data-[collapsible=icon]:hidden"><span className="relative z-10">V</span><span className="absolute left-2 right-2 top-2 h-7 rounded-full border border-[#83a89a]/55" /><span className="absolute bottom-3 h-px w-11 rotate-[-18deg] bg-[#b55b32]" /></div>
           <p className="mt-2 text-center text-[8px] font-bold uppercase tracking-[0.2em] text-[#83a89a] group-data-[collapsible=icon]:hidden">VEY-17 · autent.</p>
           <SidebarContent className="mt-5 gap-0 border-t border-white/10 pt-3">
             <SidebarMenu className="px-2 py-1">

@@ -79,3 +79,6 @@ Um monograma abstrato que une a letra **V** a um marco de vau e um arco de eclip
 - O cobre de Brasa será reservado a ações, selos, avisos, registros ativos e marcadores de legado; linhas investigativas, coordenadas e anotações marginais reforçarão a continuidade do dossiê entre as seções.
 - Todo painel interativo deve se comportar visualmente como formulário de arquivo, livro-caixa, ficha de caso ou registro carimbado; rótulos e controles adotam a voz de consulta, preparação e manuseio de evidências.
 - Fichas, cofre local, trilhas de dano e rolagens rápidas devem aparecer como instrumentos de arquivo: registros numerados, campos clínicos, estados carimbados e marcações de consulta, sem linguagem de painel SaaS genérico.
+- A Biblioteca de Antagonistas deve usar um formulário de consulta com gavetas, códigos de acesso e linhas pontilhadas, preservando a função de filtro sem recorrer a linguagem de painel genérico.
+- A ameaça cataclísmica recebe um dossiê de largura ampliada, para que a hierarquia de risco seja percebida antes da leitura dos detalhes.
+- Metadados de materiais externos aparecem traduzidos para a voz do arquivo — guia, cenário, pasta, dossiê, referenciado, catalogado e integrado — e preservam sempre um vínculo direto com a fonte.
