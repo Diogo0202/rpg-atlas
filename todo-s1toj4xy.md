@@ -14,3 +14,7 @@
 - [x] Implementar criação de personagem, retrato local, persistência no navegador e guia de criação.
 - [x] Implementar rolagem animada com dados normais e dados de Fome.
 - [x] Validar o Arquivo de Personagens em desktop e mobile, salvar checkpoint e entregar a atualização.
+- [x] Modelar o cofre local de personagens, atalhos de rolagem e trilhas de dano.
+- [x] Implementar salvamento e carregamento de fichas no navegador.
+- [x] Implementar rolagens rápidas e rastreadores de Vitalidade e Força de Vontade.
+- [x] Validar os novos controles em desktop e mobile, salvar checkpoint e entregar a atualização.

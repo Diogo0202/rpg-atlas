@@ -78,3 +78,4 @@ Um monograma abstrato que une a letra **V** a um marco de vau e um arco de eclip
 - O selo de Veyr combina um monograma V, arco de eclipse e marca de travessia, aparecendo em herói, trilha lateral, registros principais e rodapé como carimbo de autenticação.
 - O cobre de Brasa será reservado a ações, selos, avisos, registros ativos e marcadores de legado; linhas investigativas, coordenadas e anotações marginais reforçarão a continuidade do dossiê entre as seções.
 - Todo painel interativo deve se comportar visualmente como formulário de arquivo, livro-caixa, ficha de caso ou registro carimbado; rótulos e controles adotam a voz de consulta, preparação e manuseio de evidências.
+- Fichas, cofre local, trilhas de dano e rolagens rápidas devem aparecer como instrumentos de arquivo: registros numerados, campos clínicos, estados carimbados e marcações de consulta, sem linguagem de painel SaaS genérico.
