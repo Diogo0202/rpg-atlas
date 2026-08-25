@@ -39,3 +39,8 @@
 - [x] Validar e salvar a atualização de exportação.
 - [x] Adicionar filtros de tipo e raridade ao gerador de itens.
 - [x] Implementar exportação Markdown do dossiê global da campanha ativa.
+- [ ] Criar modelos de exportação Sessão, Campanha e Mestre.
+- [ ] Adicionar sumário clicável aos documentos Markdown exportados.
+- [x] Validar e salvar a atualização dos modelos de documento.
+- [x] Criar modelos de exportação Sessão, Campanha e Mestre.
+- [x] Adicionar sumário clicável aos documentos Markdown exportados.
