@@ -285,6 +285,7 @@ export default function NarratorTools() {
             <h2 className="mt-5 font-serif text-[58px] leading-[0.88] tracking-[-0.05em] sm:text-[76px]">Ganchos, rostos<br />e consequências.</h2>
             <p className="mt-8 max-w-[420px] text-[17px] leading-8 text-[#484b45]">Ferramentas prontas para abrir uma cena quando a mesa toma um desvio inesperado. Todo resultado preserva o princípio de Veyr: ambiente, testemunha e memória em risco.</p>
             <div className="mt-10 border-y border-[#161715]/15 py-6 text-[13px] leading-6 text-[#585b53]"><strong className="font-semibold text-[#161715]">Procedimento:</strong> ajuste a tensão da facção, escolha o tom, gere o registro e salve apenas o que a sessão vai recuperar depois. Os dados ficam no armazenamento local deste navegador.</div>
+            <div className="mt-8 border-l border-dashed border-[#7a876d]/70 pl-5"><p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#7a876d]">Marginalia de sessão · N-04</p><p className="mt-3 font-serif text-[25px] leading-[0.98] text-[#2d302c]">“Nenhuma consequência existe sem uma testemunha.”</p><p className="mt-4 text-[11px] leading-5 text-[#65675f]">Coord. 09°N / 13°R · Preserve o que a mesa não quer perder de vista.</p></div>
           </div>
 
           <div className="grid gap-7">

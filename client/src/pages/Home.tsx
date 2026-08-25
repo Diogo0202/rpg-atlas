@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { ArrowRight, ChevronRight, Compass, Crosshair, Menu, ScrollText, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CharacterArchive from "@/components/CharacterArchive";
 import NarratorTools from "@/components/NarratorTools";
 
 const visualAssets = {
@@ -116,26 +117,28 @@ function DossierRail({ onNavigate }: { onNavigate: (id: string) => void }) {
     ["03", "Método", "metodo"],
     ["04", "Mesa", "mesa"],
     ["05", "Crônicas", "cronicas"],
-    ["06", "Narrador", "narrador"],
+    ["06", "Fichas", "fichas"],
+    ["07", "Narrador", "narrador"],
   ];
 
   return (
-    <aside className="dossier-grid fixed bottom-0 left-0 top-[74px] z-40 hidden w-[160px] border-r border-white/10 bg-[#0e100f] lg:flex lg:flex-col lg:items-center">
-      <div className="flex h-[160px] w-full flex-col items-center justify-center border-b border-white/10">
-        <p className="mb-3 text-[7px] font-bold uppercase tracking-[0.2em] text-[#83a89a]">RPG Atlas · Veyr</p>
-        <VeyrSeal className="h-[88px] w-[88px]" label="Selo de autenticação do arquivo de Veyr" />
-        <span className="mt-2 bg-[#0e100f] px-1 text-[8px] font-bold tracking-[0.22em] text-[#83a89a]">V-17 · AUT.</span>
+    <aside className="dossier-grid fixed bottom-0 left-0 top-[74px] z-40 hidden w-[184px] border-r border-[#b55b32]/45 bg-[#0a0c0b] shadow-[12px_0_28px_rgba(0,0,0,0.24)] lg:flex lg:flex-col lg:items-center">
+      <div className="flex h-[190px] w-full flex-col items-center justify-center border-b border-white/10">
+        <p className="text-[7px] font-bold uppercase tracking-[0.25em] text-[#83a89a]">Arquivo Central</p>
+        <p className="mt-2 font-serif text-[18px] tracking-[0.18em] text-[#eae3d5]">RPG ATLAS</p>
+        <VeyrSeal className="mt-3 h-[94px] w-[94px]" label="Selo de autenticação do arquivo de Veyr" />
+        <span className="mt-2 bg-[#0a0c0b] px-1 text-[8px] font-bold tracking-[0.22em] text-[#83a89a]">VEY-17 · AUT.</span>
       </div>
-      <div className="relative flex w-full flex-1 flex-col items-center py-4">
+      <div className="relative flex w-full flex-1 flex-col items-center py-2">
         <span className="absolute top-0 h-full border-l border-dashed border-[#83a89a]/35" />
         {chapters.map(([number, label, id]) => (
-          <button key={id} onClick={() => onNavigate(id)} className="group relative z-10 mb-2 flex h-[54px] w-full flex-col items-center justify-center gap-1 bg-[#0e100f] text-center">
-            <span className="font-serif text-[19px] leading-none text-[#b55b32] transition-transform duration-150 group-hover:-translate-y-1">{number}</span>
-            <span className="text-[8px] font-bold uppercase tracking-[0.14em] text-[#9b978c] transition-colors duration-150 group-hover:text-[#eae3d5]">{label}</span>
+          <button key={id} onClick={() => onNavigate(id)} className="group relative z-10 mb-1 flex h-[50px] w-full flex-col items-center justify-center gap-1 bg-[#0a0c0b] text-center before:absolute before:bottom-1/2 before:right-0 before:h-px before:w-5 before:bg-[#b55b32]/0 before:transition-colors before:duration-150 hover:before:bg-[#b55b32]/75">
+            <span className="font-serif text-[20px] leading-none text-[#b55b32] transition-transform duration-150 group-hover:-translate-y-1">{number}</span>
+            <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-[#9b978c] transition-colors duration-150 group-hover:text-[#eae3d5]">{label}</span>
           </button>
         ))}
       </div>
-      <div className="w-full border-t border-white/10 px-3 py-4 text-center text-[8px] font-bold uppercase tracking-[0.16em] text-[#83a89a]">Arquivo<br />autenticado<br /><span className="text-[#b55b32]">registro 04</span></div>
+      <div className="w-full border-t border-white/10 px-3 py-4 text-center text-[8px] font-bold uppercase tracking-[0.18em] text-[#83a89a]">trilha<br />autenticada<br /><span className="text-[#b55b32]">registro 04</span></div>
     </aside>
   );
 }
@@ -156,7 +159,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen overflow-x-clip bg-[#111312] text-[#eae3d5] selection:bg-[#b55b32] selection:text-[#111312]">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#111312]/92 backdrop-blur-xl lg:pl-[160px]">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#111312]/92 backdrop-blur-xl lg:pl-[184px]">
         <div className="mx-auto flex h-[74px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-10">
           <button onClick={() => navigate("inicio")} className="group flex items-center gap-3 text-left xl:hidden" aria-label="Voltar ao início">
             <img src={visualAssets.sigil} alt="Selo de Veyr" className="h-10 w-10 object-contain transition-transform duration-200 group-hover:-rotate-6" />
@@ -189,7 +192,7 @@ export default function Home() {
         {menuOpen && (
           <div className="border-t border-white/10 bg-[#171a18] px-5 py-5 lg:hidden">
             <div className="flex flex-col gap-4">
-              {[["Campanha", "campanha"], ["Facções", "faccoes"], ["Método", "metodo"], ["Guia de mesa", "mesa"], ["Crônicas", "cronicas"], ["Narrador", "narrador"]].map(([label, id]) => (
+              {[["Campanha", "campanha"], ["Facções", "faccoes"], ["Método", "metodo"], ["Guia de mesa", "mesa"], ["Crônicas", "cronicas"], ["Fichas", "fichas"], ["Narrador", "narrador"]].map(([label, id]) => (
                 <button key={id} onClick={() => navigate(id)} className="text-left text-[13px] font-semibold uppercase tracking-[0.14em] text-[#d8d2c6]">{label}</button>
               ))}
             </div>
@@ -198,7 +201,7 @@ export default function Home() {
       </header>
 
       <DossierRail onNavigate={navigate} />
-      <main className="lg:pl-[160px]">
+      <main className="lg:pl-[184px]">
         <section id="inicio" className="relative isolate min-h-[760px] border-b border-white/10 bg-[#111312]">
           <img src={visualAssets.hero} alt="Véspera do Vau ao cair da noite" className="absolute inset-0 -z-20 h-full w-full object-cover object-center" />
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(17,19,18,0.97)_0%,rgba(17,19,18,0.9)_34%,rgba(17,19,18,0.42)_70%,rgba(17,19,18,0.76)_100%)]" />
@@ -433,6 +436,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <CharacterArchive />
 
         <NarratorTools />
 

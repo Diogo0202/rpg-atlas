@@ -10,3 +10,7 @@
 - [x] Modelar filtros da linha do tempo por facção e sessão, além do documento Markdown de exportação.
 - [x] Implementar a consulta filtrada e a exportação completa de crises em Markdown.
 - [x] Validar filtros e exportação em desktop e mobile, salvar checkpoint e entregar a atualização.
+- [x] Modelar a ficha editável V5, clãs homebrew, poderes e cálculo de reserva de dados.
+- [x] Implementar criação de personagem, retrato local, persistência no navegador e guia de criação.
+- [x] Implementar rolagem animada com dados normais e dados de Fome.
+- [x] Validar o Arquivo de Personagens em desktop e mobile, salvar checkpoint e entregar a atualização.
