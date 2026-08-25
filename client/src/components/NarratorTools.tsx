@@ -3,7 +3,7 @@
  * not generic dashboard widgets. State remains private to the browser.
  */
 import { useEffect, useState } from "react";
-import { Check, Clock3, Copy, Dices, Heart, Minus, Plus, RefreshCw, Trash2, UserRound } from "lucide-react";
+import { Check, Clock3, Copy, Dices, Download, FileText, Heart, Minus, Plus, RefreshCw, Trash2, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Territory = "Véspera do Vau" | "Ermo de Karzath" | "Velas Mortas";
@@ -14,6 +14,8 @@ type Hook = {
   code: string;
   title: string;
   territory: Territory;
+  factionId: string;
+  faction: string;
   premise: string;
   pressure: string;
   witness: string;
@@ -36,8 +38,9 @@ type Npc = {
 };
 
 type Favorite = { id: string; kind: FavoriteKind; title: string; summary: string; record: string };
+type SessionSummary = { title: string; happenings: string; decisions: string; nextScene: string };
 
-const hooksByTerritory: Record<Territory, Omit<Hook, "code" | "territory">[]> = {
+const hooksByTerritory: Record<Territory, Omit<Hook, "code" | "territory" | "factionId" | "faction">[]> = {
   "Véspera do Vau": [
     { title: "A lista que cresce sozinha", premise: "Uma lista de travessias começa a registrar nomes de pessoas que ainda não cruzaram o Rio Cinéreo.", pressure: "O Conselho dos Marcos exige silêncio antes que a Companhia do Sal Negro use a lista para vender proteção.", witness: "Uma aprendiz de escrivã viu um nome ser escrito por uma mão molhada dentro do próprio livro.", memory: "A última travessia de um parente desaparecido voltou a constar como paga.", reward: "Um salvo-conduto pelos marcos e um nome verdadeiro esquecido.", escalation: "Se a lista alcançar doze nomes, o Sino de Namar chama todos ao mesmo tempo." },
     { title: "O quarto toque", premise: "Três toques do Sino de Namar são rotina; o quarto anuncia que a cidade perdeu uma memória coletiva.", pressure: "A Lanterna de Sal quer isolar as margens, mas a população teme que o bloqueio esconda uma prisão.", witness: "Um barqueiro afirma ter levado uma mulher sem rosto para o centro do rio.", memory: "A canção que cada Herói aprendeu na infância perdeu um verso essencial.", reward: "Acesso a uma rota de sal que não existe em mapas públicos.", escalation: "Cada noite sem resposta transforma mais uma casa em endereço sem dono." },
@@ -70,6 +73,8 @@ const tensionFactions = [
 ];
 
 const tensionStages = ["Calma aparente", "Sussurros", "Pressão aberta", "Pânico", "Ruptura", "Confronto", "Consequência irreversível"];
+const defaultTensions = { conselho: 1, lanterna: 1, companhia: 2, vidreiros: 1, velas: 1 };
+const emptySession: SessionSummary = { title: "", happenings: "", decisions: "", nextScene: "" };
 const npcNames = ["Mara Veld", "Ivo Cantar", "Noa Cinzamar", "Rian da Ponte", "Talma Breu", "Elen Vidro", "Daro Avel", "Sila Orvalho", "Bren Salferro", "Yara Vau"];
 const npcRoles = ["escrivã de marcos", "barqueiro de juramentos", "ferreira sem nome", "vigia de lanterna", "contrabandista de memória", "devota das velas", "batedor de cinzas", "curadora de Fadiga", "negociador da Cidadela", "mensageira do pântano"];
 const npcAppearances = ["Dedos manchados de sal e um casaco que cheira a rio.", "Um olho de vidro negro e luvas de trabalho queimadas.", "Cabelos presos por uma tira de cobre; fala olhando para as rotas, não para as pessoas.", "Veste luto antigo, mas carrega uma lanterna impecável.", "Tem cinza sob as unhas e uma voz baixa demais para a distância."];
@@ -84,10 +89,15 @@ function number(min: number, max: number) { return Math.floor(Math.random() * (m
 function clamp(value: number, min: number, max: number) { return Math.min(Math.max(value, min), max); }
 function safeLoad<T>(key: string, fallback: T): T { try { const raw = window.localStorage.getItem(key); return raw ? JSON.parse(raw) as T : fallback; } catch { return fallback; } }
 
-function createHook(territory: Territory, tone: Tone): Hook {
+function dominantFaction(tensions: Record<string, number>) {
+  return tensionFactions.reduce((leader, faction) => (tensions[faction.id] ?? 0) > (tensions[leader.id] ?? 0) ? faction : leader, tensionFactions[0]);
+}
+
+function createHook(territory: Territory, tone: Tone, tensions: Record<string, number> = defaultTensions): Hook {
   const candidates = hooksByTerritory[territory].filter((item) => tone === "Qualquer tom" || hookTones[item.title]?.includes(tone));
   const base = pick(candidates.length > 0 ? candidates : hooksByTerritory[territory]);
-  return { ...base, territory, code: `G-${territory.slice(0, 2).toUpperCase()}-${number(11, 99)}` };
+  const faction = dominantFaction(tensions);
+  return { ...base, territory, factionId: faction.id, faction: faction.name, code: `G-${territory.slice(0, 2).toUpperCase()}-${number(11, 99)}` };
 }
 
 function createNpc(): Npc {
@@ -104,24 +114,38 @@ function CopyRecord({ text }: { text: string }) {
 export default function NarratorTools() {
   const [territory, setTerritory] = useState<Territory>("Véspera do Vau");
   const [tone, setTone] = useState<Tone>("Qualquer tom");
-  const [hook, setHook] = useState<Hook>(() => createHook("Véspera do Vau", "Qualquer tom"));
+  const [tensions, setTensions] = useState<Record<string, number>>(() => safeLoad<Record<string, number>>("rpg-atlas-tension-v1", defaultTensions));
+  const [hook, setHook] = useState<Hook>(() => createHook("Véspera do Vau", "Qualquer tom", defaultTensions));
   const [npc, setNpc] = useState<Npc>(() => createNpc());
   const [favorites, setFavorites] = useState<Favorite[]>(() => safeLoad<Favorite[]>("rpg-atlas-favorites-v1", []));
-  const [tensions, setTensions] = useState<Record<string, number>>(() => safeLoad<Record<string, number>>("rpg-atlas-tension-v1", { conselho: 1, lanterna: 1, companhia: 2, vidreiros: 1, velas: 1 }));
+  const [sessionSummary, setSessionSummary] = useState<SessionSummary>(() => safeLoad<SessionSummary>("rpg-atlas-session-v1", emptySession));
   const [activeFactionId, setActiveFactionId] = useState("companhia");
 
   useEffect(() => { window.localStorage.setItem("rpg-atlas-favorites-v1", JSON.stringify(favorites)); }, [favorites]);
   useEffect(() => { window.localStorage.setItem("rpg-atlas-tension-v1", JSON.stringify(tensions)); }, [tensions]);
+  useEffect(() => { window.localStorage.setItem("rpg-atlas-session-v1", JSON.stringify(sessionSummary)); }, [sessionSummary]);
 
-  const hookText = `${hook.title}\n${hook.territory} · ${hook.code}\nTom: ${tone}\nPremissa: ${hook.premise}\nPressão: ${hook.pressure}\nTestemunha: ${hook.witness}\nMemória em risco: ${hook.memory}\nRecompensa: ${hook.reward}\nEscalada: ${hook.escalation}`;
+  const hookText = `${hook.title}\n${hook.territory} · ${hook.code}\nTom: ${tone}\nFacção vinculada: ${hook.faction}\nPremissa: ${hook.premise}\nPressão: ${hook.pressure}\nTestemunha: ${hook.witness}\nMemória em risco: ${hook.memory}\nRecompensa: ${hook.reward}\nEscalada: ${hook.escalation}`;
   const npcText = `${npc.name} · ${npc.role} · ${npc.code}\nAparência: ${npc.appearance}\nDesejo: ${npc.desire}\nMedo: ${npc.fear}\nSegredo: ${npc.secret}\nOferta: ${npc.offer}\nTraição possível: ${npc.betrayal}\nCorpo ${npc.profile.body} · Coração ${npc.profile.heart} · Esperteza ${npc.profile.wits} · Resistência ${npc.profile.resistance} · Esperança ${npc.profile.hope}`;
   const activeFaction = tensionFactions.find((faction) => faction.id === activeFactionId) ?? tensionFactions[0];
   const activeTension = tensions[activeFaction.id] ?? 0;
   const isSaved = (id: string) => favorites.some((favorite) => favorite.id === id);
   const toggleFavorite = (favorite: Favorite) => setFavorites((current) => current.some((item) => item.id === favorite.id) ? current.filter((item) => item.id !== favorite.id) : [favorite, ...current].slice(0, 16));
   const changeTension = (id: string, delta: number) => setTensions((current) => ({ ...current, [id]: clamp((current[id] ?? 0) + delta, 0, 6) }));
+  const generateHook = (nextTerritory = territory, nextTone = tone) => { const generated = createHook(nextTerritory, nextTone, tensions); setHook(generated); setActiveFactionId(generated.factionId); };
+  const exportFavorites = () => {
+    if (!favorites.length) return;
+    const content = ["# RPG Atlas — Registros Favoritos", "", `Exportado em ${new Date().toLocaleString("pt-BR")}.`, "", ...favorites.flatMap((favorite, index) => [`## ${index + 1}. ${favorite.kind} — ${favorite.title}`, "", `> ${favorite.summary}`, "", favorite.record, ""])].join("\n");
+    const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "rpg-atlas-favoritos.md";
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
 
-  const hookFavorite: Favorite = { id: hook.code, kind: "Gancho", title: hook.title, summary: `${hook.territory} · ${tone}`, record: hookText };
+  const hookFavorite: Favorite = { id: hook.code, kind: "Gancho", title: hook.title, summary: `${hook.territory} · ${tone} · ${hook.faction}`, record: hookText };
   const npcFavorite: Favorite = { id: npc.code, kind: "NPC", title: npc.name, summary: npc.role, record: npcText };
 
   return (
@@ -149,8 +173,8 @@ export default function NarratorTools() {
 
             <article className="border border-[#161715]/20 bg-[#eee7db]/85 p-6 sm:p-8">
               <div className="flex flex-col justify-between gap-5 border-b border-[#161715]/15 pb-5 sm:flex-row sm:items-start"><div><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.17em] text-[#b55b32]"><Dices className="h-3.5 w-3.5" /> Gerador de gancho</div><h3 className="mt-3 font-serif text-[34px] leading-none">Registro de incidente</h3></div><div className="flex items-center gap-4"><CopyRecord text={hookText} /><button onClick={() => toggleFavorite(hookFavorite)} className={`grid h-8 w-8 place-items-center border ${isSaved(hook.code) ? "border-[#b55b32] bg-[#b55b32] text-[#161715]" : "border-[#161715]/25 text-[#b55b32]"}`} aria-label="Salvar gancho nos favoritos"><Heart className={`h-4 w-4 ${isSaved(hook.code) ? "fill-current" : ""}`} /></button></div></div>
-              <div className="mt-6 grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end"><label className="flex flex-col gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#65675f]">Território<select value={territory} onChange={(event) => { const next = event.target.value as Territory; setTerritory(next); setHook(createHook(next, tone)); }} className="h-11 border border-[#161715]/25 bg-transparent px-3 text-[13px] font-semibold normal-case tracking-normal text-[#161715] outline-none focus:border-[#b55b32]">{(Object.keys(hooksByTerritory) as Territory[]).map((item) => <option key={item}>{item}</option>)}</select></label><label className="flex flex-col gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#65675f]">Tom da aventura<select value={tone} onChange={(event) => { const next = event.target.value as Tone; setTone(next); setHook(createHook(territory, next)); }} className="h-11 border border-[#161715]/25 bg-transparent px-3 text-[13px] font-semibold normal-case tracking-normal text-[#161715] outline-none focus:border-[#b55b32]">{(["Qualquer tom", "Investigação", "Horror", "Intriga", "Sobrevivência"] as Tone[]).map((item) => <option key={item}>{item}</option>)}</select></label><Button onClick={() => setHook(createHook(territory, tone))} className="h-11 rounded-none bg-[#b55b32] px-5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#161715] hover:bg-[#d27648]"><RefreshCw className="mr-2 h-4 w-4" /> Gerar</Button></div>
-              <div className="mt-7 border-l-2 border-[#b55b32] pl-5"><div className="flex flex-wrap items-center gap-x-3 gap-y-2"><span className="font-serif text-[31px] leading-none">{hook.title}</span><span className="border border-[#b55b32]/35 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#b55b32]">{hook.code}</span><span className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#7a876d]">{tone}</span></div><p className="mt-3 text-[15px] leading-7 text-[#3f423b]">{hook.premise}</p></div>
+              <div className="mt-6 grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end"><label className="flex flex-col gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#65675f]">Território<select value={territory} onChange={(event) => { const next = event.target.value as Territory; setTerritory(next); generateHook(next, tone); }} className="h-11 border border-[#161715]/25 bg-transparent px-3 text-[13px] font-semibold normal-case tracking-normal text-[#161715] outline-none focus:border-[#b55b32]">{(Object.keys(hooksByTerritory) as Territory[]).map((item) => <option key={item}>{item}</option>)}</select></label><label className="flex flex-col gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#65675f]">Tom da aventura<select value={tone} onChange={(event) => { const next = event.target.value as Tone; setTone(next); generateHook(territory, next); }} className="h-11 border border-[#161715]/25 bg-transparent px-3 text-[13px] font-semibold normal-case tracking-normal text-[#161715] outline-none focus:border-[#b55b32]">{(["Qualquer tom", "Investigação", "Horror", "Intriga", "Sobrevivência"] as Tone[]).map((item) => <option key={item}>{item}</option>)}</select></label><Button onClick={() => generateHook()} className="h-11 rounded-none bg-[#b55b32] px-5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#161715] hover:bg-[#d27648]"><RefreshCw className="mr-2 h-4 w-4" /> Gerar</Button></div>
+              <div className="mt-7 border-l-2 border-[#b55b32] pl-5"><div className="flex flex-wrap items-center gap-x-3 gap-y-2"><span className="font-serif text-[31px] leading-none">{hook.title}</span><span className="border border-[#b55b32]/35 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#b55b32]">{hook.code}</span><span className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#7a876d]">{tone}</span></div><p className="mt-3 text-[15px] leading-7 text-[#3f423b]">{hook.premise}</p><div className="mt-4 flex items-center gap-2 border-t border-[#161715]/15 pt-3 text-[10px] font-bold uppercase tracking-[0.14em] text-[#6b6e66]"><span className="h-2 w-2 bg-[#b55b32]" /> Vínculo automático: <button onClick={() => setActiveFactionId(hook.factionId)} className="text-[#8a4630] underline decoration-dotted underline-offset-4">{hook.faction}</button> é a facção mais tensa.</div></div>
               <div className="mt-7 grid border-t border-[#161715]/15 sm:grid-cols-2">{[["Pressão", hook.pressure], ["Testemunha", hook.witness], ["Memória em risco", hook.memory], ["Recompensa", hook.reward], ["Escalada", hook.escalation]].map(([label, value], index) => <div key={label} className={`p-4 ${index < 4 ? "border-b border-[#161715]/15" : ""} ${index % 2 === 0 ? "sm:border-r" : ""}`}><p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#7a876d]">{label}</p><p className="mt-2 text-[13px] leading-6 text-[#4e5149]">{value}</p></div>)}</div>
             </article>
 
@@ -161,7 +185,8 @@ export default function NarratorTools() {
               <div className="mt-6 flex gap-6 border-t border-white/10 pt-4 text-[11px] font-bold uppercase tracking-[0.12em] text-[#a6a397]"><span>Resistência <strong className="ml-1 text-[#eae3d5]">{npc.profile.resistance}</strong></span><span>Esperança <strong className="ml-1 text-[#eae3d5]">{npc.profile.hope}</strong></span></div>
             </article>
 
-            <article className="border border-[#161715]/20 bg-[#e3dccf]/90 p-6 sm:p-8"><div className="flex items-center justify-between border-b border-[#161715]/15 pb-5"><div><p className="text-[10px] font-bold uppercase tracking-[0.17em] text-[#b55b32]">Arquivo pessoal</p><h3 className="mt-2 font-serif text-[32px] leading-none">Favoritos da sessão <span className="text-[#b55b32]">{favorites.length}</span></h3></div><Heart className="h-5 w-5 text-[#b55b32]" /></div>{favorites.length === 0 ? <p className="mt-6 text-[14px] leading-6 text-[#5e6058]">Nenhum registro salvo ainda. Use o selo de coração em um gancho ou NPC para mantê-lo disponível nesta sessão e nas próximas visitas neste navegador.</p> : <div className="mt-5 grid gap-3">{favorites.map((favorite) => <div key={favorite.id} className="flex items-start justify-between gap-4 border-l-2 border-[#b55b32] bg-[#eee7db] p-4"><button onClick={() => navigator.clipboard?.writeText(favorite.record)} className="text-left"><p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#7a876d]">{favorite.kind} · {favorite.summary}</p><p className="mt-2 font-serif text-[23px] leading-none">{favorite.title}</p></button><button onClick={() => setFavorites((current) => current.filter((item) => item.id !== favorite.id))} className="grid h-8 w-8 place-items-center border border-[#161715]/20 text-[#8a4630]" aria-label={`Remover ${favorite.title} dos favoritos`}><Trash2 className="h-4 w-4" /></button></div>)}</div>}</article>
+            <article className="border border-[#161715]/20 bg-[#e3dccf]/90 p-6 sm:p-8"><div className="flex flex-col justify-between gap-4 border-b border-[#161715]/15 pb-5 sm:flex-row sm:items-center"><div><p className="text-[10px] font-bold uppercase tracking-[0.17em] text-[#b55b32]">Arquivo pessoal</p><h3 className="mt-2 font-serif text-[32px] leading-none">Favoritos da sessão <span className="text-[#b55b32]">{favorites.length}</span></h3></div><Button onClick={exportFavorites} disabled={!favorites.length} variant="outline" className="h-10 rounded-none border-[#161715]/30 bg-transparent px-4 text-[10px] font-bold uppercase tracking-[0.13em] text-[#161715] hover:bg-[#161715] hover:text-[#eae3d5] disabled:opacity-35"><Download className="mr-2 h-3.5 w-3.5" /> Exportar .md</Button></div>{favorites.length === 0 ? <p className="mt-6 text-[14px] leading-6 text-[#5e6058]">Nenhum registro salvo ainda. Use o selo de coração em um gancho ou NPC para mantê-lo disponível nesta sessão e nas próximas visitas neste navegador.</p> : <div className="mt-5 grid gap-3">{favorites.map((favorite) => <div key={favorite.id} className="flex items-start justify-between gap-4 border-l-2 border-[#b55b32] bg-[#eee7db] p-4"><button onClick={() => navigator.clipboard?.writeText(favorite.record)} className="text-left"><p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#7a876d]">{favorite.kind} · {favorite.summary}</p><p className="mt-2 font-serif text-[23px] leading-none">{favorite.title}</p></button><button onClick={() => setFavorites((current) => current.filter((item) => item.id !== favorite.id))} className="grid h-8 w-8 place-items-center border border-[#161715]/20 text-[#8a4630]" aria-label={`Remover ${favorite.title} dos favoritos`}><Trash2 className="h-4 w-4" /></button></div>)}</div>}</article>
+            <article className="bg-[#171a18] p-6 text-[#eae3d5] sm:p-8"><div className="flex flex-col justify-between gap-5 border-b border-white/10 pb-5 sm:flex-row sm:items-start"><div><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.17em] text-[#83a89a]"><FileText className="h-3.5 w-3.5" /> Diário da sessão</div><h3 className="mt-3 font-serif text-[34px] leading-none">Resumo em andamento</h3></div><span className="border border-[#83a89a]/45 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#83a89a]">salvo localmente</span></div><div className="mt-6 grid gap-4 sm:grid-cols-2"><label className="flex flex-col gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#a6a397] sm:col-span-2">Sessão<input value={sessionSummary.title} onChange={(event) => setSessionSummary((current) => ({ ...current, title: event.target.value }))} placeholder="Ex.: Sessão 04 — O quarto toque" className="h-11 border border-white/15 bg-white/[0.03] px-3 text-[14px] font-medium normal-case tracking-normal text-[#eae3d5] outline-none placeholder:text-[#777a72] focus:border-[#b55b32]" /></label><label className="flex flex-col gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#a6a397]">Acontecimentos principais<textarea value={sessionSummary.happenings} onChange={(event) => setSessionSummary((current) => ({ ...current, happenings: event.target.value }))} placeholder="O que mudou na história?" className="min-h-[118px] resize-y border border-white/15 bg-white/[0.03] p-3 text-[13px] leading-6 font-normal normal-case tracking-normal text-[#eae3d5] outline-none placeholder:text-[#777a72] focus:border-[#b55b32]" /></label><label className="flex flex-col gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#a6a397]">Decisões dos jogadores<textarea value={sessionSummary.decisions} onChange={(event) => setSessionSummary((current) => ({ ...current, decisions: event.target.value }))} placeholder="Que escolhas abriram ou fecharam rotas?" className="min-h-[118px] resize-y border border-white/15 bg-white/[0.03] p-3 text-[13px] leading-6 font-normal normal-case tracking-normal text-[#eae3d5] outline-none placeholder:text-[#777a72] focus:border-[#b55b32]" /></label><label className="flex flex-col gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#a6a397] sm:col-span-2">Próxima cena ou consequência<textarea value={sessionSummary.nextScene} onChange={(event) => setSessionSummary((current) => ({ ...current, nextScene: event.target.value }))} placeholder="O que deve cobrar resposta no próximo encontro?" className="min-h-[88px] resize-y border border-white/15 bg-white/[0.03] p-3 text-[13px] leading-6 font-normal normal-case tracking-normal text-[#eae3d5] outline-none placeholder:text-[#777a72] focus:border-[#b55b32]" /></label></div><div className="mt-5 flex justify-between border-t border-white/10 pt-4 text-[10px] font-bold uppercase tracking-[0.14em] text-[#a6a397]"><span>alterações salvas neste navegador</span><button onClick={() => setSessionSummary(emptySession)} className="text-[#d27648]">Limpar resumo</button></div></article>
           </div>
         </div>
       </div>

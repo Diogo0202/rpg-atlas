@@ -10,3 +10,10 @@
 - [x] Adicionar filtros interativos de tom aos ganchos de aventura.
 - [x] Persistir ganchos e NPCs favoritos no armazenamento local.
 - [x] Validar os novos controles e atualizar o checkpoint.
+- [ ] Vincular cada novo gancho à facção com maior tensão.
+- [ ] Criar painel de resumo da sessão persistente.
+- [ ] Exportar favoritos em arquivo Markdown.
+- [x] Vincular cada novo gancho à facção com maior tensão.
+- [x] Criar painel de resumo da sessão persistente.
+- [x] Exportar favoritos em arquivo Markdown.
+- [x] Validar e salvar a atualização da sessão.
