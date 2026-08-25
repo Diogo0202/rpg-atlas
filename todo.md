@@ -34,3 +34,8 @@
 - [x] Criar armazenamento local e alternância de campanhas.
 - [x] Implementar gerador de itens baseado na campanha ativa.
 - [x] Validar e salvar a atualização de preparação.
+- [ ] Adicionar filtros de tipo e raridade ao gerador de itens.
+- [ ] Implementar exportação Markdown do dossiê global da campanha ativa.
+- [x] Validar e salvar a atualização de exportação.
+- [x] Adicionar filtros de tipo e raridade ao gerador de itens.
+- [x] Implementar exportação Markdown do dossiê global da campanha ativa.
