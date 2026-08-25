@@ -23,3 +23,6 @@
 - [ ] Criar alerta visual para facção em Ruptura.
 - [x] Validar o alerta e salvar a atualização.
 - [x] Criar alerta visual para facção em Ruptura.
+- [ ] Permitir editar detalhes de NPCs na trilha lateral antes da exportação.
+- [x] Validar a edição lateral e salvar a atualização.
+- [x] Permitir editar detalhes de NPCs na trilha lateral antes da exportação.
