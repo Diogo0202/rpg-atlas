@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { AlertTriangle, Check, Clock3, Copy, Dices, Download, FileText, Heart, Minus, PencilLine, Plus, RefreshCw, Save, Trash2, UserRound, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import CampaignWorkbench from "@/components/CampaignWorkbench";
+import NpcPrintPreview from "@/components/NpcPrintPreview";
 
 type Territory = "Véspera do Vau" | "Ermo de Karzath" | "Velas Mortas";
 type Tone = "Qualquer tom" | "Investigação" | "Horror" | "Intriga" | "Sobrevivência";
@@ -273,6 +275,12 @@ export default function NarratorTools() {
     setNpc(editingNpc);
     setNpcEditorOpen(false);
   };
+  const duplicateCurrentNpc = () => {
+    const duplicate = { ...npc, code: `NPC-${number(100, 999)}`, name: `${npc.name} · variação` };
+    const favorite: Favorite = { id: duplicate.code, kind: "NPC", title: duplicate.name, summary: duplicate.role, record: formatNpcRecord(duplicate), npc: duplicate };
+    setFavorites((current) => [favorite, ...current.filter((item) => item.id !== favorite.id)].slice(0, 16));
+    setNpc(duplicate);
+  };
   const hookFavorite: Favorite = { id: hook.code, kind: "Gancho", title: hook.title, summary: `${hook.territory} · ${tone} · ${hook.faction}`, record: hookText };
   const npcFavorite: Favorite = { id: npc.code, kind: "NPC", title: npc.name, summary: npc.role, record: npcText, npc };
 
@@ -289,6 +297,7 @@ export default function NarratorTools() {
           </div>
 
           <div className="grid gap-7">
+            <CampaignWorkbench />
             <article className="bg-[#171a18] p-6 text-[#eae3d5] sm:p-8">
               <div className="flex flex-col justify-between gap-5 border-b border-white/10 pb-5 sm:flex-row sm:items-start"><div className="flex items-start gap-3"><span className="relative grid h-9 w-9 shrink-0 place-items-center border border-[#b55b32]/65 font-serif text-[21px] text-[#eae3d5]"><span className="absolute inset-1 rounded-t-full border-x border-t border-[#83a89a]/55" />V</span><div><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.17em] text-[#83a89a]"><Clock3 className="h-3.5 w-3.5" /> Relógio de consequências</div><h3 className="mt-3 font-serif text-[34px] leading-none">Tensão das facções</h3></div></div><span className="border border-[#b55b32]/45 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#d27648]">V-17 · persistente</span></div>
               <div className="mt-5 flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-[9px] font-bold uppercase tracking-[0.17em] text-[#a6a397]">Alertas de Ruptura</p><p className="mt-1 max-w-[520px] text-[12px] leading-5 text-[#aaa79c]">Configure os efeitos antes da crise. O pulso evidencia registros ativos; o som só toca após uma interação da mesa e pode ser desativado a qualquer momento.</p></div><div className="flex shrink-0 flex-wrap gap-2"><button onClick={() => { const enabling = !alertPreferences.sound; setAlertPreferences((current) => ({ ...current, sound: enabling })); if (enabling) playRuptureSound(true); }} aria-pressed={alertPreferences.sound} className={`flex h-9 items-center gap-2 border px-3 text-[9px] font-bold uppercase tracking-[0.13em] transition-colors duration-150 ${alertPreferences.sound ? "border-[#ffb09d] bg-[#ffb09d] text-[#3b1d19]" : "border-white/20 text-[#c9c3b8] hover:border-[#ffb09d]/65 hover:text-[#ffb09d]"}`}>{alertPreferences.sound ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}{alertPreferences.sound ? "Som ativo" : "Ativar som"}</button><button onClick={() => setAlertPreferences((current) => ({ ...current, pulse: !current.pulse }))} aria-pressed={alertPreferences.pulse} className={`h-9 border px-3 text-[9px] font-bold uppercase tracking-[0.13em] transition-colors duration-150 ${alertPreferences.pulse ? "border-[#b55b32]/70 text-[#d27648]" : "border-white/20 text-[#c9c3b8] hover:border-[#d27648]/65 hover:text-[#d27648]"}`}>Pulso {alertPreferences.pulse ? "ativo" : "inativo"}</button></div></div>
@@ -331,6 +340,7 @@ export default function NarratorTools() {
           </div>
         </div>
       </div>
+      <NpcPrintPreview npc={npc} onDuplicate={duplicateCurrentNpc} />
     </section>
   );
 }

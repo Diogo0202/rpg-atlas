@@ -115,3 +115,9 @@
     background-size: 32px 32px;
   }
 }
+
+@media print {
+  body * { visibility: hidden !important; }
+  .npc-print-sheet, .npc-print-sheet * { visibility: visible !important; }
+  .npc-print-sheet { position: absolute !important; inset: 0 !important; width: 100% !important; border: 0 !important; box-shadow: none !important; }
+}

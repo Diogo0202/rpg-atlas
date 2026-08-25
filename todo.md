@@ -26,3 +26,11 @@
 - [ ] Permitir editar detalhes de NPCs na trilha lateral antes da exportação.
 - [x] Validar a edição lateral e salvar a atualização.
 - [x] Permitir editar detalhes de NPCs na trilha lateral antes da exportação.
+- [ ] Adicionar prévia de impressão e duplicação de NPCs.
+- [ ] Criar armazenamento local e alternância de campanhas.
+- [ ] Implementar gerador de itens baseado na campanha ativa.
+- [ ] Validar e salvar a atualização de preparação.
+- [x] Adicionar prévia de impressão e duplicação de NPCs.
+- [x] Criar armazenamento local e alternância de campanhas.
+- [x] Implementar gerador de itens baseado na campanha ativa.
+- [x] Validar e salvar a atualização de preparação.
