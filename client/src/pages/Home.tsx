@@ -3,8 +3,9 @@
  * aged bone, ember copper and salt green. The page reads like a campaign dossier.
  */
 import { useState } from "react";
-import { ArrowRight, BookOpen, ChevronRight, Compass, Crosshair, Menu, ScrollText, Sparkles, X } from "lucide-react";
+import { ArrowRight, ChevronRight, Compass, Crosshair, Menu, ScrollText, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import NarratorTools from "@/components/NarratorTools";
 
 const visualAssets = {
   hero: "/manus-storage/veyr-hero_61927817.png",
@@ -69,6 +70,7 @@ function DossierRail({ onNavigate }: { onNavigate: (id: string) => void }) {
     ["02", "Facções", "faccoes"],
     ["03", "Método", "metodo"],
     ["04", "Mesa", "mesa"],
+    ["05", "Narrador", "narrador"],
   ];
 
   return (
@@ -122,6 +124,7 @@ export default function Home() {
               ["Facções", "faccoes"],
               ["Método", "metodo"],
               ["Guia de mesa", "mesa"],
+              ["Narrador", "narrador"],
             ].map(([label, id]) => (
               <button key={id} onClick={() => navigate(id)} className="text-[12px] font-semibold uppercase tracking-[0.15em] text-[#b8b3a8] transition-colors duration-150 hover:text-[#eae3d5]">
                 {label}
@@ -139,7 +142,7 @@ export default function Home() {
         {menuOpen && (
           <div className="border-t border-white/10 bg-[#171a18] px-5 py-5 lg:hidden">
             <div className="flex flex-col gap-4">
-              {[["Campanha", "campanha"], ["Facções", "faccoes"], ["Método", "metodo"], ["Guia de mesa", "mesa"]].map(([label, id]) => (
+              {[["Campanha", "campanha"], ["Facções", "faccoes"], ["Método", "metodo"], ["Guia de mesa", "mesa"], ["Narrador", "narrador"]].map(([label, id]) => (
                 <button key={id} onClick={() => navigate(id)} className="text-left text-[13px] font-semibold uppercase tracking-[0.14em] text-[#d8d2c6]">{label}</button>
               ))}
             </div>
@@ -308,6 +311,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <NarratorTools />
 
         <section className="relative border-y border-[#161715]/15 bg-[#b55b32] text-[#161715]">
           <div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-8 px-5 py-14 sm:px-8 md:flex-row md:items-end lg:px-10">

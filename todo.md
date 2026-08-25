@@ -1,0 +1,5 @@
+- [x] Modelar os dados de ganchos de aventura para Veyr.
+- [x] Modelar os dados de fichas rápidas de NPCs.
+- [x] Criar a seção interativa Ferramentas do Narrador.
+- [x] Validar os geradores em desktop e mobile.
+- [ ] Salvar checkpoint e entregar a atualização.
