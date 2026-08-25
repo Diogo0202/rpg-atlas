@@ -22,3 +22,7 @@
 - [x] Implementar penalidades automáticas e registro persistente das rolagens da sessão.
 - [x] Implementar exportação e importação segura de fichas em JSON.
 - [x] Validar cálculos, histórico e backup em desktop e mobile, salvar checkpoint e entregar a atualização.
+- [x] Habilitar o projeto full-stack e revisar as convenções de autenticação, banco e armazenamento.
+- [x] Modelar as entidades fundamentais e o núcleo modular para V5 e O Um Anel.
+- [x] Implementar a primeira base de dados, permissões e persistência de personagens.
+- [x] Validar a fundação operacional, salvar checkpoint e documentar a próxima etapa da plataforma.

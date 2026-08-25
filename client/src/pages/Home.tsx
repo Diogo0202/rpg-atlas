@@ -3,6 +3,7 @@
  * aged bone, ember copper and salt green. The page reads like a campaign dossier.
  */
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { ArrowRight, ChevronRight, Compass, Crosshair, Menu, ScrollText, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CharacterArchive from "@/components/CharacterArchive";
@@ -148,6 +149,7 @@ function scrollToSection(id: string) {
 }
 
 export default function Home() {
+  const [, setLocation] = useLocation();
   const [activeTerritory, setActiveTerritory] = useState(territories[0]);
   const [activeChronicle, setActiveChronicle] = useState(chronicles[0]);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -226,6 +228,9 @@ export default function Home() {
                 Um atlas para construir campanhas de horror, memória e território. Entre no registro de <strong className="font-semibold text-[#f4eee4]">A Coroa Partida</strong> e descubra o que as cidades de Veyr decidiram esquecer.
               </p>
               <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                <Button onClick={() => setLocation("/santuario")} className="group h-12 rounded-none border border-[#83a89a]/55 bg-[#83a89a]/10 px-6 text-[12px] font-bold uppercase tracking-[0.13em] text-[#eae3d5] hover:bg-[#83a89a]/20">
+                  Abrir santuário <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                </Button>
                 <Button onClick={() => navigate("campanha")} className="group h-12 rounded-none bg-[#b55b32] px-6 text-[12px] font-bold uppercase tracking-[0.13em] text-[#111312] hover:bg-[#d27648]">
                   Explorar a campanha <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </Button>
