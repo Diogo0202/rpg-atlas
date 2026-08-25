@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createCharacterForUser, listCharactersForUser, recordDiceRollForUser } from "../db";
+import { createCharacterForUser, listCharactersForUser, recordDiceRollForUser, updateCharacterForUser } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 
 const systemId = z.enum(["vampiro-v5", "o-um-anel"]);
@@ -13,6 +13,13 @@ export const charactersRouter = router({
     campaignId: z.number().int().positive().nullable().optional(),
     sheetData: z.record(z.string(), z.unknown()),
   })).mutation(({ ctx, input }) => createCharacterForUser({ ownerId: ctx.user.id, ...input })),
+  update: protectedProcedure.input(z.object({
+    characterId: z.number().int().positive(),
+    name: z.string().trim().min(2).max(160),
+    concept: z.string().trim().max(255).optional(),
+    campaignId: z.number().int().positive().nullable().optional(),
+    sheetData: z.record(z.string(), z.unknown()),
+  })).mutation(({ ctx, input }) => updateCharacterForUser({ ownerId: ctx.user.id, ...input })),
   recordRoll: protectedProcedure.input(z.object({
     systemId,
     characterId: z.number().int().positive().nullable().optional(),

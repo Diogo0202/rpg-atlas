@@ -8,6 +8,8 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import AntagonistLibrary from "./pages/AntagonistLibrary";
 import Sanctum from "./pages/Sanctum";
+import VampireSheet from "./pages/VampireSheet";
+import VampireStore from "./pages/VampireStore";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -16,6 +18,8 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/santuario" component={Sanctum} />
       <Route path="/biblioteca" component={AntagonistLibrary} />
+      <Route path="/ficha-v5" component={VampireSheet} />
+      <Route path="/arsenal-v5" component={VampireStore} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

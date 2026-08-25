@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { startLogin } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { BookOpen, LayoutDashboard, LogOut, PanelLeft, ScrollText, Skull } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, PanelLeft, ScrollText, Shield, Skull, UserRound } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -31,7 +31,9 @@ const menuItems = [
   { number: "01", icon: BookOpen, label: "Atlas público", path: "/" },
   { number: "02", icon: LayoutDashboard, label: "Santuário", path: "/santuario" },
   { number: "03", icon: Skull, label: "Antagonistas", path: "/biblioteca" },
-  { number: "04", icon: ScrollText, label: "Registro vivo", path: "/santuario" },
+  { number: "04", icon: UserRound, label: "Ficha V5", path: "/ficha-v5" },
+  { number: "05", icon: Shield, label: "Arsenal V5", path: "/arsenal-v5" },
+  { number: "06", icon: ScrollText, label: "Registro vivo", path: "/santuario" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

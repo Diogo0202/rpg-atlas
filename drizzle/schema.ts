@@ -64,6 +64,22 @@ export const campaignMembers = mysqlTable("campaignMembers", {
   index("campaign_members_user_idx").on(table.userId),
 ]);
 
+/** Sessões ordenadas de uma campanha, servindo como linha do tempo consultável. */
+export const campaignSessions = mysqlTable("campaignSessions", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
+  sequence: int("sequence").notNull(),
+  title: varchar("title", { length: 160 }).notNull(),
+  summary: text("summary"),
+  status: mysqlEnum("status", ["planned", "played", "archived"]).default("planned").notNull(),
+  playedAt: timestamp("playedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  uniqueIndex("campaign_sessions_sequence_unique").on(table.campaignId, table.sequence),
+  index("campaign_sessions_campaign_idx").on(table.campaignId),
+]);
+
 /** Ficha de personagem independente, com vínculo opcional à campanha e dados específicos em JSON. */
 export const characters = mysqlTable("characters", {
   id: int("id").autoincrement().primaryKey(),
@@ -138,11 +154,40 @@ export const sourceDocuments = mysqlTable("sourceDocuments", {
   index("source_documents_category_idx").on(table.category),
 ]);
 
+/** Participação de um antagonista em uma sessão específica da linha do tempo. */
+export const antagonistSessions = mysqlTable("antagonistSessions", {
+  id: int("id").autoincrement().primaryKey(),
+  antagonistId: int("antagonistId").notNull().references(() => antagonists.id, { onDelete: "cascade" }),
+  sessionId: int("sessionId").notNull().references(() => campaignSessions.id, { onDelete: "cascade" }),
+  role: mysqlEnum("role", ["rumor", "presence", "confrontation", "aftermath"]).default("presence").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("antagonist_sessions_unique").on(table.antagonistId, table.sessionId),
+  index("antagonist_sessions_session_idx").on(table.sessionId),
+]);
+
+/** Relação narrativa entre antagonista e ficha de personagem. */
+export const antagonistCharacters = mysqlTable("antagonistCharacters", {
+  id: int("id").autoincrement().primaryKey(),
+  antagonistId: int("antagonistId").notNull().references(() => antagonists.id, { onDelete: "cascade" }),
+  characterId: int("characterId").notNull().references(() => characters.id, { onDelete: "cascade" }),
+  relation: mysqlEnum("relation", ["enemy", "rival", "target", "ally", "patron", "debt"]).default("enemy").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("antagonist_characters_unique").on(table.antagonistId, table.characterId),
+  index("antagonist_characters_character_idx").on(table.characterId),
+]);
+
 export type RpgSystem = typeof rpgSystems.$inferSelect;
 export type Campaign = typeof campaigns.$inferSelect;
 export type CampaignMember = typeof campaignMembers.$inferSelect;
+export type CampaignSession = typeof campaignSessions.$inferSelect;
 export type Character = typeof characters.$inferSelect;
 export type InsertCharacter = typeof characters.$inferInsert;
 export type DiceRoll = typeof diceRolls.$inferSelect;
 export type Antagonist = typeof antagonists.$inferSelect;
 export type SourceDocument = typeof sourceDocuments.$inferSelect;
+export type AntagonistSession = typeof antagonistSessions.$inferSelect;
+export type AntagonistCharacter = typeof antagonistCharacters.$inferSelect;

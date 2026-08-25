@@ -26,3 +26,14 @@
 - [x] Modelar as entidades fundamentais e o núcleo modular para V5 e O Um Anel.
 - [x] Implementar a primeira base de dados, permissões e persistência de personagens.
 - [x] Validar a fundação operacional, salvar checkpoint e documentar a próxima etapa da plataforma.
+- [x] Modelar vínculos de antagonistas com campanhas, sessões e fichas de personagens.
+- [x] Implementar criação, edição e associação de antagonistas por campanha.
+- [x] Implementar busca contextual em dossiês e materiais catalogados.
+- [x] Validar os novos fluxos em desktop e mobile, salvar checkpoint e entregar a atualização.
+- [x] Classificar os materiais V5 do Drive para estruturar regras, progressão e compras.
+- [x] Implementar clãs, disciplinas, poderes, predadores, geração e méritos/falhas na ficha V5.
+- [x] Adicionar arsenal de armas e armaduras e catálogo de aquisições com especificações.
+- [x] Validar ficha, cálculos e catálogos em desktop e mobile, salvar checkpoint e entregar a atualização.
+- [x] Expandir a ficha V5 com catálogo estruturado de linhagens, disciplinas, predadores e méritos/falhas conforme os materiais do Drive.
+- [x] Ampliar o arsenal e a loja V5 com armas, armaduras, equipamentos, roupas, moradias, veículos e montarias com especificações consistentes.
+- [x] Validar visualmente a biblioteca ampliada e as páginas V5 em desktop e mobile antes do checkpoint final.

@@ -1,7 +1,8 @@
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { antagonists, campaignMembers, campaigns, characters, diceRolls, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
+import { antagonistCharacters, antagonists, antagonistSessions, campaignMembers, campaignSessions, campaigns, characters, diceRolls, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { rankLibraryEntries } from "../shared/library-search";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -154,6 +155,23 @@ export async function createCharacterForUser(input: {
   return created[0];
 }
 
+export async function updateCharacterForUser(input: {
+  ownerId: number;
+  characterId: number;
+  name: string;
+  concept?: string;
+  campaignId?: number | null;
+  sheetData: Record<string, unknown>;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const owned = await db.select({ id: characters.id }).from(characters).where(and(eq(characters.id, input.characterId), eq(characters.ownerId, input.ownerId))).limit(1);
+  if (!owned[0]) throw new Error("Ficha não encontrada ou sem permissão.");
+  if (input.campaignId && !await campaignBelongsToUser(input.campaignId, input.ownerId)) throw new Error("Campanha não encontrada ou sem permissão.");
+  await db.update(characters).set({ name: input.name, concept: input.concept ?? null, campaignId: input.campaignId ?? null, sheetData: input.sheetData }).where(eq(characters.id, input.characterId));
+  return (await db.select().from(characters).where(eq(characters.id, input.characterId)).limit(1))[0];
+}
+
 export async function recordDiceRollForUser(input: {
   rollerId: number;
   systemId: string;
@@ -185,4 +203,92 @@ export async function listSourceDocuments() {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(sourceDocuments).orderBy(asc(sourceDocuments.category), asc(sourceDocuments.title));
+}
+
+async function campaignBelongsToUser(campaignId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  const result = await db.select({ id: campaigns.id }).from(campaigns).where(and(eq(campaigns.id, campaignId), eq(campaigns.ownerId, userId))).limit(1);
+  return Boolean(result[0]);
+}
+
+export async function listCampaignSessionsForUser(campaignId: number, userId: number) {
+  if (!await campaignBelongsToUser(campaignId, userId)) return [];
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(campaignSessions).where(eq(campaignSessions.campaignId, campaignId)).orderBy(asc(campaignSessions.sequence));
+}
+
+export async function createCampaignSessionForUser(input: { campaignId: number; userId: number; title: string; summary?: string }) {
+  if (!await campaignBelongsToUser(input.campaignId, input.userId)) throw new Error("Campanha não encontrada ou sem permissão.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const existing = await db.select({ sequence: campaignSessions.sequence }).from(campaignSessions).where(eq(campaignSessions.campaignId, input.campaignId)).orderBy(desc(campaignSessions.sequence)).limit(1);
+  const nextSequence = (existing[0]?.sequence ?? 0) + 1;
+  const inserted = await db.insert(campaignSessions).values({ campaignId: input.campaignId, sequence: nextSequence, title: input.title, summary: input.summary ?? null }).$returningId();
+  const sessionId = inserted[0]?.id;
+  if (!sessionId) throw new Error("Não foi possível registrar a sessão.");
+  return (await db.select().from(campaignSessions).where(eq(campaignSessions.id, sessionId)).limit(1))[0];
+}
+
+export async function listAntagonistsForUser(userId: number, filters?: { campaignId?: number; systemId?: string }) {
+  const db = await getDb();
+  if (!db) return [];
+  const clauses = [or(eq(antagonists.visibility, "public"), eq(antagonists.ownerId, userId))];
+  if (filters?.campaignId) clauses.push(eq(antagonists.campaignId, filters.campaignId));
+  if (filters?.systemId) clauses.push(eq(antagonists.systemId, filters.systemId));
+  return db.select().from(antagonists).where(and(...clauses)).orderBy(desc(antagonists.updatedAt));
+}
+
+export async function createAntagonistForUser(input: { ownerId: number; campaignId?: number | null; systemId: string; name: string; creatureType: "vampire" | "werewolf" | "mage" | "mortal" | "faction" | "entity" | "other"; threatLevel: "minor" | "moderate" | "major" | "critical" | "cataclysmic"; summary: string; hooks: string[]; }) {
+  if (input.campaignId && !await campaignBelongsToUser(input.campaignId, input.ownerId)) throw new Error("Campanha não encontrada ou sem permissão.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const inserted = await db.insert(antagonists).values({ ...input, campaignId: input.campaignId ?? null, visibility: "private" }).$returningId();
+  const antagonistId = inserted[0]?.id;
+  if (!antagonistId) throw new Error("Não foi possível registrar o antagonista.");
+  return (await db.select().from(antagonists).where(eq(antagonists.id, antagonistId)).limit(1))[0];
+}
+
+export async function updateAntagonistForUser(input: { ownerId: number; antagonistId: number; name: string; creatureType: "vampire" | "werewolf" | "mage" | "mortal" | "faction" | "entity" | "other"; threatLevel: "minor" | "moderate" | "major" | "critical" | "cataclysmic"; summary: string; hooks: string[]; campaignId?: number | null; }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  if (input.campaignId && !await campaignBelongsToUser(input.campaignId, input.ownerId)) throw new Error("Campanha não encontrada ou sem permissão.");
+  const owned = await db.select({ id: antagonists.id }).from(antagonists).where(and(eq(antagonists.id, input.antagonistId), eq(antagonists.ownerId, input.ownerId))).limit(1);
+  if (!owned[0]) throw new Error("Apenas dossiês próprios podem ser editados.");
+  await db.update(antagonists).set({ name: input.name, creatureType: input.creatureType, threatLevel: input.threatLevel, summary: input.summary, hooks: input.hooks, campaignId: input.campaignId ?? null }).where(eq(antagonists.id, input.antagonistId));
+  return (await db.select().from(antagonists).where(eq(antagonists.id, input.antagonistId)).limit(1))[0];
+}
+
+async function antagonistBelongsToUser(antagonistId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  const found = await db.select({ id: antagonists.id }).from(antagonists).where(and(eq(antagonists.id, antagonistId), eq(antagonists.ownerId, userId))).limit(1);
+  return Boolean(found[0]);
+}
+
+export async function linkAntagonistToSession(input: { ownerId: number; antagonistId: number; sessionId: number; role: "rumor" | "presence" | "confrontation" | "aftermath"; notes?: string }) {
+  if (!await antagonistBelongsToUser(input.antagonistId, input.ownerId)) throw new Error("Apenas dossiês próprios podem receber vínculos.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const session = await db.select({ campaignId: campaignSessions.campaignId }).from(campaignSessions).where(eq(campaignSessions.id, input.sessionId)).limit(1);
+  if (!session[0] || !await campaignBelongsToUser(session[0].campaignId, input.ownerId)) throw new Error("Sessão não encontrada ou sem permissão.");
+  await db.insert(antagonistSessions).values({ antagonistId: input.antagonistId, sessionId: input.sessionId, role: input.role, notes: input.notes ?? null }).onDuplicateKeyUpdate({ set: { role: input.role, notes: input.notes ?? null } });
+}
+
+export async function linkAntagonistToCharacter(input: { ownerId: number; antagonistId: number; characterId: number; relation: "enemy" | "rival" | "target" | "ally" | "patron" | "debt"; notes?: string }) {
+  if (!await antagonistBelongsToUser(input.antagonistId, input.ownerId)) throw new Error("Apenas dossiês próprios podem receber vínculos.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const character = await db.select({ ownerId: characters.ownerId }).from(characters).where(eq(characters.id, input.characterId)).limit(1);
+  if (!character[0] || character[0].ownerId !== input.ownerId) throw new Error("Ficha não encontrada ou sem permissão.");
+  await db.insert(antagonistCharacters).values({ antagonistId: input.antagonistId, characterId: input.characterId, relation: input.relation, notes: input.notes ?? null }).onDuplicateKeyUpdate({ set: { relation: input.relation, notes: input.notes ?? null } });
+}
+
+export async function searchLibraryContext(query: string) {
+  const [dossiers, documents] = await Promise.all([listAntagonists(), listSourceDocuments()]);
+  return rankLibraryEntries([
+    ...dossiers.map((item) => ({ id: item.id, kind: "dossier" as const, title: item.name, body: `${item.summary} ${(item.hooks || []).join(" ")}`, metadata: `${item.creatureType} ${item.threatLevel} ${item.sourceTitle || ""}` })),
+    ...documents.map((item) => ({ id: item.id, kind: "material" as const, title: item.title, body: item.notes || "", metadata: `${item.category} ${item.integrationStatus}` })),
+  ], query);
 }
