@@ -77,3 +77,4 @@ Um monograma abstrato que une a letra **V** a um marco de vau e um arco de eclip
 - Em telas desktop, a trilha lateral permanece como assinatura obrigatória: ela mostra âncoras de capítulo, selo de autenticação, numeração e progressão vertical; a barra superior apenas identifica o arquivo.
 - O selo de Veyr combina um monograma V, arco de eclipse e marca de travessia, aparecendo em herói, trilha lateral, registros principais e rodapé como carimbo de autenticação.
 - O cobre de Brasa será reservado a ações, selos, avisos, registros ativos e marcadores de legado; linhas investigativas, coordenadas e anotações marginais reforçarão a continuidade do dossiê entre as seções.
+- Todo painel interativo deve se comportar visualmente como formulário de arquivo, livro-caixa, ficha de caso ou registro carimbado; rótulos e controles adotam a voz de consulta, preparação e manuseio de evidências.

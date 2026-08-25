@@ -39,7 +39,7 @@ type Npc = {
 
 type Favorite = { id: string; kind: FavoriteKind; title: string; summary: string; record: string };
 type SessionSummary = { title: string; happenings: string; decisions: string; nextScene: string };
-type CrisisEvent = { id: string; factionId: string; faction: string; title: string; consequence: string; timestamp: string; resolved: boolean };
+type CrisisEvent = { id: string; factionId: string; faction: string; session: string; title: string; consequence: string; timestamp: string; resolved: boolean };
 type AlertPreferences = { sound: boolean; pulse: boolean };
 
 const hooksByTerritory: Record<Territory, Omit<Hook, "code" | "territory" | "factionId" | "faction">[]> = {
@@ -133,6 +133,8 @@ export default function NarratorTools() {
   const [activeFactionId, setActiveFactionId] = useState("companhia");
   const [crises, setCrises] = useState<CrisisEvent[]>(() => safeLoad<CrisisEvent[]>("rpg-atlas-crises-v1", []));
   const [alertPreferences, setAlertPreferences] = useState<AlertPreferences>(() => safeLoad<AlertPreferences>("rpg-atlas-alerts-v1", defaultAlertPreferences));
+  const [crisisFactionFilter, setCrisisFactionFilter] = useState("todas");
+  const [crisisSessionFilter, setCrisisSessionFilter] = useState("todas");
 
   useEffect(() => { window.localStorage.setItem("rpg-atlas-favorites-v1", JSON.stringify(favorites)); }, [favorites]);
   useEffect(() => { window.localStorage.setItem("rpg-atlas-tension-v1", JSON.stringify(tensions)); }, [tensions]);
@@ -145,6 +147,9 @@ export default function NarratorTools() {
   const activeFaction = tensionFactions.find((faction) => faction.id === activeFactionId) ?? tensionFactions[0];
   const activeTension = tensions[activeFaction.id] ?? 0;
   const ruptureFactions = tensionFactions.filter((faction) => (tensions[faction.id] ?? 0) === 6);
+  const crisisSessions = Array.from(new Set(crises.map((crisis) => crisis.session || "Sessão em curso")));
+  const filteredCrises = crises.filter((crisis) => (crisisFactionFilter === "todas" || crisis.factionId === crisisFactionFilter) && (crisisSessionFilter === "todas" || (crisis.session || "Sessão em curso") === crisisSessionFilter));
+  const activeFilteredCrises = filteredCrises.filter((crisis) => !crisis.resolved).length;
   const isSaved = (id: string) => favorites.some((favorite) => favorite.id === id);
   const toggleFavorite = (favorite: Favorite) => setFavorites((current) => current.some((item) => item.id === favorite.id) ? current.filter((item) => item !== favorite) : [favorite, ...current].slice(0, 16));
   const playRuptureSound = (force = false) => {
@@ -174,6 +179,7 @@ export default function NarratorTools() {
       id: `CR-${faction.id}-${Date.now()}`,
       factionId: faction.id,
       faction: faction.name,
+      session: sessionSummary.title.trim() || "Sessão em curso",
       title: consequence.title,
       consequence: consequence.detail,
       timestamp: `Sessão atual · ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`,
@@ -195,6 +201,43 @@ export default function NarratorTools() {
   };
   const generateHook = (nextTerritory = territory, nextTone = tone) => { const generated = createHook(nextTerritory, nextTone, tensions); setHook(generated); setActiveFactionId(generated.factionId); };
   const resolveCrisis = (id: string) => setCrises((current) => current.map((crisis) => crisis.id === id ? { ...crisis, resolved: true } : crisis));
+  const clearCrisisFilters = () => { setCrisisFactionFilter("todas"); setCrisisSessionFilter("todas"); };
+  const exportCrises = () => {
+    if (!crises.length) return;
+    const openCrises = crises.filter((crisis) => !crisis.resolved).length;
+    const content = [
+      "# RPG Atlas — Histórico de Crises da Campanha",
+      "",
+      `Exportado em ${new Date().toLocaleString("pt-BR")}.`,
+      "",
+      "## Resumo",
+      "",
+      `- Crises registradas: ${crises.length}`,
+      `- Crises em curso: ${openCrises}`,
+      `- Crises resolvidas: ${crises.length - openCrises}`,
+      "",
+      "---",
+      "",
+      ...crises.flatMap((crisis, index) => [
+        `## ${index + 1}. ${crisis.title}`,
+        "",
+        `> **Facção:** ${crisis.faction}  `,
+        `> **Sessão:** ${crisis.session || "Sessão em curso"}  `,
+        `> **Registro:** ${crisis.timestamp}  `,
+        `> **Estado:** ${crisis.resolved ? "Resolvida" : "Em curso"}`,
+        "",
+        crisis.consequence,
+        "",
+      ]),
+    ].join("\n");
+    const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "rpg-atlas-historico-de-crises.md";
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
   const exportFavorites = () => {
     if (!favorites.length) return;
     const content = ["# RPG Atlas — Registros Favoritos", "", `Exportado em ${new Date().toLocaleString("pt-BR")}.`, "", ...favorites.flatMap((favorite, index) => [`## ${index + 1}. ${favorite.kind} — ${favorite.title}`, "", `> ${favorite.summary}`, "", favorite.record, ""])].join("\n");
@@ -238,9 +281,10 @@ export default function NarratorTools() {
 
             <article className="relative overflow-hidden border border-[#161715]/20 bg-[#ece4d6] p-6 sm:p-8">
               <div className="pointer-events-none absolute inset-0 opacity-50 [background:linear-gradient(90deg,rgba(22,23,21,0.045)_1px,transparent_1px),linear-gradient(rgba(22,23,21,0.035)_1px,transparent_1px)] [background-size:24px_24px]" />
-              <div className="relative flex flex-col justify-between gap-5 border-b border-[#161715]/15 pb-5 sm:flex-row sm:items-start"><div><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.17em] text-[#b55b32]"><Clock3 className="h-3.5 w-3.5" /> Linha do tempo de crises</div><h3 className="mt-3 font-serif text-[34px] leading-none">O que já cobrou resposta.</h3></div><div className="border border-[#161715]/20 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#65675f]">{crises.filter((crisis) => !crisis.resolved).length} em curso</div></div>
+              <div className="relative flex flex-col justify-between gap-5 border-b border-[#161715]/15 pb-5 sm:flex-row sm:items-start"><div><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.17em] text-[#b55b32]"><Clock3 className="h-3.5 w-3.5" /> Linha do tempo de crises</div><h3 className="mt-3 font-serif text-[34px] leading-none">O que já cobrou resposta.</h3></div><div className="flex flex-wrap items-center gap-3"><div className="border border-[#161715]/20 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#65675f]">{activeFilteredCrises} em curso</div><Button onClick={exportCrises} disabled={!crises.length} variant="outline" className="h-9 rounded-none border-[#161715]/30 bg-transparent px-3 text-[9px] font-bold uppercase tracking-[0.13em] text-[#161715] hover:bg-[#161715] hover:text-[#eae3d5] disabled:opacity-35"><Download className="mr-2 h-3.5 w-3.5" /> Exportar .md</Button></div></div>
               <p className="relative mt-4 max-w-[680px] text-[13px] leading-6 text-[#53564f]">Toda facção que atravessa a Ruptura deixa um registro permanente. As consequências pendentes alimentam a próxima cena; resolva-as somente quando a mesa tiver pago o preço ficcional.</p>
-              <div className="relative mt-7 border-l border-dashed border-[#7a876d]/65 pl-6">{crises.length === 0 ? <div className="border border-[#161715]/15 bg-[#f4eee4]/70 p-5 text-[13px] leading-6 text-[#5e6058]">Nenhuma crise foi registrada. Ao elevar uma facção de Confronto para Ruptura, o painel cria uma entrada com consequência própria, horário e rastro no diário.</div> : <div className="grid gap-5">{crises.map((crisis) => <article key={crisis.id} className={`relative border p-5 ${crisis.resolved ? "border-[#7a876d]/25 bg-[#f2ece0]/65 opacity-70" : "border-[#b55b32]/45 bg-[#f7efe3] shadow-[4px_4px_0_rgba(181,91,50,0.14)]"}`}><span className={`absolute -left-[31px] top-6 grid h-3 w-3 place-items-center border-2 border-[#ece4d6] ${crisis.resolved ? "bg-[#83a89a]" : "bg-[#b55b32]"}`} /><div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><div className="flex flex-wrap items-center gap-3"><p className="font-serif text-[27px] leading-none text-[#161715]">{crisis.title}</p><span className="border border-[#b55b32]/35 px-2 py-1 text-[8px] font-bold uppercase tracking-[0.14em] text-[#8a4630]">{crisis.faction}</span></div><p className="mt-3 max-w-[720px] text-[13px] leading-6 text-[#4e5149]">{crisis.consequence}</p></div><div className="shrink-0 text-left sm:text-right"><p className="text-[8px] font-bold uppercase tracking-[0.15em] text-[#7a876d]">{crisis.timestamp}</p>{crisis.resolved ? <span className="mt-3 inline-block text-[9px] font-bold uppercase tracking-[0.14em] text-[#53776c]">Resolvida</span> : <button onClick={() => resolveCrisis(crisis.id)} className="mt-3 border border-[#161715]/30 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.13em] text-[#161715] hover:bg-[#161715] hover:text-[#eae3d5]">Encerrar crise</button>}</div></div></article>)}</div>}</div>
+              <div className="relative mt-6 grid gap-3 border-y border-[#161715]/15 py-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end"><label className="flex flex-col gap-2 text-[9px] font-bold uppercase tracking-[0.15em] text-[#65675f]">Facção<select value={crisisFactionFilter} onChange={(event) => setCrisisFactionFilter(event.target.value)} className="h-10 border border-[#161715]/25 bg-[#f7efe3] px-3 text-[12px] font-semibold normal-case tracking-normal text-[#161715] outline-none focus:border-[#b55b32]"><option value="todas">Todas as facções</option>{tensionFactions.map((faction) => <option key={faction.id} value={faction.id}>{faction.name}</option>)}</select></label><label className="flex flex-col gap-2 text-[9px] font-bold uppercase tracking-[0.15em] text-[#65675f]">Sessão<select value={crisisSessionFilter} onChange={(event) => setCrisisSessionFilter(event.target.value)} className="h-10 border border-[#161715]/25 bg-[#f7efe3] px-3 text-[12px] font-semibold normal-case tracking-normal text-[#161715] outline-none focus:border-[#b55b32]"><option value="todas">Todas as sessões</option>{crisisSessions.map((session) => <option key={session} value={session}>{session}</option>)}</select></label><button onClick={clearCrisisFilters} disabled={crisisFactionFilter === "todas" && crisisSessionFilter === "todas"} className="h-10 border border-[#161715]/30 px-4 text-[9px] font-bold uppercase tracking-[0.13em] text-[#161715] hover:bg-[#161715] hover:text-[#eae3d5] disabled:opacity-35">Limpar filtros</button></div>
+              <div className="relative mt-7 border-l border-dashed border-[#7a876d]/65 pl-6">{crises.length === 0 ? <div className="border border-[#161715]/15 bg-[#f4eee4]/70 p-5 text-[13px] leading-6 text-[#5e6058]">Nenhuma crise foi registrada. Ao elevar uma facção de Confronto para Ruptura, o painel cria uma entrada com consequência própria, horário e rastro no diário.</div> : filteredCrises.length === 0 ? <div className="border border-dashed border-[#161715]/25 bg-[#f4eee4]/70 p-5 text-[13px] leading-6 text-[#5e6058]">Nenhuma crise corresponde aos filtros atuais. Limpe a consulta para restaurar todo o histórico.</div> : <div className="grid gap-5">{filteredCrises.map((crisis) => <article key={crisis.id} className={`relative border p-5 ${crisis.resolved ? "border-[#7a876d]/25 bg-[#f2ece0]/65 opacity-70" : "border-[#b55b32]/45 bg-[#f7efe3] shadow-[4px_4px_0_rgba(181,91,50,0.14)]"}`}><span className={`absolute -left-[31px] top-6 grid h-3 w-3 place-items-center border-2 border-[#ece4d6] ${crisis.resolved ? "bg-[#83a89a]" : "bg-[#b55b32]"}`} /><div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><div className="flex flex-wrap items-center gap-3"><p className="font-serif text-[27px] leading-none text-[#161715]">{crisis.title}</p><span className="border border-[#b55b32]/35 px-2 py-1 text-[8px] font-bold uppercase tracking-[0.14em] text-[#8a4630]">{crisis.faction}</span><span className="text-[8px] font-bold uppercase tracking-[0.14em] text-[#7a876d]">{crisis.session || "Sessão em curso"}</span></div><p className="mt-3 max-w-[720px] text-[13px] leading-6 text-[#4e5149]">{crisis.consequence}</p></div><div className="shrink-0 text-left sm:text-right"><p className="text-[8px] font-bold uppercase tracking-[0.15em] text-[#7a876d]">{crisis.timestamp}</p>{crisis.resolved ? <span className="mt-3 inline-block text-[9px] font-bold uppercase tracking-[0.14em] text-[#53776c]">Resolvida</span> : <button onClick={() => resolveCrisis(crisis.id)} className="mt-3 border border-[#161715]/30 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.13em] text-[#161715] hover:bg-[#161715] hover:text-[#eae3d5]">Encerrar crise</button>}</div></div></article>)}</div>}</div>
             </article>
 
             <article className="border border-[#161715]/20 bg-[#eee7db]/85 p-6 sm:p-8">

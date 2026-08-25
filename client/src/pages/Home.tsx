@@ -120,10 +120,10 @@ function DossierRail({ onNavigate }: { onNavigate: (id: string) => void }) {
   ];
 
   return (
-    <aside className="dossier-grid fixed bottom-0 left-0 top-[74px] z-40 hidden w-[132px] border-r border-white/10 bg-[#0e100f] xl:flex xl:flex-col xl:items-center">
+    <aside className="dossier-grid fixed bottom-0 left-0 top-[74px] z-40 hidden w-[160px] border-r border-white/10 bg-[#0e100f] lg:flex lg:flex-col lg:items-center">
       <div className="flex h-[160px] w-full flex-col items-center justify-center border-b border-white/10">
         <p className="mb-3 text-[7px] font-bold uppercase tracking-[0.2em] text-[#83a89a]">RPG Atlas · Veyr</p>
-        <VeyrSeal className="h-[78px] w-[78px]" label="Selo de autenticação do arquivo de Veyr" />
+        <VeyrSeal className="h-[88px] w-[88px]" label="Selo de autenticação do arquivo de Veyr" />
         <span className="mt-2 bg-[#0e100f] px-1 text-[8px] font-bold tracking-[0.22em] text-[#83a89a]">V-17 · AUT.</span>
       </div>
       <div className="relative flex w-full flex-1 flex-col items-center py-4">
@@ -156,15 +156,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen overflow-x-clip bg-[#111312] text-[#eae3d5] selection:bg-[#b55b32] selection:text-[#111312]">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#111312]/92 backdrop-blur-xl xl:pl-[132px]">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#111312]/92 backdrop-blur-xl lg:pl-[160px]">
         <div className="mx-auto flex h-[74px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-10">
           <button onClick={() => navigate("inicio")} className="group flex items-center gap-3 text-left xl:hidden" aria-label="Voltar ao início">
             <img src={visualAssets.sigil} alt="Selo de Veyr" className="h-10 w-10 object-contain transition-transform duration-200 group-hover:-rotate-6" />
             <span className="hidden font-serif text-[18px] tracking-[0.16em] text-[#eae3d5] sm:inline">RPG ATLAS</span>
           </button>
 
-          <div className="hidden xl:block"><p className="font-serif text-[17px] tracking-[0.16em] text-[#eae3d5]">RPG ATLAS</p><p className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.2em] text-[#83a89a]">Registro de campanha 04 / Veyr</p></div>
-          <nav className="hidden items-center gap-7 lg:flex xl:hidden" aria-label="Navegação principal">
+          <div className="hidden lg:block"><p className="font-serif text-[17px] tracking-[0.16em] text-[#eae3d5]">RPG ATLAS</p><p className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.2em] text-[#83a89a]">Registro de campanha 04 / Veyr</p></div>
+          <nav className="hidden" aria-label="Navegação principal">
             {[
               ["Campanha", "campanha"],
               ["Facções", "faccoes"],
@@ -179,7 +179,7 @@ export default function Home() {
             ))}
           </nav>
 
-          <Button onClick={() => navigate("campanha")} className="hidden rounded-none bg-[#b55b32] px-4 text-[12px] font-bold uppercase tracking-[0.12em] text-[#111312] hover:bg-[#d27648] sm:flex xl:hidden">
+          <Button onClick={() => navigate("campanha")} className="hidden rounded-none bg-[#b55b32] px-4 text-[12px] font-bold uppercase tracking-[0.12em] text-[#111312] hover:bg-[#d27648] sm:flex lg:hidden">
             Abrir registro <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
           <button onClick={() => setMenuOpen(!menuOpen)} className="grid h-10 w-10 place-items-center border border-white/15 text-[#eae3d5] lg:hidden" aria-label="Abrir menu">
@@ -198,7 +198,7 @@ export default function Home() {
       </header>
 
       <DossierRail onNavigate={navigate} />
-      <main className="xl:pl-[132px]">
+      <main className="lg:pl-[160px]">
         <section id="inicio" className="relative isolate min-h-[760px] border-b border-white/10 bg-[#111312]">
           <img src={visualAssets.hero} alt="Véspera do Vau ao cair da noite" className="absolute inset-0 -z-20 h-full w-full object-cover object-center" />
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(17,19,18,0.97)_0%,rgba(17,19,18,0.9)_34%,rgba(17,19,18,0.42)_70%,rgba(17,19,18,0.76)_100%)]" />
@@ -436,10 +436,10 @@ export default function Home() {
 
         <NarratorTools />
 
-        <section className="relative border-y border-[#161715]/15 bg-[#b55b32] text-[#161715]">
+        <section className="relative border-y border-[#b55b32]/50 bg-[#171a18] text-[#eae3d5]">
           <div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-8 px-5 py-14 sm:px-8 md:flex-row md:items-end lg:px-10">
-            <div><div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em]"><img src={visualAssets.sigil} alt="" className="h-8 w-8 object-contain" /> RPG Atlas · Terras de Veyr · selo autenticado</div><p className="mt-4 font-serif text-[36px] leading-[0.96] tracking-[-0.03em] sm:text-[48px]">O próximo registro começa<br />naquilo que a mesa decide não esquecer.</p></div>
-            <Button onClick={() => navigate("inicio")} variant="outline" className="h-12 rounded-none border-[#161715]/40 bg-[#eae3d5]/10 px-6 text-[12px] font-bold uppercase tracking-[0.13em] text-[#161715] hover:bg-[#161715] hover:text-[#eae3d5]">Voltar ao início <ArrowRight className="ml-2 h-4 w-4" /></Button>
+            <div><div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#83a89a]"><VeyrSeal className="h-9 w-9 shrink-0" label="Selo de Veyr no encerramento do registro" /> RPG Atlas · Terras de Veyr · selo autenticado</div><p className="mt-4 font-serif text-[36px] leading-[0.96] tracking-[-0.03em] sm:text-[48px]">O próximo registro começa<br />naquilo que a mesa decide não esquecer.</p></div>
+            <Button onClick={() => navigate("inicio")} variant="outline" className="h-12 rounded-none border-[#eae3d5]/35 bg-transparent px-6 text-[12px] font-bold uppercase tracking-[0.13em] text-[#eae3d5] hover:bg-[#b55b32] hover:text-[#111312]">Voltar ao início <ArrowRight className="ml-2 h-4 w-4" /></Button>
           </div>
         </section>
       </main>

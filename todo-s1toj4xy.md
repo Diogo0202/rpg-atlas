@@ -7,3 +7,6 @@
 - [x] Modelar a linha do tempo de crises e as consequências de Ruptura por facção.
 - [x] Implementar alertas visuais e sonoros opcionais para o estado de Ruptura.
 - [x] Validar o painel de crises em desktop e mobile, salvar checkpoint e entregar a atualização.
+- [x] Modelar filtros da linha do tempo por facção e sessão, além do documento Markdown de exportação.
+- [x] Implementar a consulta filtrada e a exportação completa de crises em Markdown.
+- [x] Validar filtros e exportação em desktop e mobile, salvar checkpoint e entregar a atualização.
