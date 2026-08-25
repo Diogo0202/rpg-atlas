@@ -18,3 +18,7 @@
 - [x] Implementar salvamento e carregamento de fichas no navegador.
 - [x] Implementar rolagens rápidas e rastreadores de Vitalidade e Força de Vontade.
 - [x] Validar os novos controles em desktop e mobile, salvar checkpoint e entregar a atualização.
+- [x] Modelar as penalidades críticas, o histórico visual e o formato de backup JSON.
+- [x] Implementar penalidades automáticas e registro persistente das rolagens da sessão.
+- [x] Implementar exportação e importação segura de fichas em JSON.
+- [x] Validar cálculos, histórico e backup em desktop e mobile, salvar checkpoint e entregar a atualização.

@@ -122,11 +122,11 @@ function DossierRail({ onNavigate }: { onNavigate: (id: string) => void }) {
   ];
 
   return (
-    <aside className="dossier-grid fixed bottom-0 left-0 top-[74px] z-40 hidden w-[184px] border-r border-[#b55b32]/45 bg-[#0a0c0b] shadow-[12px_0_28px_rgba(0,0,0,0.24)] lg:flex lg:flex-col lg:items-center">
-      <div className="flex h-[190px] w-full flex-col items-center justify-center border-b border-white/10">
+    <aside className="dossier-grid fixed bottom-0 left-0 top-0 z-[60] hidden w-[208px] border-r border-[#b55b32]/55 bg-[#0a0c0b] shadow-[16px_0_34px_rgba(0,0,0,0.3)] lg:flex lg:flex-col lg:items-center">
+      <div className="flex h-[218px] w-full flex-col items-center justify-center border-b border-[#b55b32]/35">
         <p className="text-[7px] font-bold uppercase tracking-[0.25em] text-[#83a89a]">Arquivo Central</p>
         <p className="mt-2 font-serif text-[18px] tracking-[0.18em] text-[#eae3d5]">RPG ATLAS</p>
-        <VeyrSeal className="mt-3 h-[94px] w-[94px]" label="Selo de autenticação do arquivo de Veyr" />
+        <VeyrSeal className="mt-3 h-[108px] w-[108px]" label="Selo de autenticação do arquivo de Veyr" />
         <span className="mt-2 bg-[#0a0c0b] px-1 text-[8px] font-bold tracking-[0.22em] text-[#83a89a]">VEY-17 · AUT.</span>
       </div>
       <div className="relative flex w-full flex-1 flex-col items-center py-2">
@@ -159,7 +159,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen overflow-x-clip bg-[#111312] text-[#eae3d5] selection:bg-[#b55b32] selection:text-[#111312]">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#111312]/92 backdrop-blur-xl lg:pl-[184px]">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#111312]/92 backdrop-blur-xl lg:pl-[208px]">
         <div className="mx-auto flex h-[74px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-10">
           <button onClick={() => navigate("inicio")} className="group flex items-center gap-3 text-left xl:hidden" aria-label="Voltar ao início">
             <img src={visualAssets.sigil} alt="Selo de Veyr" className="h-10 w-10 object-contain transition-transform duration-200 group-hover:-rotate-6" />
@@ -201,7 +201,7 @@ export default function Home() {
       </header>
 
       <DossierRail onNavigate={navigate} />
-      <main className="lg:pl-[184px]">
+      <main className="lg:pl-[208px]">
         <section id="inicio" className="relative isolate min-h-[760px] border-b border-white/10 bg-[#111312]">
           <img src={visualAssets.hero} alt="Véspera do Vau ao cair da noite" className="absolute inset-0 -z-20 h-full w-full object-cover object-center" />
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(17,19,18,0.97)_0%,rgba(17,19,18,0.9)_34%,rgba(17,19,18,0.42)_70%,rgba(17,19,18,0.76)_100%)]" />
