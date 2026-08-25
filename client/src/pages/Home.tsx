@@ -64,33 +64,78 @@ const workflow = [
   ["Entrega", "Consolidar suplementos, mapas, imagens e trilhas."],
 ];
 
+const chronicles = [
+  {
+    id: "vampiro",
+    index: "01",
+    title: "Vampiro: A Máscara",
+    eyebrow: "Fome, influência e dívida",
+    summary: "A noite é uma rede de favores, territórios e nomes que não podem aparecer à luz. Cada vitória testa aquilo que o personagem ainda considera humano.",
+    question: "Que parte de si você entrega para manter a Máscara intacta?",
+    pressure: "A dívida chega antes do amanhecer.",
+    dossiers: ["Humanidade", "Prestígio", "Segredos"],
+  },
+  {
+    id: "lobisomem",
+    index: "02",
+    title: "Lobisomem: O Apocalipse",
+    eyebrow: "Fúria, território e ruína",
+    summary: "A guerra pelo mundo material e espiritual é íntima: a matilha defende o que ainda respira enquanto aprende o preço de transformar indignação em destruição.",
+    question: "O que você protege quando a Fúria também quer decidir por você?",
+    pressure: "Toda fronteira guarda uma ferida aberta.",
+    dossiers: ["Matilha", "Território", "Fúria"],
+  },
+  {
+    id: "mago",
+    index: "03",
+    title: "Mago: A Ascensão",
+    eyebrow: "Vontade, crença e paradoxo",
+    summary: "A realidade não é neutra: ela é disputada por convicções, rituais e consequências. O poder amplia a escolha, mas também torna cada contradição impossível de ignorar.",
+    question: "Qual verdade continua de pé quando o mundo recusa acreditar nela?",
+    pressure: "Toda certeza deixa uma rachadura no real.",
+    dossiers: ["Esfera", "Convicção", "Paradoxo"],
+  },
+];
+
+function VeyrSeal({ className = "", label = "selo de Veyr" }: { className?: string; label?: string }) {
+  return (
+    <div className={`relative grid place-items-center border border-[#b55b32]/75 bg-[#111312]/85 ${className}`} aria-label={label}>
+      <span className="absolute left-2 right-2 top-2 h-[42%] rounded-t-full border-x border-t border-[#83a89a]/70" />
+      <span className="absolute inset-[13%] border border-[#eae3d5]/20" />
+      <img src={visualAssets.sigil} alt="" className="absolute inset-2 h-[calc(100%-1rem)] w-[calc(100%-1rem)] object-contain opacity-55" />
+      <span className="relative font-serif text-[clamp(1.6rem,2.5vw,2.5rem)] leading-none text-[#eae3d5]">V</span>
+      <span className="absolute bottom-2 left-2 right-2 border-t border-dashed border-[#b55b32]/70" />
+    </div>
+  );
+}
+
 function DossierRail({ onNavigate }: { onNavigate: (id: string) => void }) {
   const chapters = [
     ["01", "Campanha", "campanha"],
     ["02", "Facções", "faccoes"],
     ["03", "Método", "metodo"],
     ["04", "Mesa", "mesa"],
-    ["05", "Narrador", "narrador"],
+    ["05", "Crônicas", "cronicas"],
+    ["06", "Narrador", "narrador"],
   ];
 
   return (
-    <aside className="fixed bottom-0 left-0 top-[74px] z-40 hidden w-[112px] border-r border-white/10 bg-[#111312] xl:flex xl:flex-col xl:items-center">
-      <div className="flex h-[128px] w-full items-center justify-center border-b border-white/10">
-        <div className="relative grid h-[72px] w-[72px] place-items-center border border-[#b55b32]/70">
-          <img src={visualAssets.sigil} alt="Selo do arquivo de Veyr" className="h-[58px] w-[58px] object-contain" />
-          <span className="absolute -bottom-2 bg-[#111312] px-1 text-[8px] font-bold tracking-[0.22em] text-[#83a89a]">V-17</span>
-        </div>
+    <aside className="dossier-grid fixed bottom-0 left-0 top-[74px] z-40 hidden w-[132px] border-r border-white/10 bg-[#0e100f] xl:flex xl:flex-col xl:items-center">
+      <div className="flex h-[160px] w-full flex-col items-center justify-center border-b border-white/10">
+        <p className="mb-3 text-[7px] font-bold uppercase tracking-[0.2em] text-[#83a89a]">RPG Atlas · Veyr</p>
+        <VeyrSeal className="h-[78px] w-[78px]" label="Selo de autenticação do arquivo de Veyr" />
+        <span className="mt-2 bg-[#0e100f] px-1 text-[8px] font-bold tracking-[0.22em] text-[#83a89a]">V-17 · AUT.</span>
       </div>
-      <div className="relative flex w-full flex-1 flex-col items-center py-7">
-        <span className="absolute top-0 h-full border-l border-dashed border-white/15" />
+      <div className="relative flex w-full flex-1 flex-col items-center py-4">
+        <span className="absolute top-0 h-full border-l border-dashed border-[#83a89a]/35" />
         {chapters.map(([number, label, id]) => (
-          <button key={id} onClick={() => onNavigate(id)} className="group relative z-10 mb-7 flex h-[70px] w-full flex-col items-center justify-center gap-1 bg-[#111312] text-center">
-            <span className="font-serif text-[23px] leading-none text-[#b55b32] transition-transform duration-150 group-hover:-translate-y-1">{number}</span>
+          <button key={id} onClick={() => onNavigate(id)} className="group relative z-10 mb-2 flex h-[54px] w-full flex-col items-center justify-center gap-1 bg-[#0e100f] text-center">
+            <span className="font-serif text-[19px] leading-none text-[#b55b32] transition-transform duration-150 group-hover:-translate-y-1">{number}</span>
             <span className="text-[8px] font-bold uppercase tracking-[0.14em] text-[#9b978c] transition-colors duration-150 group-hover:text-[#eae3d5]">{label}</span>
           </button>
         ))}
       </div>
-      <div className="w-full border-t border-white/10 px-3 py-5 text-center text-[8px] font-bold uppercase tracking-[0.16em] text-[#83a89a]">Arquivo<br />autenticado</div>
+      <div className="w-full border-t border-white/10 px-3 py-4 text-center text-[8px] font-bold uppercase tracking-[0.16em] text-[#83a89a]">Arquivo<br />autenticado<br /><span className="text-[#b55b32]">registro 04</span></div>
     </aside>
   );
 }
@@ -101,6 +146,7 @@ function scrollToSection(id: string) {
 
 export default function Home() {
   const [activeTerritory, setActiveTerritory] = useState(territories[0]);
+  const [activeChronicle, setActiveChronicle] = useState(chronicles[0]);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navigate = (id: string) => {
@@ -110,20 +156,21 @@ export default function Home() {
 
   return (
     <div className="min-h-screen overflow-x-clip bg-[#111312] text-[#eae3d5] selection:bg-[#b55b32] selection:text-[#111312]">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#111312]/92 backdrop-blur-xl xl:pl-[112px]">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#111312]/92 backdrop-blur-xl xl:pl-[132px]">
         <div className="mx-auto flex h-[74px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-10">
           <button onClick={() => navigate("inicio")} className="group flex items-center gap-3 text-left xl:hidden" aria-label="Voltar ao início">
             <img src={visualAssets.sigil} alt="Selo de Veyr" className="h-10 w-10 object-contain transition-transform duration-200 group-hover:-rotate-6" />
             <span className="hidden font-serif text-[18px] tracking-[0.16em] text-[#eae3d5] sm:inline">RPG ATLAS</span>
           </button>
 
-          <p className="hidden text-[10px] font-bold uppercase tracking-[0.2em] text-[#83a89a] xl:block">RPG Atlas · Registro de campanha 04 / Veyr</p>
+          <div className="hidden xl:block"><p className="font-serif text-[17px] tracking-[0.16em] text-[#eae3d5]">RPG ATLAS</p><p className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.2em] text-[#83a89a]">Registro de campanha 04 / Veyr</p></div>
           <nav className="hidden items-center gap-7 lg:flex xl:hidden" aria-label="Navegação principal">
             {[
               ["Campanha", "campanha"],
               ["Facções", "faccoes"],
               ["Método", "metodo"],
               ["Guia de mesa", "mesa"],
+              ["Crônicas", "cronicas"],
               ["Narrador", "narrador"],
             ].map(([label, id]) => (
               <button key={id} onClick={() => navigate(id)} className="text-[12px] font-semibold uppercase tracking-[0.15em] text-[#b8b3a8] transition-colors duration-150 hover:text-[#eae3d5]">
@@ -142,7 +189,7 @@ export default function Home() {
         {menuOpen && (
           <div className="border-t border-white/10 bg-[#171a18] px-5 py-5 lg:hidden">
             <div className="flex flex-col gap-4">
-              {[["Campanha", "campanha"], ["Facções", "faccoes"], ["Método", "metodo"], ["Guia de mesa", "mesa"], ["Narrador", "narrador"]].map(([label, id]) => (
+              {[["Campanha", "campanha"], ["Facções", "faccoes"], ["Método", "metodo"], ["Guia de mesa", "mesa"], ["Crônicas", "cronicas"], ["Narrador", "narrador"]].map(([label, id]) => (
                 <button key={id} onClick={() => navigate(id)} className="text-left text-[13px] font-semibold uppercase tracking-[0.14em] text-[#d8d2c6]">{label}</button>
               ))}
             </div>
@@ -151,7 +198,7 @@ export default function Home() {
       </header>
 
       <DossierRail onNavigate={navigate} />
-      <main className="xl:pl-[112px]">
+      <main className="xl:pl-[132px]">
         <section id="inicio" className="relative isolate min-h-[760px] border-b border-white/10 bg-[#111312]">
           <img src={visualAssets.hero} alt="Véspera do Vau ao cair da noite" className="absolute inset-0 -z-20 h-full w-full object-cover object-center" />
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(17,19,18,0.97)_0%,rgba(17,19,18,0.9)_34%,rgba(17,19,18,0.42)_70%,rgba(17,19,18,0.76)_100%)]" />
@@ -159,6 +206,10 @@ export default function Home() {
           <div className="absolute right-5 top-28 hidden text-right xl:block xl:right-10">
             <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#83a89a]">Coord. 21°V / 07°R</p>
             <p className="mt-2 text-[10px] uppercase tracking-[0.12em] text-[#bbb4a7]">Margem do Rio Cinéreo</p>
+          </div>
+          <div className="absolute bottom-8 left-10 hidden items-center gap-4 xl:flex">
+            <span className="h-px w-24 border-t border-dashed border-[#83a89a]/70" />
+            <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[#83a89a]">Linha de investigação · 04 marcos ativos</p>
           </div>
           <div className="mx-auto grid min-h-[760px] max-w-[1440px] grid-cols-1 items-end px-5 pb-16 pt-28 sm:px-8 lg:grid-cols-[minmax(0,760px)_1fr] lg:px-10 lg:pb-24">
             <div>
@@ -181,10 +232,15 @@ export default function Home() {
               </div>
             </div>
               <div className="mt-14 justify-self-end border-l border-dashed border-[#eae3d5]/30 pl-6 lg:mt-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#83a89a]">Registro em curso</p>
-              <p className="mt-3 max-w-[250px] font-serif text-[25px] leading-tight text-[#f4eee4]">"O Sino chama pelo nome que a cidade não suporta lembrar."</p>
-              <p className="mt-5 max-w-[240px] text-[13px] leading-5 text-[#c2bbae]">Véspera do Vau · Rio Cinéreo · A Coroa Partida</p>
-            </div>
+                <div className="flex items-start gap-4">
+                  <VeyrSeal className="h-[64px] w-[64px] shrink-0" label="Selo de Veyr no registro em curso" />
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#83a89a]">Registro em curso</p>
+                    <p className="mt-3 max-w-[250px] font-serif text-[25px] leading-tight text-[#f4eee4]">"O Sino chama pelo nome que a cidade não suporta lembrar."</p>
+                    <p className="mt-5 max-w-[240px] text-[13px] leading-5 text-[#c2bbae]">Véspera do Vau · Rio Cinéreo · A Coroa Partida</p>
+                  </div>
+                </div>
+              </div>
           </div>
         </section>
 
@@ -312,6 +368,72 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="cronicas" className="archive-paper relative overflow-hidden text-[#161715]">
+          <div className="pointer-events-none absolute inset-0 opacity-60 [background:radial-gradient(circle_at_88%_20%,rgba(131,168,154,0.2),transparent_22%),radial-gradient(circle_at_13%_76%,rgba(181,91,50,0.14),transparent_28%)]" />
+          <div className="relative mx-auto flex max-w-[1440px] items-center gap-4 px-5 pt-7 sm:px-8 lg:px-10"><span className="h-px w-20 border-t border-dashed border-[#b55b32]/75" /><span className="text-[8px] font-bold uppercase tracking-[0.2em] text-[#7a876d]">Rota de evidência · ramificação C-04</span><span className="h-2 w-2 border border-[#b55b32]" /></div>
+          <div className="relative mx-auto max-w-[1440px] px-5 py-20 sm:px-8 lg:px-10 lg:py-28">
+            <div className="grid gap-14 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-20">
+              <div>
+                <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#7a876d]"><span className="grid h-7 w-7 place-items-center border border-[#b55b32] font-serif text-[15px] text-[#b55b32]">V</span> 05 · mundo das trevas · índice de crônicas</div>
+                <h2 className="mt-5 font-serif text-[56px] leading-[0.88] tracking-[-0.045em] sm:text-[76px]">A noite<br />tem arquivo.</h2>
+                <p className="mt-8 max-w-[300px] text-[16px] leading-7 text-[#484b45]">Três dossiês para crônicas onde identidade, território e realidade cobram consequências pessoais.</p>
+
+                <div className="mt-10 border-t border-[#161715]/20">
+                  {chronicles.map((chronicle) => {
+                    const selected = activeChronicle.id === chronicle.id;
+
+                    return (
+                      <button
+                        key={chronicle.id}
+                        onClick={() => setActiveChronicle(chronicle)}
+                        aria-pressed={selected}
+                        className={`group flex w-full items-center justify-between gap-4 border-b border-[#161715]/20 py-5 text-left transition-colors duration-150 ${selected ? "text-[#b55b32]" : "text-[#4d514a] hover:text-[#161715]"}`}
+                      >
+                        <span className="flex items-center gap-4"><span className="font-serif text-[24px]">{chronicle.index}</span><span className="font-serif text-[24px] leading-[0.95]">{chronicle.title}</span></span>
+                        <ChevronRight className={`h-4 w-4 shrink-0 transition-transform duration-150 ${selected ? "translate-x-1" : "group-hover:translate-x-1"}`} />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <article className="relative overflow-hidden border border-[#161715]/20 bg-[#171a18] text-[#f4eee4] shadow-[16px_16px_0_rgba(22,23,21,0.12)]">
+                <div className="absolute inset-0 dossier-grid opacity-30" />
+                <div className="absolute inset-x-0 top-0 h-1 bg-[#b55b32]" />
+                <div className="relative grid min-h-[520px] lg:grid-cols-[minmax(0,1.15fr)_280px]">
+                  <div className="flex flex-col p-7 sm:p-10 lg:p-12">
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/15 pb-5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#a9c7bb]">
+                      <span>Registro {activeChronicle.index} · consulta de crônica</span>
+                      <span className="border border-[#b55b32]/60 px-2 py-1 text-[#d27648]">ativo</span>
+                    </div>
+                    <p className="mt-10 text-[11px] font-bold uppercase tracking-[0.2em] text-[#a9c7bb]">{activeChronicle.eyebrow}</p>
+                    <h3 className="mt-4 max-w-[620px] font-serif text-[50px] leading-[0.88] tracking-[-0.045em] sm:text-[72px]">{activeChronicle.title}</h3>
+                    <p className="mt-8 max-w-[610px] text-[17px] leading-8 text-[#d6d0c5]">{activeChronicle.summary}</p>
+                    <div className="mt-auto pt-10">
+                      <div className="border-l border-dashed border-[#a9c7bb]/55 pl-5">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#a9c7bb]">Pergunta para abrir a cena</p>
+                        <p className="mt-3 max-w-[570px] font-serif text-[27px] leading-tight text-[#f4eee4]">“{activeChronicle.question}”</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="relative flex flex-col border-t border-white/15 bg-[#111312]/65 p-7 sm:p-10 lg:border-l lg:border-t-0 lg:p-9">
+                    <span className="absolute right-4 top-4 text-[8px] font-bold uppercase tracking-[0.18em] text-[#83a89a]/70">arquivo interno</span>
+                    <div className="mt-8 text-[10px] font-bold uppercase tracking-[0.2em] text-[#83a89a]">Sinais de pressão</div>
+                    <p className="mt-4 font-serif text-[31px] leading-[0.98] text-[#d27648]">{activeChronicle.pressure}</p>
+                    <div className="mt-12 space-y-0 border-t border-white/15">
+                      {activeChronicle.dossiers.map((dossier, index) => (
+                        <div key={dossier} className="flex items-center justify-between border-b border-white/15 py-4 text-[12px] font-bold uppercase tracking-[0.16em] text-[#d8d2c6]"><span>{dossier}</span><span className="font-serif text-[20px] text-[#b55b32]">0{index + 1}</span></div>
+                      ))}
+                    </div>
+                    <div className="mt-auto border border-[#83a89a]/35 p-4 text-[11px] leading-5 text-[#b8b3a8]">Selecione uma crônica para trocar o registro sem perder o fio da investigação.</div>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
         <NarratorTools />
 
         <section className="relative border-y border-[#161715]/15 bg-[#b55b32] text-[#161715]">
@@ -324,7 +446,7 @@ export default function Home() {
 
       <footer className="bg-[#111312]">
         <div className="mx-auto flex max-w-[1440px] flex-col gap-8 px-5 py-10 text-[12px] text-[#89877e] sm:px-8 md:flex-row md:items-center md:justify-between lg:px-10">
-          <div className="flex items-center gap-3"><img src={visualAssets.sigil} alt="" className="h-8 w-8 object-contain" /><span>RPG Atlas · Arquivo de campanha</span></div>
+          <div className="flex items-center gap-3"><VeyrSeal className="h-10 w-10 shrink-0" label="Selo de Veyr no rodapé" /><span>RPG Atlas · Arquivo de campanha</span></div>
           <p className="max-w-[630px] leading-5">Conteúdo baseado no contexto de skills, campanhas e materiais fornecidos. Exports de conta e tarefas criptografados permanecem fora do escopo deste atlas.</p>
           <div className="flex items-center gap-2 font-semibold uppercase tracking-[0.12em] text-[#d2ccc0]"><Sparkles className="h-3.5 w-3.5 text-[#b55b32]" /> Manus AI</div>
         </div>

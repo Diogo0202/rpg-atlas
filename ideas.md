@@ -74,3 +74,6 @@ Um monograma abstrato que une a letra **V** a um marco de vau e um arco de eclip
 - Toda seção terá ao menos um artefato de arquivo recorrente: coordenada, linha de investigação pontilhada, carimbo de cobre, anotação marginal ou rótulo de registro.
 - O selo de Veyr será repetido como marca de autenticação na trilha lateral, nos registros principais e no rodapé, para tornar a marca reconhecível sem o wordmark.
 - As seções claras receberão textura de papel antigo, campos regrados e marcações de documento para evitar o aspecto de página editorial genérica.
+- Em telas desktop, a trilha lateral permanece como assinatura obrigatória: ela mostra âncoras de capítulo, selo de autenticação, numeração e progressão vertical; a barra superior apenas identifica o arquivo.
+- O selo de Veyr combina um monograma V, arco de eclipse e marca de travessia, aparecendo em herói, trilha lateral, registros principais e rodapé como carimbo de autenticação.
+- O cobre de Brasa será reservado a ações, selos, avisos, registros ativos e marcadores de legado; linhas investigativas, coordenadas e anotações marginais reforçarão a continuidade do dossiê entre as seções.
