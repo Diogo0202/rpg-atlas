@@ -3,7 +3,7 @@
  * not generic dashboard widgets. State remains private to the browser.
  */
 import { useEffect, useState } from "react";
-import { AlertTriangle, Check, Clock3, Copy, Dices, Download, FileText, Heart, Minus, Plus, RefreshCw, Trash2, UserRound } from "lucide-react";
+import { AlertTriangle, Check, Clock3, Copy, Dices, Download, FileText, Heart, Minus, Plus, RefreshCw, Trash2, UserRound, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Territory = "Véspera do Vau" | "Ermo de Karzath" | "Velas Mortas";
@@ -39,6 +39,8 @@ type Npc = {
 
 type Favorite = { id: string; kind: FavoriteKind; title: string; summary: string; record: string };
 type SessionSummary = { title: string; happenings: string; decisions: string; nextScene: string };
+type CrisisEvent = { id: string; factionId: string; faction: string; title: string; consequence: string; timestamp: string; resolved: boolean };
+type AlertPreferences = { sound: boolean; pulse: boolean };
 
 const hooksByTerritory: Record<Territory, Omit<Hook, "code" | "territory" | "factionId" | "faction">[]> = {
   "Véspera do Vau": [
@@ -72,9 +74,18 @@ const tensionFactions = [
   { id: "velas", name: "Círculo das Velas Mortas", note: "nomes e luto" },
 ];
 
+const ruptureConsequences: Record<string, { title: string; detail: string; prompt: string }> = {
+  conselho: { title: "Edital de apagamento", detail: "O Conselho declara um registro como falso e inicia uma busca oficial por quem o preservou.", prompt: "Escolha qual prova será destruída, falsificada ou defendida antes da próxima travessia." },
+  lanterna: { title: "Quarentena das margens", detail: "A Lanterna fecha rotas, recolhe luzes e transforma abrigo em suspeita para conter um perigo que ninguém consegue nomear.", prompt: "Defina quem fica preso do lado errado do rio e qual exceção custará um favor." },
+  companhia: { title: "Pedágio de sal negro", detail: "A Companhia toma a rota mais segura e cobra memória, nome ou proteção de quem precisa atravessar.", prompt: "Determine o preço de uma passagem e quem será forçado a negociar primeiro." },
+  vidreiros: { title: "Reflexos em fuga", detail: "Espelhos começam a mostrar versões dos heróis que aceitaram pactos diferentes, atraindo caçadores e testemunhas indesejadas.", prompt: "Escolha qual futuro possível invade a cena e que segredo ele revela." },
+  velas: { title: "Vigília dos não lembrados", detail: "As velas do pântano chamam mortos sem nome para cobrar promessas deixadas sem resposta.", prompt: "Decida qual juramento retorna e quem será reconhecido por uma memória que nunca viveu." },
+};
+
 const tensionStages = ["Calma aparente", "Sussurros", "Pressão aberta", "Pânico", "Ruptura", "Confronto", "Consequência irreversível"];
 const defaultTensions = { conselho: 1, lanterna: 1, companhia: 2, vidreiros: 1, velas: 1 };
 const emptySession: SessionSummary = { title: "", happenings: "", decisions: "", nextScene: "" };
+const defaultAlertPreferences: AlertPreferences = { sound: false, pulse: true };
 const npcNames = ["Mara Veld", "Ivo Cantar", "Noa Cinzamar", "Rian da Ponte", "Talma Breu", "Elen Vidro", "Daro Avel", "Sila Orvalho", "Bren Salferro", "Yara Vau"];
 const npcRoles = ["escrivã de marcos", "barqueiro de juramentos", "ferreira sem nome", "vigia de lanterna", "contrabandista de memória", "devota das velas", "batedor de cinzas", "curadora de Fadiga", "negociador da Cidadela", "mensageira do pântano"];
 const npcAppearances = ["Dedos manchados de sal e um casaco que cheira a rio.", "Um olho de vidro negro e luvas de trabalho queimadas.", "Cabelos presos por uma tira de cobre; fala olhando para as rotas, não para as pessoas.", "Veste luto antigo, mas carrega uma lanterna impecável.", "Tem cinza sob as unhas e uma voz baixa demais para a distância."];
@@ -120,10 +131,14 @@ export default function NarratorTools() {
   const [favorites, setFavorites] = useState<Favorite[]>(() => safeLoad<Favorite[]>("rpg-atlas-favorites-v1", []));
   const [sessionSummary, setSessionSummary] = useState<SessionSummary>(() => safeLoad<SessionSummary>("rpg-atlas-session-v1", emptySession));
   const [activeFactionId, setActiveFactionId] = useState("companhia");
+  const [crises, setCrises] = useState<CrisisEvent[]>(() => safeLoad<CrisisEvent[]>("rpg-atlas-crises-v1", []));
+  const [alertPreferences, setAlertPreferences] = useState<AlertPreferences>(() => safeLoad<AlertPreferences>("rpg-atlas-alerts-v1", defaultAlertPreferences));
 
   useEffect(() => { window.localStorage.setItem("rpg-atlas-favorites-v1", JSON.stringify(favorites)); }, [favorites]);
   useEffect(() => { window.localStorage.setItem("rpg-atlas-tension-v1", JSON.stringify(tensions)); }, [tensions]);
   useEffect(() => { window.localStorage.setItem("rpg-atlas-session-v1", JSON.stringify(sessionSummary)); }, [sessionSummary]);
+  useEffect(() => { window.localStorage.setItem("rpg-atlas-crises-v1", JSON.stringify(crises)); }, [crises]);
+  useEffect(() => { window.localStorage.setItem("rpg-atlas-alerts-v1", JSON.stringify(alertPreferences)); }, [alertPreferences]);
 
   const hookText = `${hook.title}\n${hook.territory} · ${hook.code}\nTom: ${tone}\nFacção vinculada: ${hook.faction}\nPremissa: ${hook.premise}\nPressão: ${hook.pressure}\nTestemunha: ${hook.witness}\nMemória em risco: ${hook.memory}\nRecompensa: ${hook.reward}\nEscalada: ${hook.escalation}`;
   const npcText = `${npc.name} · ${npc.role} · ${npc.code}\nAparência: ${npc.appearance}\nDesejo: ${npc.desire}\nMedo: ${npc.fear}\nSegredo: ${npc.secret}\nOferta: ${npc.offer}\nTraição possível: ${npc.betrayal}\nCorpo ${npc.profile.body} · Coração ${npc.profile.heart} · Esperteza ${npc.profile.wits} · Resistência ${npc.profile.resistance} · Esperança ${npc.profile.hope}`;
@@ -131,13 +146,55 @@ export default function NarratorTools() {
   const activeTension = tensions[activeFaction.id] ?? 0;
   const ruptureFactions = tensionFactions.filter((faction) => (tensions[faction.id] ?? 0) === 6);
   const isSaved = (id: string) => favorites.some((favorite) => favorite.id === id);
-  const toggleFavorite = (favorite: Favorite) => setFavorites((current) => current.some((item) => item.id === favorite.id) ? current.filter((item) => item.id !== favorite.id) : [favorite, ...current].slice(0, 16));
-  const changeTension = (id: string, delta: number) => setTensions((current) => ({ ...current, [id]: clamp((current[id] ?? 0) + delta, 0, 6) }));
+  const toggleFavorite = (favorite: Favorite) => setFavorites((current) => current.some((item) => item.id === favorite.id) ? current.filter((item) => item !== favorite) : [favorite, ...current].slice(0, 16));
+  const playRuptureSound = (force = false) => {
+    if ((!force && !alertPreferences.sound) || typeof window === "undefined") return;
+    try {
+      const context = new AudioContext();
+      const gain = context.createGain();
+      const oscillator = context.createOscillator();
+      const now = context.currentTime;
+      oscillator.type = "triangle";
+      oscillator.frequency.setValueAtTime(126, now);
+      oscillator.frequency.exponentialRampToValueAtTime(82, now + 0.62);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.06, now + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start(now);
+      oscillator.stop(now + 0.72);
+      window.setTimeout(() => void context.close(), 900);
+    } catch { /* O alerta visual permanece disponível quando o navegador bloqueia áudio. */ }
+  };
+  const registerRupture = (factionRef: string) => {
+    const faction = tensionFactions.find((item) => item.id === factionRef || item.name === factionRef) ?? tensionFactions[0];
+    const consequence = ruptureConsequences[faction.id];
+    const entry: CrisisEvent = {
+      id: `CR-${faction.id}-${Date.now()}`,
+      factionId: faction.id,
+      faction: faction.name,
+      title: consequence.title,
+      consequence: consequence.detail,
+      timestamp: `Sessão atual · ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`,
+      resolved: false,
+    };
+    setCrises((current) => current.some((item) => item.factionId === faction.id && !item.resolved) ? current : [entry, ...current].slice(0, 12));
+    const diaryEntry = `Ruptura — ${faction.name}: ${consequence.title}. ${consequence.prompt}`;
+    setSessionSummary((current) => ({ ...current, nextScene: current.nextScene.includes(diaryEntry) ? current.nextScene : [current.nextScene, diaryEntry].filter(Boolean).join("\n") }));
+  };
+  const changeTension = (id: string, delta: number) => {
+    const currentValue = tensions[id] ?? 0;
+    const nextValue = clamp(currentValue + delta, 0, 6);
+    setTensions((current) => ({ ...current, [id]: nextValue }));
+    if (delta > 0 && currentValue < 6 && nextValue === 6) {
+      setActiveFactionId(id);
+      registerRupture(id);
+      playRuptureSound();
+    }
+  };
   const generateHook = (nextTerritory = territory, nextTone = tone) => { const generated = createHook(nextTerritory, nextTone, tensions); setHook(generated); setActiveFactionId(generated.factionId); };
-  const registerRupture = (factionName: string) => setSessionSummary((current) => {
-    const entry = `Ruptura: ${factionName} alcançou o nível máximo de tensão e exige uma consequência na próxima cena.`;
-    return { ...current, nextScene: current.nextScene.includes(entry) ? current.nextScene : [current.nextScene, entry].filter(Boolean).join("\n") };
-  });
+  const resolveCrisis = (id: string) => setCrises((current) => current.map((crisis) => crisis.id === id ? { ...crisis, resolved: true } : crisis));
   const exportFavorites = () => {
     if (!favorites.length) return;
     const content = ["# RPG Atlas — Registros Favoritos", "", `Exportado em ${new Date().toLocaleString("pt-BR")}.`, "", ...favorites.flatMap((favorite, index) => [`## ${index + 1}. ${favorite.kind} — ${favorite.title}`, "", `> ${favorite.summary}`, "", favorite.record, ""])].join("\n");
@@ -166,8 +223,10 @@ export default function NarratorTools() {
 
           <div className="grid gap-7">
             <article className="bg-[#171a18] p-6 text-[#eae3d5] sm:p-8">
-              <div className="flex flex-col justify-between gap-5 border-b border-white/10 pb-5 sm:flex-row sm:items-start"><div><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.17em] text-[#83a89a]"><Clock3 className="h-3.5 w-3.5" /> Relógio de consequências</div><h3 className="mt-3 font-serif text-[34px] leading-none">Tensão das facções</h3></div><span className="border border-[#b55b32]/45 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#d27648]">persistente</span></div>
+              <div className="flex flex-col justify-between gap-5 border-b border-white/10 pb-5 sm:flex-row sm:items-start"><div className="flex items-start gap-3"><span className="relative grid h-9 w-9 shrink-0 place-items-center border border-[#b55b32]/65 font-serif text-[21px] text-[#eae3d5]"><span className="absolute inset-1 rounded-t-full border-x border-t border-[#83a89a]/55" />V</span><div><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.17em] text-[#83a89a]"><Clock3 className="h-3.5 w-3.5" /> Relógio de consequências</div><h3 className="mt-3 font-serif text-[34px] leading-none">Tensão das facções</h3></div></div><span className="border border-[#b55b32]/45 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#d27648]">V-17 · persistente</span></div>
+              <div className="mt-5 flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-[9px] font-bold uppercase tracking-[0.17em] text-[#a6a397]">Alertas de Ruptura</p><p className="mt-1 max-w-[520px] text-[12px] leading-5 text-[#aaa79c]">Configure os efeitos antes da crise. O pulso evidencia registros ativos; o som só toca após uma interação da mesa e pode ser desativado a qualquer momento.</p></div><div className="flex shrink-0 flex-wrap gap-2"><button onClick={() => { const enabling = !alertPreferences.sound; setAlertPreferences((current) => ({ ...current, sound: enabling })); if (enabling) playRuptureSound(true); }} aria-pressed={alertPreferences.sound} className={`flex h-9 items-center gap-2 border px-3 text-[9px] font-bold uppercase tracking-[0.13em] transition-colors duration-150 ${alertPreferences.sound ? "border-[#ffb09d] bg-[#ffb09d] text-[#3b1d19]" : "border-white/20 text-[#c9c3b8] hover:border-[#ffb09d]/65 hover:text-[#ffb09d]"}`}>{alertPreferences.sound ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}{alertPreferences.sound ? "Som ativo" : "Ativar som"}</button><button onClick={() => setAlertPreferences((current) => ({ ...current, pulse: !current.pulse }))} aria-pressed={alertPreferences.pulse} className={`h-9 border px-3 text-[9px] font-bold uppercase tracking-[0.13em] transition-colors duration-150 ${alertPreferences.pulse ? "border-[#b55b32]/70 text-[#d27648]" : "border-white/20 text-[#c9c3b8] hover:border-[#d27648]/65 hover:text-[#d27648]"}`}>Pulso {alertPreferences.pulse ? "ativo" : "inativo"}</button></div></div>
               {ruptureFactions.length > 0 && <div className="mt-6 border-2 border-[#e0523f] bg-[#3b1d19] p-4 shadow-[5px_5px_0_rgba(224,82,63,0.2)]"><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#ffb09d]"><AlertTriangle className="h-4 w-4" /> Ruptura detectada · ação imediata</div><div className="mt-4 grid gap-3">{ruptureFactions.map((faction) => <div key={faction.id} className="flex flex-col gap-3 border-t border-[#ffb09d]/25 pt-3 sm:flex-row sm:items-center sm:justify-between"><p className="font-serif text-[23px] leading-none text-[#f7dfd6]">{faction.name} <span className="ml-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#ffb09d]">em Ruptura</span></p><div className="flex gap-2"><button onClick={() => { setActiveFactionId(faction.id); registerRupture(faction.name); }} className="border border-[#ffb09d]/50 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.13em] text-[#ffb09d] hover:bg-[#ffb09d] hover:text-[#3b1d19]">Registrar no diário</button><button onClick={() => changeTension(faction.id, -1)} className="border border-[#ffb09d]/25 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.13em] text-[#f7dfd6] hover:bg-white/10">Voltar a Confronto</button></div></div>)}</div></div>}
+              {ruptureFactions.length > 0 && <div className={`mt-4 border border-[#e0523f]/65 bg-[#261615] px-4 py-3 ${alertPreferences.pulse ? "rupture-pulse motion-reduce:animate-none" : ""}`}><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-[9px] font-bold uppercase tracking-[0.19em] text-[#ffb09d]">Consequência de Ruptura pronta</p><p className="mt-1 font-serif text-[24px] leading-none text-[#f7dfd6]">{ruptureConsequences[ruptureFactions[0].id].title}</p></div><div className="flex items-center gap-2"><button onClick={() => setAlertPreferences((current) => ({ ...current, sound: !current.sound }))} aria-pressed={alertPreferences.sound} className={`flex h-9 items-center gap-2 border px-3 text-[9px] font-bold uppercase tracking-[0.13em] ${alertPreferences.sound ? "border-[#ffb09d] bg-[#ffb09d] text-[#3b1d19]" : "border-[#ffb09d]/35 text-[#ffb09d]"}`}>{alertPreferences.sound ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}{alertPreferences.sound ? "Som ativo" : "Som silenciado"}</button><button onClick={() => setAlertPreferences((current) => ({ ...current, pulse: !current.pulse }))} aria-pressed={alertPreferences.pulse} className={`h-9 border px-3 text-[9px] font-bold uppercase tracking-[0.13em] ${alertPreferences.pulse ? "border-[#ffb09d] text-[#ffb09d]" : "border-white/20 text-[#c9c3b8]"}`}>Pulso {alertPreferences.pulse ? "ativo" : "inativo"}</button></div></div><p className="mt-3 text-[12px] leading-5 text-[#d6b4aa]">{ruptureConsequences[ruptureFactions[0].id].detail}</p></div>}
               <div className="mt-7 grid gap-6 md:grid-cols-[190px_1fr] md:items-center">
                 <button onClick={() => changeTension(activeFaction.id, 1)} className={`group mx-auto grid h-[166px] w-[166px] place-items-center rounded-full p-2 transition-transform duration-200 hover:scale-[1.03] ${activeTension === 6 ? "ring-2 ring-[#e0523f] ring-offset-4 ring-offset-[#171a18]" : ""}`} style={{ background: `conic-gradient(${activeTension === 6 ? "#e0523f" : "#b55b32"} 0deg ${activeTension * 60}deg, rgba(234,227,213,0.13) ${activeTension * 60}deg 360deg)` }} aria-label={`Avançar tensão de ${activeFaction.name}`}>
                   <span className="grid h-[146px] w-[146px] place-items-center rounded-full bg-[#171a18] text-center"><span><b className="block font-serif text-[46px] leading-none text-[#d27648]">{activeTension}/6</b><span className="mt-1 block text-[9px] font-bold uppercase tracking-[0.14em] text-[#a6a397]">{tensionStages[activeTension]}</span></span></span>
@@ -175,6 +234,13 @@ export default function NarratorTools() {
                 <div className="grid border-t border-white/10 sm:grid-cols-2">{tensionFactions.map((faction, index) => { const value = tensions[faction.id] ?? 0; const active = faction.id === activeFaction.id; const rupture = value === 6; return <div key={faction.id} className={`group p-4 ${index < 4 ? "border-b border-white/10" : ""} ${index % 2 === 0 ? "sm:border-r" : ""} ${active ? "bg-white/[0.04]" : ""} ${rupture ? "bg-[#4a231c] ring-1 ring-inset ring-[#e0523f]" : ""}`}><button onClick={() => setActiveFactionId(faction.id)} className="w-full text-left"><div className="flex items-start justify-between gap-2"><p className={`font-serif text-[21px] leading-none ${rupture ? "text-[#ffb09d]" : active ? "text-[#eae3d5]" : "text-[#c0bcb0]"}`}>{faction.name}</p>{rupture && <AlertTriangle className="h-4 w-4 shrink-0 text-[#e0523f]" />}</div><p className="mt-2 text-[10px] uppercase tracking-[0.13em] text-[#85897f]">{rupture ? "Ruptura · consequência ativa" : faction.note}</p></button><div className="mt-4 flex items-center justify-between"><div className="flex gap-1">{Array.from({ length: 6 }, (_, mark) => <span key={mark} className={`h-1.5 w-4 ${mark < value ? rupture ? "bg-[#e0523f]" : "bg-[#b55b32]" : "bg-white/10"}`} />)}</div><div className="flex gap-1"><button onClick={() => changeTension(faction.id, -1)} disabled={value === 0} className="grid h-6 w-6 place-items-center border border-white/15 text-[#c9c3b8] disabled:opacity-30"><Minus className="h-3 w-3" /></button><button onClick={() => changeTension(faction.id, 1)} disabled={value === 6} className="grid h-6 w-6 place-items-center border border-[#b55b32]/60 text-[#d27648] disabled:opacity-30"><Plus className="h-3 w-3" /></button></div></div></div>; })}</div>
               </div>
               <p className="mt-6 border-t border-white/10 pt-4 text-[12px] leading-6 text-[#aaa79c]"><strong className={`font-semibold ${activeTension === 6 ? "text-[#ffb09d]" : "text-[#d8d2c6]"}`}>{activeFaction.name}:</strong> {activeTension === 6 ? "Ruptura. A facção exige uma consequência agora; registre a pressão no diário ou recue uma marca após resolver a cena." : `${tensionStages[activeTension]}. Clique no anel para avançar uma marca; use os controles de cada registro para retroceder ou calibrar a pressão.`}</p>
+            </article>
+
+            <article className="relative overflow-hidden border border-[#161715]/20 bg-[#ece4d6] p-6 sm:p-8">
+              <div className="pointer-events-none absolute inset-0 opacity-50 [background:linear-gradient(90deg,rgba(22,23,21,0.045)_1px,transparent_1px),linear-gradient(rgba(22,23,21,0.035)_1px,transparent_1px)] [background-size:24px_24px]" />
+              <div className="relative flex flex-col justify-between gap-5 border-b border-[#161715]/15 pb-5 sm:flex-row sm:items-start"><div><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.17em] text-[#b55b32]"><Clock3 className="h-3.5 w-3.5" /> Linha do tempo de crises</div><h3 className="mt-3 font-serif text-[34px] leading-none">O que já cobrou resposta.</h3></div><div className="border border-[#161715]/20 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#65675f]">{crises.filter((crisis) => !crisis.resolved).length} em curso</div></div>
+              <p className="relative mt-4 max-w-[680px] text-[13px] leading-6 text-[#53564f]">Toda facção que atravessa a Ruptura deixa um registro permanente. As consequências pendentes alimentam a próxima cena; resolva-as somente quando a mesa tiver pago o preço ficcional.</p>
+              <div className="relative mt-7 border-l border-dashed border-[#7a876d]/65 pl-6">{crises.length === 0 ? <div className="border border-[#161715]/15 bg-[#f4eee4]/70 p-5 text-[13px] leading-6 text-[#5e6058]">Nenhuma crise foi registrada. Ao elevar uma facção de Confronto para Ruptura, o painel cria uma entrada com consequência própria, horário e rastro no diário.</div> : <div className="grid gap-5">{crises.map((crisis) => <article key={crisis.id} className={`relative border p-5 ${crisis.resolved ? "border-[#7a876d]/25 bg-[#f2ece0]/65 opacity-70" : "border-[#b55b32]/45 bg-[#f7efe3] shadow-[4px_4px_0_rgba(181,91,50,0.14)]"}`}><span className={`absolute -left-[31px] top-6 grid h-3 w-3 place-items-center border-2 border-[#ece4d6] ${crisis.resolved ? "bg-[#83a89a]" : "bg-[#b55b32]"}`} /><div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><div className="flex flex-wrap items-center gap-3"><p className="font-serif text-[27px] leading-none text-[#161715]">{crisis.title}</p><span className="border border-[#b55b32]/35 px-2 py-1 text-[8px] font-bold uppercase tracking-[0.14em] text-[#8a4630]">{crisis.faction}</span></div><p className="mt-3 max-w-[720px] text-[13px] leading-6 text-[#4e5149]">{crisis.consequence}</p></div><div className="shrink-0 text-left sm:text-right"><p className="text-[8px] font-bold uppercase tracking-[0.15em] text-[#7a876d]">{crisis.timestamp}</p>{crisis.resolved ? <span className="mt-3 inline-block text-[9px] font-bold uppercase tracking-[0.14em] text-[#53776c]">Resolvida</span> : <button onClick={() => resolveCrisis(crisis.id)} className="mt-3 border border-[#161715]/30 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.13em] text-[#161715] hover:bg-[#161715] hover:text-[#eae3d5]">Encerrar crise</button>}</div></div></article>)}</div>}</div>
             </article>
 
             <article className="border border-[#161715]/20 bg-[#eee7db]/85 p-6 sm:p-8">

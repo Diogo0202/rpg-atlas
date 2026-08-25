@@ -10,6 +10,9 @@
 - [x] Adicionar filtros interativos de tom aos ganchos de aventura.
 - [x] Persistir ganchos e NPCs favoritos no armazenamento local.
 - [x] Validar os novos controles e atualizar o checkpoint.
+- [ ] Modelar o catálogo da Biblioteca de Antagonistas com tipo de criatura e nível de ameaça.
+- [ ] Implementar filtros combináveis e estados de consulta da Biblioteca de Antagonistas.
+- [ ] Validar a biblioteca em desktop e mobile, salvar checkpoint e entregar a atualização.
 - [ ] Vincular cada novo gancho à facção com maior tensão.
 - [ ] Criar painel de resumo da sessão persistente.
 - [ ] Exportar favoritos em arquivo Markdown.

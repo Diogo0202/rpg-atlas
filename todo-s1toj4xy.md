@@ -1,0 +1,9 @@
+- [ ] Modelar o catálogo da Biblioteca de Antagonistas com tipo de criatura e nível de ameaça.
+- [ ] Implementar filtros combináveis e estados de consulta da Biblioteca de Antagonistas.
+- [ ] Validar a biblioteca em desktop e mobile, salvar checkpoint e entregar a atualização.
+- [ ] Inventariar os arquivos da pasta Google Drive compartilhada e classificar suas funções no atlas.
+- [ ] Integrar os materiais aprovados à estrutura, à navegação e aos recursos do RPG Atlas.
+- [ ] Validar os materiais integrados, salvar checkpoint e entregar a atualização.
+- [x] Modelar a linha do tempo de crises e as consequências de Ruptura por facção.
+- [x] Implementar alertas visuais e sonoros opcionais para o estado de Ruptura.
+- [x] Validar o painel de crises em desktop e mobile, salvar checkpoint e entregar a atualização.
