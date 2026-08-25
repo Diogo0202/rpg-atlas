@@ -17,3 +17,6 @@
 - [x] Criar painel de resumo da sessão persistente.
 - [x] Exportar favoritos em arquivo Markdown.
 - [x] Validar e salvar a atualização da sessão.
+- [ ] Criar alerta visual para facção em Ruptura.
+- [x] Validar o alerta e salvar a atualização.
+- [x] Criar alerta visual para facção em Ruptura.
