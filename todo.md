@@ -2,45 +2,45 @@
 - [x] Modelar os dados de fichas rápidas de NPCs.
 - [x] Criar a seção interativa Ferramentas do Narrador.
 - [x] Validar os geradores em desktop e mobile.
-- [ ] Salvar checkpoint e entregar a atualização.
-- [ ] Modelar o relógio visual de consequências por facção.
-- [ ] Adicionar filtros interativos de tom aos ganchos de aventura.
-- [ ] Persistir ganchos e NPCs favoritos no armazenamento local.
+- [x] Salvar checkpoint e entregar a atualização.
+- [x] Modelar o relógio visual de consequências por facção.
+- [x] Adicionar filtros interativos de tom aos ganchos de aventura.
+- [x] Persistir ganchos e NPCs favoritos no armazenamento local.
 - [x] Modelar o relógio visual de consequências por facção.
 - [x] Adicionar filtros interativos de tom aos ganchos de aventura.
 - [x] Persistir ganchos e NPCs favoritos no armazenamento local.
 - [x] Validar os novos controles e atualizar o checkpoint.
-- [ ] Modelar o catálogo da Biblioteca de Antagonistas com tipo de criatura e nível de ameaça.
-- [ ] Implementar filtros combináveis e estados de consulta da Biblioteca de Antagonistas.
-- [ ] Validar a biblioteca em desktop e mobile, salvar checkpoint e entregar a atualização.
-- [ ] Vincular cada novo gancho à facção com maior tensão.
-- [ ] Criar painel de resumo da sessão persistente.
-- [ ] Exportar favoritos em arquivo Markdown.
+- [x] Modelar o catálogo da Biblioteca de Antagonistas com tipo de criatura e nível de ameaça.
+- [x] Implementar filtros combináveis e estados de consulta da Biblioteca de Antagonistas.
+- [x] Validar a biblioteca em desktop e mobile, salvar checkpoint e entregar a atualização.
+- [x] Vincular cada novo gancho à facção com maior tensão.
+- [x] Criar painel de resumo da sessão persistente.
+- [x] Exportar favoritos em arquivo Markdown.
 - [x] Vincular cada novo gancho à facção com maior tensão.
 - [x] Criar painel de resumo da sessão persistente.
 - [x] Exportar favoritos em arquivo Markdown.
 - [x] Validar e salvar a atualização da sessão.
-- [ ] Criar alerta visual para facção em Ruptura.
+- [x] Criar alerta visual para facção em Ruptura.
 - [x] Validar o alerta e salvar a atualização.
 - [x] Criar alerta visual para facção em Ruptura.
-- [ ] Permitir editar detalhes de NPCs na trilha lateral antes da exportação.
+- [x] Permitir editar detalhes de NPCs na trilha lateral antes da exportação.
 - [x] Validar a edição lateral e salvar a atualização.
 - [x] Permitir editar detalhes de NPCs na trilha lateral antes da exportação.
-- [ ] Adicionar prévia de impressão e duplicação de NPCs.
-- [ ] Criar armazenamento local e alternância de campanhas.
-- [ ] Implementar gerador de itens baseado na campanha ativa.
-- [ ] Validar e salvar a atualização de preparação.
 - [x] Adicionar prévia de impressão e duplicação de NPCs.
 - [x] Criar armazenamento local e alternância de campanhas.
 - [x] Implementar gerador de itens baseado na campanha ativa.
 - [x] Validar e salvar a atualização de preparação.
-- [ ] Adicionar filtros de tipo e raridade ao gerador de itens.
-- [ ] Implementar exportação Markdown do dossiê global da campanha ativa.
+- [x] Adicionar prévia de impressão e duplicação de NPCs.
+- [x] Criar armazenamento local e alternância de campanhas.
+- [x] Implementar gerador de itens baseado na campanha ativa.
+- [x] Validar e salvar a atualização de preparação.
+- [x] Adicionar filtros de tipo e raridade ao gerador de itens.
+- [x] Implementar exportação Markdown do dossiê global da campanha ativa.
 - [x] Validar e salvar a atualização de exportação.
 - [x] Adicionar filtros de tipo e raridade ao gerador de itens.
 - [x] Implementar exportação Markdown do dossiê global da campanha ativa.
-- [ ] Criar modelos de exportação Sessão, Campanha e Mestre.
-- [ ] Adicionar sumário clicável aos documentos Markdown exportados.
+- [x] Criar modelos de exportação Sessão, Campanha e Mestre.
+- [x] Adicionar sumário clicável aos documentos Markdown exportados.
 - [x] Validar e salvar a atualização dos modelos de documento.
 - [x] Criar modelos de exportação Sessão, Campanha e Mestre.
 - [x] Adicionar sumário clicável aos documentos Markdown exportados.

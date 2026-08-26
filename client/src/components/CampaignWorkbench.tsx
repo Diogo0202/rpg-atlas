@@ -94,7 +94,7 @@ export default function CampaignWorkbench() {
       items: ["## Itens preparados", "", ...reportItems.flatMap(itemMarkdown)],
     };
     const order = template === "Mestre" ? normalizeMasterOrder(masterOrder) : ["session", "crises", "npcs", "items"] as SectionKey[];
-    const toc = order.map((key) => `- [${template === "Sessão" && key === "crises" ? "Crises em curso" : sectionLabels[key]}](#${sectionAnchors[key]})`);
+    const toc = order.map((key) => { const isOpenCrises = template === "Sessão" && key === "crises"; return `- [${isOpenCrises ? "Crises em curso" : sectionLabels[key]}](#${isOpenCrises ? "crises-em-curso" : sectionAnchors[key]})`; });
     return [`# RPG Atlas — ${activeCampaign.name}`, "", `> **Modelo:** ${template}  `, `> **Registro:** ${activeCampaign.register}  `, `> **Território:** ${activeCampaign.setting}  `, `> **Tom:** ${activeCampaign.tone}`, "", "## Sumario", "", ...toc, "", "---", "", ...order.flatMap((key) => sections[key])].join("\n");
   };
   const previewDossier = () => setPreview(buildMarkdown());
