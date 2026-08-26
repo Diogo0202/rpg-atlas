@@ -1,6 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+export type Theme = "light" | "dark";
+
+export function resolveArchiveTheme(stored: string | null, defaultTheme: Theme): Theme {
+  return stored === "light" || stored === "dark" ? stored : defaultTheme;
+}
+
+export function toggleArchiveTheme(theme: Theme): Theme {
+  return theme === "light" ? "dark" : "light";
+}
 
 interface ThemeContextType {
   theme: Theme;
@@ -24,7 +32,7 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(() => {
     if (switchable) {
       const stored = localStorage.getItem("theme");
-      return (stored as Theme) || defaultTheme;
+      return resolveArchiveTheme(stored, defaultTheme);
     }
     return defaultTheme;
   });
@@ -44,7 +52,7 @@ export function ThemeProvider({
 
   const toggleTheme = switchable
     ? () => {
-        setTheme(prev => (prev === "light" ? "dark" : "light"));
+        setTheme(toggleArchiveTheme);
       }
     : undefined;
 

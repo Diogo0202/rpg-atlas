@@ -190,13 +190,16 @@ export const V5_GENERATIONS = Array.from({ length: 11 }, (_, index) => {
 export type V5SheetData = {
   clan: string; predator: string; generation: number; bloodPotency: number; humanity: number; hunger: number;
   attributes: Record<string, number>; skills: Record<string, number>; disciplines: Record<string, string[]>;
-  advantages: { name: string; dots: number }[]; flaws: { name: string; dots: number }[]; inventory: string[]; equippedWeaponId: string | null;
+  advantages: { name: string; dots: number }[]; flaws: { name: string; dots: number }[]; inventory: string[]; equippedWeaponId: string | null; equippedArmorId: string | null;
+  experienceHistory: V5ExperienceRecord[];
 };
+
+export type V5ExperienceRecord = { id: string; kind: V5AdvancementKind; currentDots: number; targetDots: number; cost: number; recordedAt: number };
 
 export function createV5SheetData(): V5SheetData {
   const attributes = Object.values(V5_ATTRIBUTES).flat().reduce<Record<string, number>>((acc, name) => ({ ...acc, [name]: 1 }), {});
   const skills = Object.values(V5_SKILLS).flat().reduce<Record<string, number>>((acc, name) => ({ ...acc, [name]: 0 }), {});
-  return { clan: "", predator: "", generation: 13, bloodPotency: 0, humanity: 7, hunger: 1, attributes, skills, disciplines: {}, advantages: [], flaws: [], inventory: [], equippedWeaponId: null };
+  return { clan: "", predator: "", generation: 13, bloodPotency: 0, humanity: 7, hunger: 1, attributes, skills, disciplines: {}, advantages: [], flaws: [], inventory: [], equippedWeaponId: null, equippedArmorId: null, experienceHistory: [] };
 }
 
 export function v5HealthTrack(attributes: Record<string, number>) { return Math.max(1, (attributes["Vigor"] || 1) + 3); }
@@ -218,4 +221,41 @@ export function getV5InventoryItems(sheet: Pick<V5SheetData, "inventory">) {
 export function getV5EquippedWeapon(sheet: Pick<V5SheetData, "equippedWeaponId">) {
   const item = V5_STORE.find((entry) => entry.id === sheet.equippedWeaponId);
   return item?.category === "arma" ? item : undefined;
+}
+
+export function getV5EquippedArmor(sheet: Pick<V5SheetData, "equippedArmorId">) {
+  const item = V5_STORE.find((entry) => entry.id === sheet.equippedArmorId);
+  return item?.category === "armadura" ? item : undefined;
+}
+
+export function getV5AdvancementLabel(kind: V5AdvancementKind) {
+  return ({ attribute: "Atributo", skill: "Habilidade", discipline: "Disciplina de clã", outOfClanDiscipline: "Disciplina externa", bloodPotency: "Potência de Sangue" } satisfies Record<V5AdvancementKind, string>)[kind];
+}
+
+export type V5SheetExportSection = { title: string; lines: string[] };
+
+export function buildV5SheetExportSections(input: { name: string; concept?: string; campaignName?: string; sheet: V5SheetData }): V5SheetExportSection[] {
+  const { name, concept, campaignName, sheet } = input;
+  const clan = V5_CLANS.find((entry) => entry.id === sheet.clan)?.name || "Não informado";
+  const predator = V5_PREDATORS.find((entry) => entry.id === sheet.predator)?.name || "Não informado";
+  const generation = V5_GENERATIONS.find((entry) => entry.generation === sheet.generation)?.label || `${sheet.generation}ª Geração`;
+  const inventoryLines = getV5InventoryItems(sheet).map((item) => {
+    const status = item.id === sheet.equippedWeaponId ? " [ARMA EQUIPADA]" : item.id === sheet.equippedArmorId ? " [ARMADURA EQUIPADA]" : "";
+    const score = item.damage !== undefined ? `dano +${item.damage}` : item.armor !== undefined ? `proteção +${item.armor}` : `Recursos ${item.resources}`;
+    return `${item.name}${status} · ${item.category} · ${score}`;
+  });
+  const disciplineLines = Object.entries(sheet.disciplines).filter(([, powers]) => powers.length).map(([discipline, powers]) => `${discipline}: ${powers.join(", ")}`);
+  const experienceLines = [...sheet.experienceHistory].sort((a, b) => b.recordedAt - a.recordedAt).map((entry) => `${new Date(entry.recordedAt).toLocaleDateString("pt-BR")} · ${getV5AdvancementLabel(entry.kind)} ${entry.currentDots}→${entry.targetDots} · ${entry.cost} XP`);
+
+  return [
+    { title: "Identidade", lines: [`Nome: ${name || "Sem nome"}`, `Conceito: ${concept || "Não informado"}`, `Crônica: ${campaignName || "Sem vínculo"}`, `Clã: ${clan}`, `Predador: ${predator}`, `Geração: ${generation} · Potência de Sangue ${sheet.bloodPotency}`] },
+    { title: "Marcadores", lines: [`Fome: ${sheet.hunger}/5`, `Humanidade: ${sheet.humanity}/10`, `Vitalidade: ${v5HealthTrack(sheet.attributes)}`, `Força de Vontade: ${v5WillpowerTrack(sheet.attributes)}`] },
+    { title: "Atributos", lines: Object.entries(V5_ATTRIBUTES).map(([group, labels]) => `${group}: ${labels.map((label) => `${label} ${sheet.attributes[label] ?? 0}`).join(" · ")}`) },
+    { title: "Habilidades", lines: Object.entries(V5_SKILLS).map(([group, labels]) => `${group}: ${labels.filter((label) => (sheet.skills[label] ?? 0) > 0).map((label) => `${label} ${sheet.skills[label]}`).join(" · ") || "Nenhuma registrada"}`) },
+    { title: "Disciplinas e poderes", lines: disciplineLines.length ? disciplineLines : ["Nenhuma disciplina ou poder registrado."] },
+    { title: "Vantagens", lines: sheet.advantages.length ? sheet.advantages.map((entry) => `${entry.name} · ${entry.dots} ponto(s)`) : ["Nenhuma vantagem registrada."] },
+    { title: "Desvantagens", lines: sheet.flaws.length ? sheet.flaws.map((entry) => `${entry.name} · ${entry.dots} ponto(s)`) : ["Nenhuma desvantagem registrada."] },
+    { title: "Inventário e equipamento", lines: inventoryLines.length ? inventoryLines : ["Nenhum item registrado."] },
+    { title: "Histórico de experiência", lines: experienceLines.length ? experienceLines : ["Nenhuma evolução registrada."] },
+  ];
 }

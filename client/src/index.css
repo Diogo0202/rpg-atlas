@@ -31,6 +31,41 @@
 }
 
 :root {
+  --background: oklch(0.93 0.021 85);
+  --foreground: oklch(0.2 0.013 145);
+  --card: oklch(0.97 0.015 85);
+  --card-foreground: oklch(0.2 0.013 145);
+  --popover: oklch(0.97 0.015 85);
+  --popover-foreground: oklch(0.2 0.013 145);
+  --primary: oklch(0.51 0.13 43);
+  --primary-foreground: oklch(0.98 0.012 85);
+  --secondary: oklch(0.87 0.023 85);
+  --secondary-foreground: oklch(0.2 0.013 145);
+  --muted: oklch(0.89 0.02 85);
+  --muted-foreground: oklch(0.43 0.018 145);
+  --accent: oklch(0.54 0.06 164);
+  --accent-foreground: oklch(0.98 0.012 85);
+  --destructive: oklch(0.5 0.18 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.34 0.016 145 / 22%);
+  --input: oklch(0.34 0.016 145 / 22%);
+  --ring: oklch(0.54 0.06 164);
+  --archive-void: #eee7d9;
+  --archive-panel: #fbf6eb;
+  --archive-side: #e2d8c6;
+  --archive-deep: #e9e0d0;
+  --archive-recessed: #e5dbca;
+  --archive-highlight: #f4ecdf;
+  --archive-ink: #1c211e;
+  --archive-muted: #5e625b;
+  --archive-line: rgba(28, 33, 30, 0.18);
+  --archive-copper: #9d492b;
+  --archive-salt: #3e776b;
+  --archive-warning: #8f392a;
+  --archive-paper-ink: #161715;
+}
+
+.dark {
   --background: oklch(0.14 0.008 145);
   --foreground: oklch(0.91 0.012 82);
   --card: oklch(0.18 0.01 145);
@@ -50,6 +85,19 @@
   --border: oklch(0.91 0.012 82 / 14%);
   --input: oklch(0.91 0.012 82 / 14%);
   --ring: oklch(0.67 0.05 164);
+  --archive-void: #101211;
+  --archive-panel: #171a18;
+  --archive-side: #0a0c0b;
+  --archive-deep: #111312;
+  --archive-recessed: #0f1110;
+  --archive-highlight: #1d211e;
+  --archive-ink: #eae3d5;
+  --archive-muted: #b8b3a8;
+  --archive-line: rgba(234, 227, 213, 0.14);
+  --archive-copper: #b55b32;
+  --archive-salt: #83a89a;
+  --archive-warning: #ffb08e;
+  --archive-paper-ink: #161715;
 }
 
 @layer base {
@@ -58,6 +106,24 @@
   body { @apply bg-background font-sans text-foreground antialiased; }
   button:not(:disabled), a[href] { @apply cursor-pointer; }
 }
+
+/* The legacy dossier surfaces retain their editorial hierarchy while inheriting the selected archive theme. */
+html:not(.dark) [class~="bg-[#101211]"] { background-color: var(--archive-void) !important; }
+html:not(.dark) [class~="bg-[#171a18]"] { background-color: var(--archive-panel) !important; }
+html:not(.dark) [class~="bg-[#0a0c0b]"] { background-color: var(--archive-side) !important; }
+html:not(.dark) [class~="bg-[#111312]"] { background-color: var(--archive-deep) !important; }
+html:not(.dark) [class~="bg-black/10"] { background-color: var(--archive-recessed) !important; }
+html:not(.dark) [class~="bg-white/[0.04]"] { background-color: var(--archive-highlight) !important; }
+html:not(.dark) [class~="text-[#eae3d5]"],
+html:not(.dark) [class~="text-[#f4eee4]"] { color: var(--archive-ink) !important; }
+html:not(.dark) [class~="text-[#b8b3a8]"],
+html:not(.dark) [class~="text-[#c7c1b5]"] { color: var(--archive-muted) !important; }
+html:not(.dark) [class~="text-[#83a89a]"],
+html:not(.dark) [class~="text-[#a9c7bb]"] { color: var(--archive-salt) !important; }
+html:not(.dark) [class~="text-[#ffb08e]"] { color: var(--archive-warning) !important; }
+html:not(.dark) [class~="border-white/10"],
+html:not(.dark) [class~="border-white/15"],
+html:not(.dark) [class~="border-white/20"] { border-color: var(--archive-line) !important; }
 
 @layer utilities {
   @keyframes rupture-pulse {

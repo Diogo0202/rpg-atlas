@@ -42,4 +42,12 @@
 - [x] Implementar filtros avançados para Arsenal e Casa de Recursos.
 - [x] Validar cálculos, filtros e equipamento em desktop e mobile, salvar checkpoint e entregar a atualização.
 - [x] Integrar a arma equipada ao fluxo completo de rolagem V5, incluindo dados de Fome e resultado persistente.
-- [ ] Salvar checkpoint e entregar a atualização de experiência, filtros e equipamento após a integração final.
+- [x] Salvar checkpoint e entregar a atualização de experiência, filtros e equipamento após a integração final.
+- [x] Modelar preferências de tema, indicadores de equipamento e conteúdo do relatório de ficha.
+- [x] Implementar alternância clara/escura e estados visuais de armas e armaduras equipadas.
+- [x] Implementar exportação PDF da ficha com inventário e histórico de experiência.
+- [x] Validar tema, equipamento e PDF em desktop e mobile, salvar checkpoint e entregar a atualização.
+- [x] Validar a alternância claro/escuro em desktop e mobile, incluindo contraste e legibilidade, com capturas, presença do controle e teste determinístico de transição; a interação no navegador conectado foi tentada, mas a extensão retornou HTTP 504.
+- [x] Verificar a exportação PDF da ficha completa com teste de bytes `%PDF`, conteúdo estruturado e compilação; o clique autenticado no navegador conectado não pôde ser automatizado devido ao HTTP 504 da extensão.
+- [ ] Salvar checkpoint final e entregar a atualização após as verificações interativas.
+- [x] Produzir evidência visual real dos modos claro e escuro da ficha V5 em desktop e mobile, mantendo a configuração final em tema escuro com alternância disponível.

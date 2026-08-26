@@ -20,8 +20,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { startLogin } from "@/const";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useMobile";
-import { BookOpen, LayoutDashboard, LogOut, PanelLeft, ScrollText, Shield, Skull, UserRound } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, Moon, PanelLeft, ScrollText, Shield, Skull, Sun, UserRound } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -119,6 +120,7 @@ function DashboardLayoutContent({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     if (isCollapsed) {
@@ -206,8 +208,18 @@ function DashboardLayoutContent({
             </SidebarMenu>
           </SidebarContent>
 
-          <SidebarFooter className="border-t border-white/10 p-3">
-            <DropdownMenu>
+	          <SidebarFooter className="border-t border-white/10 p-3">
+	            <Button
+	              type="button"
+	              variant="outline"
+	              onClick={toggleTheme}
+	              className="mb-3 h-10 w-full rounded-none border-white/15 bg-transparent px-3 text-[9px] font-bold uppercase tracking-[0.12em] text-[#eae3d5] hover:bg-white/[0.04] group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:px-0"
+	              aria-label={theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"}
+	            >
+	              {theme === "dark" ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
+	              <span className="ml-2 group-data-[collapsible=icon]:hidden">{theme === "dark" ? "Luz do alvorecer" : "Véu noturno"}</span>
+	            </Button>
+	            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex w-full items-center gap-3 px-1 py-1 text-left transition-colors hover:bg-white/[0.04] group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b55b32]">
                   <Avatar className="h-9 w-9 shrink-0 border border-[#b55b32]/60">
@@ -259,9 +271,12 @@ function DashboardLayoutContent({
                   </span>
                 </div>
               </div>
-            </div>
-          </div>
-        )}
+	            </div>
+	            <Button type="button" variant="outline" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-none border-white/15 bg-[#171a18] text-[#eae3d5]" aria-label={theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"}>
+	              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+	            </Button>
+	          </div>
+	        )}
         <main className="flex-1 p-4">{children}</main>
       </SidebarInset>
     </>
