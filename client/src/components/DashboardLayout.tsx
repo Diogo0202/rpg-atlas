@@ -22,7 +22,7 @@ import {
 import { startLogin } from "@/const";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useMobile";
-import { BookOpen, LayoutDashboard, LogOut, Moon, PanelLeft, ScrollText, Shield, Skull, Sun, UserRound } from "lucide-react";
+import { BookMarked, BookOpen, LayoutDashboard, LogOut, Moon, PanelLeft, ScrollText, Shield, Skull, Sun, UserRound } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -32,10 +32,11 @@ const menuItems = [
   { number: "01", icon: BookOpen, label: "Atlas público", path: "/" },
   { number: "02", icon: LayoutDashboard, label: "Santuário", path: "/santuario" },
   { number: "03", icon: Skull, label: "Antagonistas", path: "/biblioteca" },
-  { number: "04", icon: UserRound, label: "Ficha V5", path: "/ficha-v5" },
-  { number: "05", icon: Shield, label: "Arsenal V5", path: "/arsenal-v5" },
-  { number: "06", icon: UserRound, label: "Ficha O Um Anel", path: "/ficha-um-anel" },
-  { number: "07", icon: ScrollText, label: "Registro vivo", path: "/santuario" },
+  { number: "04", icon: BookMarked, label: "Acervo", path: "/acervo" },
+  { number: "05", icon: UserRound, label: "Ficha V5", path: "/ficha-v5" },
+  { number: "06", icon: Shield, label: "Arsenal V5", path: "/arsenal-v5" },
+  { number: "07", icon: UserRound, label: "Ficha O Um Anel", path: "/ficha-um-anel" },
+  { number: "08", icon: ScrollText, label: "Registro vivo", path: "/santuario" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

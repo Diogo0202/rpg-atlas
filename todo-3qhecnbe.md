@@ -1,0 +1,21 @@
+# Project TODO
+
+- [x] Mapear a estrutura, as rotas e os componentes atuais do RPG Atlas relevantes ao acervo de consulta.
+- [x] Examinar os dois diretórios de referência no Google Drive e consolidar o material utilizável sobre vampiros, caçadores e O Um Anel.
+- [x] Incluir os 12 clãs de vampiros no acervo de consulta, com organização e detalhes consistentes.
+- [x] Incluir os arquétipos de caçador no acervo de consulta, com organização e detalhes consistentes.
+- [x] Incluir as linhagens de O Um Anel no acervo de consulta, com organização e detalhes consistentes.
+- [x] Integrar navegação, pesquisa ou filtros para tornar os novos conteúdos encontráveis.
+- [x] Criar ou atualizar testes unitários pertinentes para a organização do material.
+- [x] Validar responsividade, acessibilidade básica, qualidade visual e ausência de erros de execução.
+- [x] Exercitar em runtime a busca e as abas do acervo, além da escolha manual de disciplinas sem clã.
+- [x] Registrar a revisão de acessibilidade básica, incluindo rótulos, foco visível, contraste e estados vazios.
+- [x] Exibir o símbolo do clã ao lado do retrato do personagem na ficha V5.
+- [x] Usar o símbolo do clã como imagem principal quando a ficha não tiver retrato.
+- [x] Cobrir o retrato e o símbolo de clã com teste de interface.
+- [x] Criar um checkpoint publicado com a atualização concluída.
+- [x] Usar o PDF anexado “Cópia de Caçador — A Revanche” como fonte de dados dos arquétipos de caçador.
+- [x] Validar e registrar todos os arquétipos e credos de Caçador diretamente a partir do PDF anexado.
+- [x] Adicionar uma aba de Disciplinas na ficha V5.
+- [x] Exibir automaticamente as disciplinas iniciais ao selecionar um clã na ficha V5.
+- [x] Permitir que personagens sem clã selecionem manualmente as próprias disciplinas iniciais.

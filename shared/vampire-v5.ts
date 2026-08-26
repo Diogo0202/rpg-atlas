@@ -266,7 +266,7 @@ export const V5_GENERATIONS = Array.from({ length: 11 }, (_, index) => {
 export type TemporaryModifier = { id: string; label: string; value: number; scope: "all" | "attributes" | "skills"; enabled: boolean };
 
 export type V5SheetData = {
-  clan: string; predator: string; generation: number; bloodPotency: number; humanity: number; hunger: number;
+  clan: string; predator: string; generation: number; bloodPotency: number; humanity: number; hunger: number; portraitUrl: string;
   attributes: Record<string, number>; skills: Record<string, number>; disciplines: Record<string, string[]>;
   advantages: { name: string; dots: number }[]; flaws: { name: string; dots: number }[]; inventory: V5InventoryEntry[]; equippedWeaponId: string | null; equippedArmorId: string | null;
   experienceHistory: V5ExperienceRecord[]; history: V5HistoryRecord[]; temporaryModifiers: TemporaryModifier[];
@@ -278,7 +278,7 @@ export type V5HistoryRecord = { id: string; label: string; recordedAt: number };
 export function createV5SheetData(): V5SheetData {
   const attributes = Object.values(V5_ATTRIBUTES).flat().reduce<Record<string, number>>((acc, name) => ({ ...acc, [name]: 1 }), {});
   const skills = Object.values(V5_SKILLS).flat().reduce<Record<string, number>>((acc, name) => ({ ...acc, [name]: 0 }), {});
-  return { clan: "", predator: "", generation: 13, bloodPotency: 0, humanity: 7, hunger: 1, attributes, skills, disciplines: {}, advantages: [], flaws: [], inventory: [], equippedWeaponId: null, equippedArmorId: null, experienceHistory: [], history: [], temporaryModifiers: [] };
+  return { clan: "", predator: "", generation: 13, bloodPotency: 0, humanity: 7, hunger: 1, portraitUrl: "", attributes, skills, disciplines: {}, advantages: [], flaws: [], inventory: [], equippedWeaponId: null, equippedArmorId: null, experienceHistory: [], history: [], temporaryModifiers: [] };
 }
 
 export function appendV5History(sheet: V5SheetData, label: string, recordedAt = Date.now()): V5SheetData {
