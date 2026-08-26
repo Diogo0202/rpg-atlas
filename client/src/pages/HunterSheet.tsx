@@ -7,7 +7,7 @@ import { HUNTER_CREEDS } from "@shared/reference-archive";
 import { createHunterSheetData, HUNTER_IMPORT_FORMAT, HUNTER_SYSTEM_ID, hydrateHunterSheet, parseHunterCharacterImport, type HunterSheetData } from "@shared/hunter";
 import { getRpgSystem } from "@shared/rpg-systems";
 import { CheckCircle2, ChevronDown, ChevronUp, FileUp, LoaderCircle, Plus, Save, ShieldAlert, Upload } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const HUNTER = getRpgSystem(HUNTER_SYSTEM_ID)!;

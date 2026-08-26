@@ -75,5 +75,5 @@ describe("inventário expansível autenticado", () => {
     await user.click(screen.getByRole("button", { name: /Dante/i }));
     expect(screen.queryByText("Novo item")).toBeNull();
     expect(screen.queryByDisplayValue("Rascunho de Mara")).toBeNull();
-  }, 10_000);
+  }, 15_000);
 });

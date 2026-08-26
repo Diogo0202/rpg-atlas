@@ -86,8 +86,12 @@
 - [x] Manter o seletor guiado livre para qualquer combinação de atributo e habilidade, conforme confirmado pelo usuário.
 - [x] Posicionar o seletor guiado imediatamente abaixo de Rolagens por traço, preservando os atalhos diretos.
 - [x] Validar ambas as modalidades de rolagem por checagem, testes, build e captura visual da ficha.
-- [ ] Importar arquétipos personalizados por arquivos JSON validados e associá-los ao sistema correto.
-- [ ] Atualizar explicitamente o retrato de um arquétipo salvo com os valores da ficha atual.
-- [ ] Retomar o módulo separado de Caçador com criação, persistência e importação de fichas JSON.
-- [ ] Cobrir importações, atualização de retrato e ficha de Caçador com testes automatizados.
-- [ ] Validar os módulos em desktop e mobile, salvar checkpoint e publicar a entrega.
+- [x] Importar arquétipos personalizados por arquivos JSON validados e associá-los ao sistema correto.
+- [x] Atualizar explicitamente o retrato de um arquétipo salvo com os valores da ficha atual.
+- [x] Retomar o módulo separado de Caçador com criação, persistência e importação de fichas JSON.
+- [x] Cobrir importações, atualização de retrato e ficha de Caçador com testes automatizados.
+- [x] Validar os módulos em desktop e mobile, salvar checkpoint e publicar a entrega.
+- [x] Cobrir em DOM a seleção de arquivo JSON de arquétipo e a chamada de persistência resultante.
+- [x] Cobrir a importação e a persistência da ficha de Caçador na página do módulo.
+- [x] Revalidar os testes, a tipagem e o build após a nova cobertura e salvar o checkpoint publicado.
+- [ ] Salvar o checkpoint final após a cobertura DOM de importação de arquétipos e da ficha de Caçador.

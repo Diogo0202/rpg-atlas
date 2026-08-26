@@ -4,10 +4,9 @@ import { cleanup, render, screen } from "@testing-library/react";
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const mutate = vi.fn();
-const updateMutate = vi.fn();
-const invalidate = vi.fn();
-const onApply = vi.fn();
+const { mutate, updateMutate, invalidate, onApply, toastSuccess, toastError } = vi.hoisted(() => ({
+  mutate: vi.fn(), updateMutate: vi.fn(), invalidate: vi.fn(), onApply: vi.fn(), toastSuccess: vi.fn(), toastError: vi.fn(),
+}));
 
 vi.mock("@/lib/trpc", () => ({
   trpc: {
@@ -20,7 +19,7 @@ vi.mock("@/lib/trpc", () => ({
     },
   },
 }));
-vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+vi.mock("sonner", () => ({ toast: { success: toastSuccess, error: toastError } }));
 
 import { CustomArchetypePanel } from "./CustomArchetypePanel";
 
@@ -28,6 +27,7 @@ describe("arquétipos personalizados", () => {
   afterEach(() => {
     cleanup();
     vi.clearAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it("salva o retrato atual e permite reaplicar um modelo preservado", async () => {
@@ -56,5 +56,33 @@ describe("arquétipos personalizados", () => {
     await user.click(screen.getByRole("button", { name: /^editar$/i }));
     await user.click(screen.getByRole("button", { name: /atualizar retrato/i }));
     expect(updateMutate).toHaveBeenCalledWith({ archetypeId: 7, title: "Batedor da Estrada", summary: "Viagem e percepção", payload: { attributes: { "Força": 5 } } });
+  });
+
+  it("importa um arquivo JSON compatível para o sistema em uso", async () => {
+    const user = userEvent.setup();
+    class MockFileReader {
+      result: string | null = JSON.stringify({ format: "rpg-atlas-archetype-v1", systemId: "vampiro-v5", title: "Vigia do cais", summary: "Vigilância", payload: { skills: { furtividade: 3 } } });
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      readAsText() { this.onload?.(); }
+    }
+    vi.stubGlobal("FileReader", MockFileReader);
+    render(<CustomArchetypePanel systemId="vampiro-v5" snapshot={{}} onApply={onApply} />);
+    await user.upload(screen.getByLabelText("Importar arquétipo JSON"), new File(["{}"], "vigia.json", { type: "application/json" }));
+    expect(mutate).toHaveBeenCalledWith({ systemId: "vampiro-v5", title: "Vigia do cais", summary: "Vigilância", payload: { skills: { furtividade: 3 } } });
+  });
+
+  it("recusa um arquivo de arquétipo incompatível", async () => {
+    const user = userEvent.setup();
+    class MockFileReader {
+      result: string | null = JSON.stringify({ format: "rpg-atlas-archetype-v1", systemId: "o-um-anel", title: "Vigia", payload: {} });
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      readAsText() { this.onload?.(); }
+    }
+    vi.stubGlobal("FileReader", MockFileReader);
+    render(<CustomArchetypePanel systemId="vampiro-v5" snapshot={{}} onApply={onApply} />);
+    await user.upload(screen.getByLabelText("Importar arquétipo JSON"), new File(["{}"], "anel.json", { type: "application/json" }));
+    expect(toastError).toHaveBeenCalledWith("Arquivo inválido ou incompatível com este sistema de ficha.");
   });
 });

@@ -37,7 +37,6 @@ const menuItems = [
   { number: "06", icon: Shield, label: "Arsenal V5", path: "/arsenal-v5" },
   { number: "07", icon: UserRound, label: "Ficha O Um Anel", path: "/ficha-um-anel" },
   { number: "08", icon: UserRound, label: "Ficha Caçador", path: "/ficha-cacador" },
-  { number: "09", icon: ScrollText, label: "Registro vivo", path: "/santuario" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -197,7 +196,7 @@ function DashboardLayoutContent({
                       isActive={isActive}
                       onClick={() => setLocation(item.path)}
                       tooltip={item.label}
-                      className={`h-12 rounded-none border-l-2 border-transparent px-3 transition-all font-normal text-[#b8b3a8] hover:bg-white/[0.04] hover:text-[#f4eee4] data-[active=true]:border-[#b55b32] data-[active=true]:bg-[#b55b32]/10 data-[active=true]:text-[#f4eee4]`}
+                      className={`h-10 rounded-none border-l-2 border-transparent px-3 transition-all font-normal text-[#b8b3a8] hover:bg-white/[0.04] hover:text-[#f4eee4] data-[active=true]:border-[#b55b32] data-[active=true]:bg-[#b55b32]/10 data-[active=true]:text-[#f4eee4]`}
                     >
                       <item.icon
                         className={`h-4 w-4 ${isActive ? "text-[#d27648]" : "text-[#83a89a]"}`}
