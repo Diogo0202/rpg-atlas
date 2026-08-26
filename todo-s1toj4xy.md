@@ -49,5 +49,12 @@
 - [x] Validar tema, equipamento e PDF em desktop e mobile, salvar checkpoint e entregar a atualização.
 - [x] Validar a alternância claro/escuro em desktop e mobile, incluindo contraste e legibilidade, com capturas, presença do controle e teste determinístico de transição; a interação no navegador conectado foi tentada, mas a extensão retornou HTTP 504.
 - [x] Verificar a exportação PDF da ficha completa com teste de bytes `%PDF`, conteúdo estruturado e compilação; o clique autenticado no navegador conectado não pôde ser automatizado devido ao HTTP 504 da extensão.
-- [ ] Salvar checkpoint final e entregar a atualização após as verificações interativas.
+- [x] Salvar checkpoint final e entregar a atualização após as verificações interativas.
 - [x] Produzir evidência visual real dos modos claro e escuro da ficha V5 em desktop e mobile, mantendo a configuração final em tema escuro com alternância disponível.
+- [x] Modelar compartilhamento nativo, alternativa por e-mail e transição de tema com redução de movimento.
+- [x] Implementar compartilhamento rápido do PDF por aplicativos compatíveis e e-mail.
+- [x] Implementar transição visual suave entre Luz do Alvorecer e Arquivo Obsidiano.
+- [x] Validar compartilhamento, transições e responsividade, salvar checkpoint e entregar a atualização.
+- [x] Ajustar o compartilhamento para anexos reais por Web Share em clientes compatíveis e tornar explícito o fallback de e-mail sem anexo automático.
+- [x] Verificar o compartilhamento nativo em ambiente compatível; a rota hospedada exigiu autenticação e não herdou a sessão, portanto a ramificação Web Share foi coberta por testes e a indisponibilidade documentada na interface.
+- [ ] Salvar checkpoint e entregar a atualização de compartilhamento e transição temática.

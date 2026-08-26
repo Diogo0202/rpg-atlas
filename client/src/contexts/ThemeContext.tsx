@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 
 export type Theme = "light" | "dark";
 
@@ -8,6 +8,10 @@ export function resolveArchiveTheme(stored: string | null, defaultTheme: Theme):
 
 export function toggleArchiveTheme(theme: Theme): Theme {
   return theme === "light" ? "dark" : "light";
+}
+
+export function shouldAnimateThemeChange(prefersReducedMotion: boolean) {
+  return !prefersReducedMotion;
 }
 
 interface ThemeContextType {
@@ -29,6 +33,7 @@ export function ThemeProvider({
   defaultTheme = "light",
   switchable = false,
 }: ThemeProviderProps) {
+  const transitionTimer = useRef<number | null>(null);
   const [theme, setTheme] = useState<Theme>(() => {
     if (switchable) {
       const stored = localStorage.getItem("theme");
@@ -52,6 +57,16 @@ export function ThemeProvider({
 
   const toggleTheme = switchable
     ? () => {
+        const root = document.documentElement;
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (shouldAnimateThemeChange(reduceMotion)) {
+          if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
+          root.dataset.themeTransition = "active";
+          transitionTimer.current = window.setTimeout(() => {
+            delete root.dataset.themeTransition;
+            transitionTimer.current = null;
+          }, 280);
+        }
         setTheme(toggleArchiveTheme);
       }
     : undefined;
