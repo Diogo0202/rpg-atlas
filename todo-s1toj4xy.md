@@ -94,4 +94,4 @@
 - [x] Cobrir em DOM a seleção de arquivo JSON de arquétipo e a chamada de persistência resultante.
 - [x] Cobrir a importação e a persistência da ficha de Caçador na página do módulo.
 - [x] Revalidar os testes, a tipagem e o build após a nova cobertura e salvar o checkpoint publicado.
-- [ ] Salvar o checkpoint final após a cobertura DOM de importação de arquétipos e da ficha de Caçador.
+- [x] Salvar o checkpoint final após a cobertura DOM de importação de arquétipos e da ficha de Caçador.
