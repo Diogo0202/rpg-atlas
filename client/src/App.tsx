@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import AntagonistLibrary from "./pages/AntagonistLibrary";
+import OneRingSheet from "./pages/OneRingSheet";
 import Sanctum from "./pages/Sanctum";
 import VampireSheet from "./pages/VampireSheet";
 import VampireStore from "./pages/VampireStore";
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/santuario" component={Sanctum} />
       <Route path="/biblioteca" component={AntagonistLibrary} />
       <Route path="/ficha-v5" component={VampireSheet} />
+      <Route path="/ficha-um-anel" component={OneRingSheet} />
       <Route path="/arsenal-v5" component={VampireStore} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

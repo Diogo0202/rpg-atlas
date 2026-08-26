@@ -46,3 +46,8 @@
 - [x] Adicionar sumário clicável aos documentos Markdown exportados.
 - [x] Mesclar alterações locais com a versão remota mais recente sem descartar dados persistidos.
 - [x] Validar a versão reconciliada e salvar o checkpoint correspondente.
+- [x] Mapear dados locais e contratos tRPC para a migração gradual do workbench.
+- [x] Criar ficha persistente de O Um Anel com leitura, edição e salvamento tRPC.
+- [x] Migrar a seleção de campanhas do workbench para campanhas tRPC com fallback local compatível.
+- [x] Adicionar busca textual de crises e itens no workbench da campanha.
+- [x] Testar, validar visualmente e salvar a atualização de ficha, migração e busca.

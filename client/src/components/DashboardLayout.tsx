@@ -33,7 +33,8 @@ const menuItems = [
   { number: "03", icon: Skull, label: "Antagonistas", path: "/biblioteca" },
   { number: "04", icon: UserRound, label: "Ficha V5", path: "/ficha-v5" },
   { number: "05", icon: Shield, label: "Arsenal V5", path: "/arsenal-v5" },
-  { number: "06", icon: ScrollText, label: "Registro vivo", path: "/santuario" },
+  { number: "06", icon: UserRound, label: "Ficha O Um Anel", path: "/ficha-um-anel" },
+  { number: "07", icon: ScrollText, label: "Registro vivo", path: "/santuario" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

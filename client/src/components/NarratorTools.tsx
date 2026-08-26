@@ -42,7 +42,7 @@ type Npc = {
 
 type Favorite = { id: string; kind: FavoriteKind; title: string; summary: string; record: string; npc?: Npc };
 type SessionSummary = { title: string; happenings: string; decisions: string; nextScene: string };
-type CrisisEvent = { id: string; factionId: string; faction: string; session: string; title: string; consequence: string; timestamp: string; resolved: boolean };
+type CrisisEvent = { id: string; campaignId?: string; factionId: string; faction: string; session: string; title: string; consequence: string; timestamp: string; resolved: boolean };
 type AlertPreferences = { sound: boolean; pulse: boolean };
 
 const hooksByTerritory: Record<Territory, Omit<Hook, "code" | "territory" | "factionId" | "faction">[]> = {
@@ -154,6 +154,7 @@ export default function NarratorTools() {
   const [npcEditorOpen, setNpcEditorOpen] = useState(false);
 
   useEffect(() => { window.localStorage.setItem("rpg-atlas-favorites-v1", JSON.stringify(favorites)); }, [favorites]);
+  useEffect(() => { setCrises((current) => current.map((crisis) => crisis.campaignId ? crisis : { ...crisis, campaignId: "coroa-partida" })); }, []);
   useEffect(() => { window.localStorage.setItem("rpg-atlas-tension-v1", JSON.stringify(tensions)); }, [tensions]);
   useEffect(() => { window.localStorage.setItem("rpg-atlas-session-v1", JSON.stringify(sessionSummary)); }, [sessionSummary]);
   useEffect(() => { window.localStorage.setItem("rpg-atlas-crises-v1", JSON.stringify(crises)); }, [crises]);
@@ -194,6 +195,7 @@ export default function NarratorTools() {
     const consequence = ruptureConsequences[faction.id];
     const entry: CrisisEvent = {
       id: `CR-${faction.id}-${Date.now()}`,
+      campaignId: safeLoad<string>("rpg-atlas-active-campaign-v1", "coroa-partida"),
       factionId: faction.id,
       faction: faction.name,
       session: sessionSummary.title.trim() || "Sessão em curso",
