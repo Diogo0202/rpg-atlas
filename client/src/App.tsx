@@ -13,6 +13,7 @@ import VampireSheet from "./pages/VampireSheet";
 import VampireStore from "./pages/VampireStore";
 import SharedCharacterSheet from "./pages/SharedCharacterSheet";
 import ReferenceArchive from "./pages/ReferenceArchive";
+import ReferenceDetail from "./pages/ReferenceDetail";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/ficha-v5" component={VampireSheet} />
       <Route path="/ficha-um-anel" component={OneRingSheet} />
       <Route path="/arsenal-v5" component={VampireStore} />
+      <Route path="/acervo/:category/:id" component={ReferenceDetail} />
       <Route path="/acervo" component={ReferenceArchive} />
       <Route path="/compartilhar/ficha/:token" component={SharedCharacterSheet} />
       <Route path="/compartilhar/:token" component={SharedCharacterSheet} />
