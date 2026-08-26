@@ -35,6 +35,7 @@ function downloadBlob(blob: Blob, filename: string) {
 export async function createV5PdfFile(payload: V5PdfPayload): Promise<File> {
   const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ unit: "mm", format: "a4" });
+  pdf.setProperties({ title: `Ficha V5 · ${payload.name}`, subject: "Ficha preenchida para impressão" });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const sections = buildV5SheetExportSections(payload);
@@ -67,7 +68,7 @@ export async function createV5PdfFile(payload: V5PdfPayload): Promise<File> {
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(7);
   pdf.setTextColor(131, 168, 154);
-  pdf.text("DOSSIÊ DE PERSONAGEM · ARQUIVO OBSIDIANO", 15, 36);
+  pdf.text("FICHA PREENCHIDA · PRONTA PARA IMPRESSÃO A4", 15, 36);
   y = 53;
 
   sections.forEach((section) => {

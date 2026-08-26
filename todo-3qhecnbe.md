@@ -19,3 +19,11 @@
 - [x] Adicionar uma aba de Disciplinas na ficha V5.
 - [x] Exibir automaticamente as disciplinas iniciais ao selecionar um clã na ficha V5.
 - [x] Permitir que personagens sem clã selecionem manualmente as próprias disciplinas iniciais.
+- [x] Mapear as rotas, os dados e o gerador de PDF atuais para a expansão do Acervo e da impressão.
+- [x] Criar páginas de detalhe navegáveis para cada clã do Acervo.
+- [x] Criar páginas de detalhe navegáveis para cada credo de Caçador do Acervo.
+- [x] Criar páginas de detalhe navegáveis para cada linhagem de O Um Anel do Acervo.
+- [x] Vincular os cartões do Acervo às respectivas páginas de detalhe.
+- [x] Aprimorar e tornar explícita a exportação em PDF para impressão da ficha preenchida.
+- [x] Cobrir páginas de detalhe e exportação em PDF com testes e validação visual.
+- [x] Criar um checkpoint publicado com a expansão concluída.
