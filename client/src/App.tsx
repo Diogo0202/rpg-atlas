@@ -13,6 +13,7 @@ import VampireSheet from "./pages/VampireSheet";
 import VampireStore from "./pages/VampireStore";
 import SharedCharacterSheet from "./pages/SharedCharacterSheet";
 import ReferenceArchive from "./pages/ReferenceArchive";
+import HunterSheet from "./pages/HunterSheet";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/biblioteca" component={AntagonistLibrary} />
       <Route path="/ficha-v5" component={VampireSheet} />
       <Route path="/ficha-um-anel" component={OneRingSheet} />
+      <Route path="/ficha-cacador" component={HunterSheet} />
       <Route path="/arsenal-v5" component={VampireStore} />
       <Route path="/acervo" component={ReferenceArchive} />
       <Route path="/compartilhar/ficha/:token" component={SharedCharacterSheet} />

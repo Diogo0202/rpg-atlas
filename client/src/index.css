@@ -144,6 +144,34 @@ html[data-theme-transition="active"] *::after {
 }
 
 @layer utilities {
+  .field-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    color: #a9c7bb;
+    font-size: 0.5625rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .field-input {
+    height: 2.5rem;
+    border: 1px solid rgb(255 255 255 / 0.15);
+    background: #101211;
+    padding-inline: 0.75rem;
+    color: #eae3d5;
+    font-size: 0.875rem;
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .field-input:focus {
+    border-color: #b55b32;
+    outline: none;
+  }
+
   @keyframes rupture-pulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(224, 82, 63, 0); }
     45% { box-shadow: 0 0 0 8px rgba(224, 82, 63, 0.18); }

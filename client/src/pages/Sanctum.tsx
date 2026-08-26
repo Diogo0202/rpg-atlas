@@ -3,6 +3,7 @@ import { SystemRuleTooltip } from "@/components/SystemRuleTooltip";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
+import { createHunterSheetData, HUNTER_SYSTEM_ID } from "@shared/hunter";
 import { ArchiveRestore, BookOpen, Dices, FolderPlus, Plus, ScrollText, ShieldCheck, UsersRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 const systemLabels: Record<string, string> = {
   "vampiro-v5": "Vampiro: A Máscara V5",
   "o-um-anel": "O Um Anel",
+  "cacador-a-vinganca": "Caçador: A Revanche",
 };
 const recentCampaignKey = "rpg-atlas-active-db-campaign-id";
 
@@ -18,7 +20,7 @@ function SanctumContent() {
   const utils = trpc.useUtils();
   const [campaignTitle, setCampaignTitle] = useState("");
   const [characterName, setCharacterName] = useState("");
-  const [systemId, setSystemId] = useState<"vampiro-v5" | "o-um-anel">("vampiro-v5");
+  const [systemId, setSystemId] = useState<"vampiro-v5" | "o-um-anel" | "cacador-a-vinganca">("vampiro-v5");
   const [recentCampaignId, setRecentCampaignId] = useState<number | null>(() => { const stored = window.localStorage.getItem(recentCampaignKey); return stored ? Number(stored) : null; });
   const { data: systems = [] } = trpc.systems.list.useQuery();
   const { data: campaigns = [], isLoading: loadingCampaigns } = trpc.campaigns.mine.useQuery(undefined, { enabled: Boolean(user) });
@@ -46,7 +48,7 @@ function SanctumContent() {
     createCharacter.mutate({
       name,
       systemId,
-      sheetData: systemId === "vampiro-v5" ? { hunger: 0, healthDamage: [], willpowerDamage: [], attributes: {}, skills: {} } : { endurance: 0, hope: 0, shadow: 0, attributes: {}, skills: {} },
+      sheetData: systemId === "vampiro-v5" ? { hunger: 0, healthDamage: [], willpowerDamage: [], attributes: {}, skills: {} } : systemId === HUNTER_SYSTEM_ID ? createHunterSheetData() : { endurance: 0, hope: 0, shadow: 0, attributes: {}, skills: {} },
     });
   };
 

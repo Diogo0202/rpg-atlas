@@ -49,4 +49,12 @@ describe("arquétipos personalizados", () => {
     await user.click(screen.getByRole("button", { name: /^atualizar$/i }));
     expect(updateMutate).toHaveBeenCalledWith({ archetypeId: 7, title: "Batedor da Estrada", summary: "Vigilância e estrada", payload: { skills: { travel: 3 } } });
   });
+
+  it("permite atualizar explicitamente o retrato com a ficha atual", async () => {
+    const user = userEvent.setup();
+    render(<CustomArchetypePanel systemId="vampiro-v5" snapshot={{ attributes: { "Força": 5 } }} onApply={onApply} />);
+    await user.click(screen.getByRole("button", { name: /^editar$/i }));
+    await user.click(screen.getByRole("button", { name: /atualizar retrato/i }));
+    expect(updateMutate).toHaveBeenCalledWith({ archetypeId: 7, title: "Batedor da Estrada", summary: "Viagem e percepção", payload: { attributes: { "Força": 5 } } });
+  });
 });

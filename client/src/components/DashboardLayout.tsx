@@ -36,7 +36,8 @@ const menuItems = [
   { number: "05", icon: UserRound, label: "Ficha V5", path: "/ficha-v5" },
   { number: "06", icon: Shield, label: "Arsenal V5", path: "/arsenal-v5" },
   { number: "07", icon: UserRound, label: "Ficha O Um Anel", path: "/ficha-um-anel" },
-  { number: "08", icon: ScrollText, label: "Registro vivo", path: "/santuario" },
+  { number: "08", icon: UserRound, label: "Ficha Caçador", path: "/ficha-cacador" },
+  { number: "09", icon: ScrollText, label: "Registro vivo", path: "/santuario" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
