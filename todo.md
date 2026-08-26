@@ -44,3 +44,5 @@
 - [x] Validar e salvar a atualização dos modelos de documento.
 - [x] Criar modelos de exportação Sessão, Campanha e Mestre.
 - [x] Adicionar sumário clicável aos documentos Markdown exportados.
+- [x] Mesclar alterações locais com a versão remota mais recente sem descartar dados persistidos.
+- [x] Validar a versão reconciliada e salvar o checkpoint correspondente.

@@ -1,15 +1,17 @@
 import DashboardLayout from "@/components/DashboardLayout";
+import { SystemRuleTooltip } from "@/components/SystemRuleTooltip";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Dices, FolderPlus, Plus, ScrollText, ShieldCheck, UsersRound } from "lucide-react";
-import { useState } from "react";
+import { ArchiveRestore, BookOpen, Dices, FolderPlus, Plus, ScrollText, ShieldCheck, UsersRound } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const systemLabels: Record<string, string> = {
   "vampiro-v5": "Vampiro: A Máscara V5",
   "o-um-anel": "O Um Anel",
 };
+const recentCampaignKey = "rpg-atlas-active-db-campaign-id";
 
 function SanctumContent() {
   const { user } = useAuth();
@@ -17,11 +19,15 @@ function SanctumContent() {
   const [campaignTitle, setCampaignTitle] = useState("");
   const [characterName, setCharacterName] = useState("");
   const [systemId, setSystemId] = useState<"vampiro-v5" | "o-um-anel">("vampiro-v5");
+  const [recentCampaignId, setRecentCampaignId] = useState<number | null>(() => { const stored = window.localStorage.getItem(recentCampaignKey); return stored ? Number(stored) : null; });
   const { data: systems = [] } = trpc.systems.list.useQuery();
   const { data: campaigns = [], isLoading: loadingCampaigns } = trpc.campaigns.mine.useQuery(undefined, { enabled: Boolean(user) });
   const { data: characters = [], isLoading: loadingCharacters } = trpc.characters.mine.useQuery(undefined, { enabled: Boolean(user) });
+  const recentCampaign = campaigns.find((campaign) => campaign.id === recentCampaignId) ?? campaigns[0];
+  useEffect(() => { if (recentCampaign && recentCampaign.id !== recentCampaignId) { setRecentCampaignId(recentCampaign.id); window.localStorage.setItem(recentCampaignKey, String(recentCampaign.id)); } }, [recentCampaign, recentCampaignId]);
+  const markRecent = (campaign: { id: number; title: string }) => { setRecentCampaignId(campaign.id); window.localStorage.setItem(recentCampaignKey, String(campaign.id)); toast.success(`${campaign.title} carregada como contexto atual do arquivo.`); };
   const createCampaign = trpc.campaigns.create.useMutation({
-    onSuccess: async () => { setCampaignTitle(""); await utils.campaigns.mine.invalidate(); toast.success("Campanha registrada no arquivo."); },
+    onSuccess: async (campaign) => { setCampaignTitle(""); await utils.campaigns.mine.invalidate(); markRecent(campaign); },
     onError: () => toast.error("Não foi possível registrar a campanha."),
   });
   const createCharacter = trpc.characters.create.useMutation({
@@ -45,6 +51,7 @@ function SanctumContent() {
   };
 
   return <div className="min-h-screen bg-[#101211] text-[#eae3d5]"><div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10"><header className="flex flex-col justify-between gap-6 border-b border-white/10 pb-8 md:flex-row md:items-end"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#83a89a]">Santuário autenticado · registro 01</p><h1 className="mt-3 font-serif text-5xl leading-none tracking-[-0.04em] text-[#f4eee4]">Bem-vindo ao<br />arquivo vivo.</h1></div><div className="border-l border-[#b55b32]/55 pl-5 text-sm leading-6 text-[#b8b3a8]"><p className="font-serif text-xl text-[#eae3d5]">{user?.name || "Cronista"}</p><p>Suas campanhas, fichas e futuros registros agora vivem fora do navegador.</p></div></header>
+  <section className="mt-6 border border-[#b55b32]/45 bg-[#171a18] p-5"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div><div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.16em] text-[#83a89a]"><ArchiveRestore className="h-3.5 w-3.5 text-[#d27648]" /> Contexto recente</div><p className="mt-2 font-serif text-2xl leading-none text-[#f4eee4]">{recentCampaign?.title || "Nenhuma campanha registrada"}</p><p className="mt-2 text-sm text-[#b8b3a8]">Carregue a última campanha para retomá-la como referência do arquivo.</p></div>{recentCampaign ? <Button onClick={() => markRecent(recentCampaign)} className="h-10 rounded-none bg-[#b55b32] text-[9px] font-bold uppercase tracking-[0.14em] text-[#101211] hover:bg-[#d27648]">Carregar campanha</Button> : null}</div></section>
 
   <section className="mt-8 grid gap-4 md:grid-cols-3"><article className="border border-white/10 bg-[#171a18] p-5"><ScrollText className="h-4 w-4 text-[#d27648]" /><p className="mt-5 text-[10px] font-bold uppercase tracking-[0.15em] text-[#a9c7bb]">Campanhas ativas</p><p className="mt-2 font-serif text-4xl text-[#f4eee4]">{loadingCampaigns ? "—" : campaigns.length}</p></article><article className="border border-white/10 bg-[#171a18] p-5"><UsersRound className="h-4 w-4 text-[#d27648]" /><p className="mt-5 text-[10px] font-bold uppercase tracking-[0.15em] text-[#a9c7bb]">Fichas preservadas</p><p className="mt-2 font-serif text-4xl text-[#f4eee4]">{loadingCharacters ? "—" : characters.length}</p></article><article className="border border-white/10 bg-[#171a18] p-5"><ShieldCheck className="h-4 w-4 text-[#d27648]" /><p className="mt-5 text-[10px] font-bold uppercase tracking-[0.15em] text-[#a9c7bb]">Sistemas disponíveis</p><p className="mt-2 font-serif text-4xl text-[#f4eee4]">{systems.length}</p></article></section>
 
