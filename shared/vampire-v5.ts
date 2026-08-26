@@ -113,6 +113,21 @@ export const V5_DISCIPLINE_ADVANCED_POWERS: Record<string, { level: number; name
 };
 
 export type V5StoreItem = { id: string; category: "arma" | "armadura" | "equipamento" | "roupa" | "moradia" | "veiculo" | "montaria"; name: string; resources: number; damage?: number; armor?: number; specification: string };
+export type V5StoreCategory = V5StoreItem["category"];
+export type V5DamageFilter = "all" | "balistico" | "cortante" | "contundente" | "incapacitante" | "narrativo";
+export type V5StoreFilter = { categories: V5StoreCategory[]; category?: V5StoreCategory | "all"; maxResources: number; damageType?: V5DamageFilter };
+
+export function getV5DamageType(item: V5StoreItem): V5DamageFilter {
+  if (item.damage === undefined) return "narrativo";
+  if (["pistola", "revolver", "submetralhadora", "rifle", "espingarda"].includes(item.id)) return "balistico";
+  if (["faca", "espada", "machete", "machado", "arco"].includes(item.id)) return "cortante";
+  if (item.id === "gas") return "incapacitante";
+  return "contundente";
+}
+
+export function filterV5Store(items: readonly V5StoreItem[], filter: V5StoreFilter) {
+  return items.filter((item) => filter.categories.includes(item.category) && (!filter.category || filter.category === "all" || item.category === filter.category) && item.resources <= filter.maxResources && (!filter.damageType || filter.damageType === "all" || getV5DamageType(item) === filter.damageType));
+}
 export const V5_STORE: V5StoreItem[] = [
   { id: "faca", category: "arma", name: "Faca robusta", resources: 1, damage: 1, specification: "Arma branca discreta, fácil de ocultar." },
   { id: "taco", category: "arma", name: "Taco ou bastão", resources: 1, damage: 2, specification: "Arma contundente comum, pouco discreta." },
@@ -175,14 +190,32 @@ export const V5_GENERATIONS = Array.from({ length: 11 }, (_, index) => {
 export type V5SheetData = {
   clan: string; predator: string; generation: number; bloodPotency: number; humanity: number; hunger: number;
   attributes: Record<string, number>; skills: Record<string, number>; disciplines: Record<string, string[]>;
-  advantages: { name: string; dots: number }[]; flaws: { name: string; dots: number }[]; inventory: string[];
+  advantages: { name: string; dots: number }[]; flaws: { name: string; dots: number }[]; inventory: string[]; equippedWeaponId: string | null;
 };
 
 export function createV5SheetData(): V5SheetData {
   const attributes = Object.values(V5_ATTRIBUTES).flat().reduce<Record<string, number>>((acc, name) => ({ ...acc, [name]: 1 }), {});
   const skills = Object.values(V5_SKILLS).flat().reduce<Record<string, number>>((acc, name) => ({ ...acc, [name]: 0 }), {});
-  return { clan: "", predator: "", generation: 13, bloodPotency: 0, humanity: 7, hunger: 1, attributes, skills, disciplines: {}, advantages: [], flaws: [], inventory: [] };
+  return { clan: "", predator: "", generation: 13, bloodPotency: 0, humanity: 7, hunger: 1, attributes, skills, disciplines: {}, advantages: [], flaws: [], inventory: [], equippedWeaponId: null };
 }
 
 export function v5HealthTrack(attributes: Record<string, number>) { return Math.max(1, (attributes["Vigor"] || 1) + 3); }
 export function v5WillpowerTrack(attributes: Record<string, number>) { return Math.max(1, (attributes["Determinação"] || 1) + (attributes["Autocontrole"] || 1)); }
+
+export type V5AdvancementKind = "attribute" | "skill" | "discipline" | "outOfClanDiscipline" | "bloodPotency";
+const advancementMultipliers: Record<V5AdvancementKind, number> = { attribute: 5, skill: 3, discipline: 5, outOfClanDiscipline: 7, bloodPotency: 10 };
+
+export function calculateV5ExperienceCost(kind: V5AdvancementKind, currentDots: number, targetDots: number) {
+  const from = Math.max(0, Math.floor(currentDots));
+  const to = Math.max(from, Math.floor(targetDots));
+  return Array.from({ length: to - from }, (_, index) => (from + index + 1) * advancementMultipliers[kind]).reduce((total, cost) => total + cost, 0);
+}
+
+export function getV5InventoryItems(sheet: Pick<V5SheetData, "inventory">) {
+  return sheet.inventory.map((id) => V5_STORE.find((item) => item.id === id)).filter((item): item is V5StoreItem => Boolean(item));
+}
+
+export function getV5EquippedWeapon(sheet: Pick<V5SheetData, "equippedWeaponId">) {
+  const item = V5_STORE.find((entry) => entry.id === sheet.equippedWeaponId);
+  return item?.category === "arma" ? item : undefined;
+}

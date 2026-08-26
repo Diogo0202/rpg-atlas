@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { V5_CLANS, V5_STORE, createV5SheetData, v5HealthTrack, v5WillpowerTrack } from "./vampire-v5";
+import { V5_CLANS, V5_STORE, calculateV5ExperienceCost, createV5SheetData, filterV5Store, getV5EquippedWeapon, v5HealthTrack, v5WillpowerTrack } from "./vampire-v5";
 
 describe("fundação da ficha V5", () => {
   it("inicia a ficha com os marcadores centrais da criação", () => {
@@ -17,5 +17,17 @@ describe("fundação da ficha V5", () => {
   it("oferece linhagens e aquisições em todas as categorias de consulta", () => {
     expect(V5_CLANS.length).toBeGreaterThanOrEqual(16);
     expect(new Set(V5_STORE.map((item) => item.category))).toEqual(new Set(["arma", "armadura", "equipamento", "roupa", "moradia", "veiculo", "montaria"]));
+  });
+
+  it("calcula a evolução por cada nível adquirido e encontra a arma equipada", () => {
+    expect(calculateV5ExperienceCost("attribute", 2, 4)).toBe(35);
+    expect(calculateV5ExperienceCost("outOfClanDiscipline", 1, 2)).toBe(14);
+    expect(getV5EquippedWeapon({ equippedWeaponId: "pistola" })?.damage).toBe(2);
+  });
+
+  it("filtra o arsenal por categoria, custo e tipo de dano", () => {
+    const results = filterV5Store(V5_STORE, { categories: ["arma"], category: "arma", maxResources: 2, damageType: "contundente" });
+    expect(results.map((item) => item.id)).toContain("taco");
+    expect(results.every((item) => item.resources <= 2)).toBe(true);
   });
 });

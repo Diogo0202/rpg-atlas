@@ -37,3 +37,9 @@
 - [x] Expandir a ficha V5 com catálogo estruturado de linhagens, disciplinas, predadores e méritos/falhas conforme os materiais do Drive.
 - [x] Ampliar o arsenal e a loja V5 com armas, armaduras, equipamentos, roupas, moradias, veículos e montarias com especificações consistentes.
 - [x] Validar visualmente a biblioteca ampliada e as páginas V5 em desktop e mobile antes do checkpoint final.
+- [x] Modelar custos de experiência, filtros por dano/custo e estado de arma equipada.
+- [x] Implementar calculadora de evolução, remoção de itens e rolagens conectadas ao armamento.
+- [x] Implementar filtros avançados para Arsenal e Casa de Recursos.
+- [x] Validar cálculos, filtros e equipamento em desktop e mobile, salvar checkpoint e entregar a atualização.
+- [x] Integrar a arma equipada ao fluxo completo de rolagem V5, incluindo dados de Fome e resultado persistente.
+- [ ] Salvar checkpoint e entregar a atualização de experiência, filtros e equipamento após a integração final.
