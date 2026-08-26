@@ -185,14 +185,6 @@ export async function recordDiceRollForUser(input: {
   await db.insert(diceRolls).values(input);
 }
 
-export async function listDiceRollsForUser(input: { rollerId: number; characterId?: number }) {
-  const db = await getDb();
-  if (!db) return [];
-  const clauses = [eq(diceRolls.rollerId, input.rollerId)];
-  if (input.characterId) clauses.push(eq(diceRolls.characterId, input.characterId));
-  return db.select().from(diceRolls).where(and(...clauses)).orderBy(desc(diceRolls.createdAt));
-}
-
 export async function listCharacterArchetypesForUser(ownerId: number, systemId?: string) {
   const db = await getDb();
   if (!db) return [];
@@ -208,15 +200,6 @@ export async function createCharacterArchetypeForUser(input: { ownerId: number; 
   const archetypeId = inserted[0]?.id;
   if (!archetypeId) throw new Error("Não foi possível salvar o arquétipo.");
   return (await db.select().from(characterArchetypes).where(eq(characterArchetypes.id, archetypeId)).limit(1))[0];
-}
-
-export async function updateCharacterArchetypeForUser(input: { ownerId: number; archetypeId: number; title: string; summary?: string; payload: Record<string, unknown> }) {
-  const db = await getDb();
-  if (!db) throw new Error("Banco de dados indisponível.");
-  const owned = await db.select({ id: characterArchetypes.id }).from(characterArchetypes).where(and(eq(characterArchetypes.id, input.archetypeId), eq(characterArchetypes.ownerId, input.ownerId))).limit(1);
-  if (!owned[0]) throw new Error("Arquétipo não encontrado ou sem permissão.");
-  await db.update(characterArchetypes).set({ title: input.title, summary: input.summary ?? null, payload: input.payload }).where(eq(characterArchetypes.id, input.archetypeId));
-  return (await db.select().from(characterArchetypes).where(eq(characterArchetypes.id, input.archetypeId)).limit(1))[0];
 }
 
 export async function deleteCharacterArchetypeForUser(input: { ownerId: number; archetypeId: number }) {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createCharacterForUser, listCharactersForUser, listDiceRollsForUser, recordDiceRollForUser, updateCharacterForUser } from "../db";
+import { createCharacterForUser, listCharactersForUser, recordDiceRollForUser, updateCharacterForUser } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 
 const systemId = z.enum(["vampiro-v5", "o-um-anel"]);
@@ -27,5 +27,4 @@ export const charactersRouter = router({
     context: z.string().trim().max(255).optional(),
     resultData: z.record(z.string(), z.unknown()),
   })).mutation(({ ctx, input }) => recordDiceRollForUser({ rollerId: ctx.user.id, ...input })),
-  rollHistory: protectedProcedure.input(z.object({ characterId: z.number().int().positive().optional() }).optional()).query(({ ctx, input }) => listDiceRollsForUser({ rollerId: ctx.user.id, characterId: input?.characterId })),
 });

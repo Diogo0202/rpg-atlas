@@ -62,8 +62,3 @@
 - [x] Adicionar botões de rolagem rápida e guia de criação para V5 e O Um Anel.
 - [x] Permitir criar, salvar e reutilizar arquétipos personalizados.
 - [x] Testar, validar visualmente e salvar as melhorias de criação de fichas.
-- [x] Mapear contratos de rolagens e arquétipos para histórico, edição e dificuldade.
-- [x] Adicionar painel lateral de histórico completo de rolagens por personagem.
-- [x] Permitir editar e atualizar arquétipos personalizados salvos.
-- [x] Adicionar dificuldade configurável às rolagens rápidas V5 e O Um Anel.
-- [x] Testar, validar visualmente e salvar as melhorias de histórico e rolagens.
