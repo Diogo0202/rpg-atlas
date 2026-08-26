@@ -68,4 +68,20 @@
 - [x] Adicionar cobertura específica para o descarte do rascunho do editor ao trocar de ficha e salvar o checkpoint final.
 - [x] Validar em contexto autenticado simulado a expansão, o recolhimento, a adição, a edição e a remoção de itens em uma ficha V5.
 - [x] Comprovar por teste de interface que alternar fichas descarta o rascunho aberto do editor de inventário.
-- [ ] Salvar checkpoint e entregar o inventário expansível validado.
+- [x] Salvar checkpoint e entregar o inventário expansível validado.
+- [x] Mapear os fluxos atuais de arquétipos, rolagens e rotas modulares.
+- [x] Implementar exportação JSON e toasts de sucesso/erro para arquétipos personalizados.
+- [x] Integrar rolagens rápidas acionadas por atributos e habilidades nas fichas.
+- [x] Organizar as áreas do Atlas em módulos navegáveis por clique.
+- [x] Validar recursos, responsividade e persistência; salvar checkpoint e entregar a atualização.
+- [ ] Confirmar ou implementar edição de arquétipos personalizados com toasts explícitos de sucesso e erro.
+- [x] Inspecionar e testar rolagens rápidas clicáveis em atributos e habilidades das fichas.
+- [ ] Validar visualmente os controles recentes, salvar checkpoint e entregar a atualização.
+- [ ] Implementar clique direto em atributos e habilidades para disparar rolagens e registrar o resultado.
+- [ ] Cobrir em DOM o clique em um traço da ficha e o registro da rolagem correspondente.
+- [ ] Implementar o fluxo atual de atributo seguido de habilidade relacionada para rolagens V5.
+- [ ] Validar a escolha, o resultado e o registro persistente da nova rolagem; salvar checkpoint e entregar.
+- [ ] Manter os atalhos diretos e integrar o seletor guiado como alternativa visível de rolagem.
+- [ ] Validar ambas as modalidades de rolagem; salvar checkpoint e entregar a atualização.
+- [x] Posicionar o seletor guiado imediatamente abaixo de Rolagens por traço, preservando os atalhos diretos.
+- [x] Validar ambas as modalidades de rolagem por checagem, testes, build e captura visual da ficha.
