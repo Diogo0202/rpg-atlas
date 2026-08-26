@@ -76,3 +76,6 @@
 - [x] Exibir status e tempo restante do link de compartilhamento ativo na ficha.
 - [x] Adicionar efeitos sonoros opcionais e controle de volume às animações de rolagem.
 - [x] Testar, revisar e publicar os atalhos de expiração, status do link e controles de áudio.
+- [x] Adicionar botão explícito para copiar o link compartilhado ativo com toast de sucesso.
+- [x] Permitir personalizar cor ou estilo visual dos dados nas rolagens animadas.
+- [x] Testar, revisar e publicar a cópia de link e os estilos de dados.

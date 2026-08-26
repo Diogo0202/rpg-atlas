@@ -198,7 +198,7 @@ export async function getCharacterShareLinkStatusForUser(input: { ownerId: numbe
   if (!db) throw new Error("Banco de dados indisponível.");
   const owned = await db.select({ id: characters.id }).from(characters).where(and(eq(characters.id, input.characterId), eq(characters.ownerId, input.ownerId))).limit(1);
   if (!owned[0]) throw new Error("Ficha não encontrada ou sem permissão.");
-  const link = await db.select({ expiresAt: characterShareLinks.expiresAt, createdAt: characterShareLinks.createdAt }).from(characterShareLinks).where(and(eq(characterShareLinks.characterId, input.characterId), eq(characterShareLinks.ownerId, input.ownerId))).limit(1);
+  const link = await db.select({ token: characterShareLinks.token, expiresAt: characterShareLinks.expiresAt, createdAt: characterShareLinks.createdAt }).from(characterShareLinks).where(and(eq(characterShareLinks.characterId, input.characterId), eq(characterShareLinks.ownerId, input.ownerId))).limit(1);
   if (!link[0]) return null;
   return { ...link[0], isActive: !link[0].expiresAt || link[0].expiresAt > new Date() };
 }
