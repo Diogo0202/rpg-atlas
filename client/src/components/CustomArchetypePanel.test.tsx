@@ -12,8 +12,9 @@ vi.mock("@/lib/trpc", () => ({
   trpc: {
     useUtils: () => ({ archetypes: { mine: { invalidate } } }),
     archetypes: {
-      mine: { useQuery: () => ({ data: [{ id: 7, title: "Batedor da Estrada", summary: "Viagem e percepção", payload: { skills: { travel: 3 } } }], isLoading: false }) },
+      mine: { useQuery: () => ({ data: [{ id: 7, title: "Batedor da Estrada", summary: "Viagem e percepção", payload: { skills: { travel: 3 } } }], isLoading: false, error: null, refetch: vi.fn() }) },
       create: { useMutation: () => ({ mutate, isPending: false }) },
+      update: { useMutation: () => ({ mutate, isPending: false }) },
       remove: { useMutation: () => ({ mutate, isPending: false }) },
     },
   },
@@ -31,5 +32,11 @@ describe("arquétipos personalizados", () => {
     expect(mutate).toHaveBeenCalledWith(expect.objectContaining({ systemId: "vampiro-v5", title: "Guardião de ferro", payload: { attributes: { "Força": 3 } } }));
     await user.click(screen.getByRole("button", { name: /aplicar/i }));
     expect(onApply).toHaveBeenCalledWith({ skills: { travel: 3 } }, "Batedor da Estrada");
+    await user.click(screen.getByRole("button", { name: "Editar Batedor da Estrada" }));
+    const nameInput = screen.getByPlaceholderText("Ex.: Investigadora do Elysium");
+    await user.clear(nameInput);
+    await user.type(nameInput, "Batedor do Ermo");
+    await user.click(screen.getByRole("button", { name: /atualizar/i }));
+    expect(mutate).toHaveBeenLastCalledWith(expect.objectContaining({ archetypeId: 7, title: "Batedor do Ermo", systemId: "vampiro-v5" }));
   });
 });
