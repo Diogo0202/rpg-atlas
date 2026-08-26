@@ -74,14 +74,15 @@
 - [x] Integrar rolagens rápidas acionadas por atributos e habilidades nas fichas.
 - [x] Organizar as áreas do Atlas em módulos navegáveis por clique.
 - [x] Validar recursos, responsividade e persistência; salvar checkpoint e entregar a atualização.
-- [ ] Confirmar ou implementar edição de arquétipos personalizados com toasts explícitos de sucesso e erro.
+- [x] Confirmar ou implementar edição de arquétipos personalizados com toasts explícitos de sucesso e erro.
 - [x] Inspecionar e testar rolagens rápidas clicáveis em atributos e habilidades das fichas.
-- [ ] Validar visualmente os controles recentes, salvar checkpoint e entregar a atualização.
-- [ ] Implementar clique direto em atributos e habilidades para disparar rolagens e registrar o resultado.
-- [ ] Cobrir em DOM o clique em um traço da ficha e o registro da rolagem correspondente.
-- [ ] Implementar o fluxo atual de atributo seguido de habilidade relacionada para rolagens V5.
-- [ ] Validar a escolha, o resultado e o registro persistente da nova rolagem; salvar checkpoint e entregar.
-- [ ] Manter os atalhos diretos e integrar o seletor guiado como alternativa visível de rolagem.
-- [ ] Validar ambas as modalidades de rolagem; salvar checkpoint e entregar a atualização.
+- [x] Validar visualmente os controles recentes, salvar checkpoint e entregar a atualização.
+- [x] Implementar clique direto em atributos e habilidades para disparar rolagens e registrar o resultado.
+- [x] Cobrir em DOM o clique em um traço da ficha e o registro da rolagem correspondente.
+- [x] Implementar o fluxo atual de atributo seguido de habilidade relacionada para rolagens V5.
+- [x] Validar a escolha, o resultado e o registro persistente da nova rolagem; salvar checkpoint e entregar.
+- [x] Manter os atalhos diretos e integrar o seletor guiado como alternativa visível de rolagem.
+- [x] Validar ambas as modalidades de rolagem; salvar checkpoint e entregar a atualização.
+- [x] Manter o seletor guiado livre para qualquer combinação de atributo e habilidade, conforme confirmado pelo usuário.
 - [x] Posicionar o seletor guiado imediatamente abaixo de Rolagens por traço, preservando os atalhos diretos.
 - [x] Validar ambas as modalidades de rolagem por checagem, testes, build e captura visual da ficha.
