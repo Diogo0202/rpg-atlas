@@ -182,6 +182,61 @@ export const V5_STORE: V5StoreItem[] = [
   { id: "carruagem", category: "montaria", name: "Carruagem restaurada", resources: 4, specification: "Veículo histórico para domínios tradicionais, eventos ou cenários rurais." },
 ] as const;
 
+export type V5InventoryEntry = {
+  id: string;
+  catalogId?: string;
+  source: "catalog" | "custom";
+  name: string;
+  category: V5StoreCategory;
+  resources: number;
+  quantity: number;
+  damage?: number;
+  armor?: number;
+  specification: string;
+};
+
+const inventoryCategories: V5StoreCategory[] = ["arma", "armadura", "equipamento", "roupa", "moradia", "veiculo", "montaria"];
+
+export function createV5CatalogInventoryItem(catalogId: string): V5InventoryEntry | undefined {
+  const item = V5_STORE.find((entry) => entry.id === catalogId);
+  return item ? { ...item, catalogId: item.id, source: "catalog", quantity: 1 } : undefined;
+}
+
+export function normalizeV5Inventory(value: unknown): V5InventoryEntry[] {
+  if (!Array.isArray(value)) return [];
+  const entries: V5InventoryEntry[] = [];
+  const ids = new Set<string>();
+  value.forEach((raw) => {
+    if (typeof raw === "string") {
+      const legacy = createV5CatalogInventoryItem(raw);
+      if (legacy && !ids.has(legacy.id)) { entries.push(legacy); ids.add(legacy.id); }
+      return;
+    }
+    if (!raw || typeof raw !== "object") return;
+    const candidate = raw as Partial<V5InventoryEntry>;
+    const fallback = candidate.catalogId ? createV5CatalogInventoryItem(candidate.catalogId) : undefined;
+    const id = typeof candidate.id === "string" && candidate.id ? candidate.id : fallback?.id;
+    const name = typeof candidate.name === "string" && candidate.name.trim() ? candidate.name.trim() : fallback?.name;
+    if (!id || !name || ids.has(id)) return;
+    const category = inventoryCategories.includes(candidate.category as V5StoreCategory) ? candidate.category as V5StoreCategory : fallback?.category || "equipamento";
+    const number = (input: unknown, fallbackValue: number | undefined) => typeof input === "number" && Number.isFinite(input) ? Math.max(0, input) : fallbackValue;
+    entries.push({
+      id,
+      catalogId: typeof candidate.catalogId === "string" ? candidate.catalogId : fallback?.catalogId,
+      source: candidate.source === "catalog" || candidate.source === "custom" ? candidate.source : fallback ? "catalog" : "custom",
+      name,
+      category,
+      resources: number(candidate.resources, fallback?.resources ?? 0) ?? 0,
+      quantity: Math.max(1, Math.floor(number(candidate.quantity, 1) ?? 1)),
+      damage: number(candidate.damage, fallback?.damage),
+      armor: number(candidate.armor, fallback?.armor),
+      specification: typeof candidate.specification === "string" ? candidate.specification : fallback?.specification || "Item registrado na ficha.",
+    });
+    ids.add(id);
+  });
+  return entries;
+}
+
 export const V5_GENERATIONS = Array.from({ length: 11 }, (_, index) => {
   const generation = 13 - index;
   return { generation, bloodPotency: Math.max(0, 13 - generation), label: generation === 3 ? "Terceira Geração" : `${generation}ª Geração` };
@@ -190,7 +245,7 @@ export const V5_GENERATIONS = Array.from({ length: 11 }, (_, index) => {
 export type V5SheetData = {
   clan: string; predator: string; generation: number; bloodPotency: number; humanity: number; hunger: number;
   attributes: Record<string, number>; skills: Record<string, number>; disciplines: Record<string, string[]>;
-  advantages: { name: string; dots: number }[]; flaws: { name: string; dots: number }[]; inventory: string[]; equippedWeaponId: string | null; equippedArmorId: string | null;
+  advantages: { name: string; dots: number }[]; flaws: { name: string; dots: number }[]; inventory: V5InventoryEntry[]; equippedWeaponId: string | null; equippedArmorId: string | null;
   experienceHistory: V5ExperienceRecord[];
 };
 
@@ -215,17 +270,24 @@ export function calculateV5ExperienceCost(kind: V5AdvancementKind, currentDots: 
 }
 
 export function getV5InventoryItems(sheet: Pick<V5SheetData, "inventory">) {
-  return sheet.inventory.map((id) => V5_STORE.find((item) => item.id === id)).filter((item): item is V5StoreItem => Boolean(item));
+  return normalizeV5Inventory(sheet.inventory);
 }
 
-export function getV5EquippedWeapon(sheet: Pick<V5SheetData, "equippedWeaponId">) {
-  const item = V5_STORE.find((entry) => entry.id === sheet.equippedWeaponId);
+export function getV5EquippedWeapon(sheet: Pick<V5SheetData, "inventory" | "equippedWeaponId">) {
+  const item = getV5InventoryItems(sheet).find((entry) => entry.id === sheet.equippedWeaponId);
   return item?.category === "arma" ? item : undefined;
 }
 
-export function getV5EquippedArmor(sheet: Pick<V5SheetData, "equippedArmorId">) {
-  const item = V5_STORE.find((entry) => entry.id === sheet.equippedArmorId);
+export function getV5EquippedArmor(sheet: Pick<V5SheetData, "inventory" | "equippedArmorId">) {
+  const item = getV5InventoryItems(sheet).find((entry) => entry.id === sheet.equippedArmorId);
   return item?.category === "armadura" ? item : undefined;
+}
+
+export function reconcileV5EquipmentAfterInventoryEdit(current: Pick<V5SheetData, "equippedWeaponId" | "equippedArmorId">, item: Pick<V5InventoryEntry, "id" | "category">) {
+  return {
+    equippedWeaponId: current.equippedWeaponId === item.id && item.category !== "arma" ? null : current.equippedWeaponId,
+    equippedArmorId: current.equippedArmorId === item.id && item.category !== "armadura" ? null : current.equippedArmorId,
+  };
 }
 
 export function getV5AdvancementLabel(kind: V5AdvancementKind) {
@@ -242,7 +304,7 @@ export function buildV5SheetExportSections(input: { name: string; concept?: stri
   const inventoryLines = getV5InventoryItems(sheet).map((item) => {
     const status = item.id === sheet.equippedWeaponId ? " [ARMA EQUIPADA]" : item.id === sheet.equippedArmorId ? " [ARMADURA EQUIPADA]" : "";
     const score = item.damage !== undefined ? `dano +${item.damage}` : item.armor !== undefined ? `proteção +${item.armor}` : `Recursos ${item.resources}`;
-    return `${item.name}${status} · ${item.category} · ${score}`;
+    return `${item.name}${item.quantity > 1 ? ` ×${item.quantity}` : ""}${status} · ${item.category} · ${score}`;
   });
   const disciplineLines = Object.entries(sheet.disciplines).filter(([, powers]) => powers.length).map(([discipline, powers]) => `${discipline}: ${powers.join(", ")}`);
   const experienceLines = [...sheet.experienceHistory].sort((a, b) => b.recordedAt - a.recordedAt).map((entry) => `${new Date(entry.recordedAt).toLocaleDateString("pt-BR")} · ${getV5AdvancementLabel(entry.kind)} ${entry.currentDots}→${entry.targetDots} · ${entry.cost} XP`);

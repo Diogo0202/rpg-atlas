@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
-import { V5_STORE, filterV5Store, type V5DamageFilter, type V5SheetData } from "@shared/vampire-v5";
+import { V5_STORE, createV5CatalogInventoryItem, filterV5Store, normalizeV5Inventory, type V5DamageFilter, type V5SheetData } from "@shared/vampire-v5";
 import { Armchair, Car, Check, Filter, Home, Shield, ShoppingBag, Sword } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -38,8 +38,11 @@ function StoreContent() {
     const resources = (sheet.advantages || []).find((entry) => entry.name === "Recursos")?.dots ?? 0;
     if (!item) { toast.error("Registro de aquisição não encontrado."); return; }
     if (resources < item.resources) { toast.error(`Esta aquisição exige Recursos ${item.resources}; a ficha possui Recursos ${resources}.`); return; }
-    if ((sheet.inventory || []).includes(itemId)) { toast.error("Este item já está registrado no inventário da ficha."); return; }
-    const inventory = [...(sheet.inventory || []), itemId];
+    const inventory = normalizeV5Inventory(sheet.inventory);
+    if (inventory.some((entry) => entry.catalogId === itemId)) { toast.error("Este item já está registrado no inventário da ficha."); return; }
+    const inventoryEntry = createV5CatalogInventoryItem(itemId);
+    if (!inventoryEntry) { toast.error("Não foi possível preparar a aquisição para o inventário."); return; }
+    inventory.push(inventoryEntry);
     update.mutate({ characterId: character.id, name: character.name, concept: character.concept || undefined, campaignId: character.campaignId ?? null, sheetData: { ...sheet, inventory } });
   };
 

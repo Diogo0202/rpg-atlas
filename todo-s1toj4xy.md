@@ -57,4 +57,15 @@
 - [x] Validar compartilhamento, transições e responsividade, salvar checkpoint e entregar a atualização.
 - [x] Ajustar o compartilhamento para anexos reais por Web Share em clientes compatíveis e tornar explícito o fallback de e-mail sem anexo automático.
 - [x] Verificar o compartilhamento nativo em ambiente compatível; a rota hospedada exigiu autenticação e não herdou a sessão, portanto a ramificação Web Share foi coberta por testes e a indisponibilidade documentada na interface.
-- [ ] Salvar checkpoint e entregar a atualização de compartilhamento e transição temática.
+- [x] Salvar checkpoint e entregar a atualização de compartilhamento e transição temática.
+- [x] Modelar itens personalizados e preservação de equipamento no inventário V5.
+- [x] Implementar seção expansível com adição, edição e remoção de itens.
+- [x] Validar inventário expansível, persistência e responsividade; salvar checkpoint e entregar a atualização.
+- [x] Resetar o editor de inventário ao alternar fichas e validar que rascunhos não atravessam personagens.
+- [x] Produzir capturas desktop e mobile do inventário expansível e de seus controles de gestão.
+- [x] Cobrir o descarte de rascunho de inventário ao trocar de ficha e salvar o checkpoint final da entrega.
+- [x] Validar a estrutura expansível e os controles de inventário nas capturas desktop e mobile da ficha, além da compilação de produção; a pré-visualização conserva o fluxo autenticado no ambiente do projeto.
+- [x] Adicionar cobertura específica para o descarte do rascunho do editor ao trocar de ficha e salvar o checkpoint final.
+- [x] Validar em contexto autenticado simulado a expansão, o recolhimento, a adição, a edição e a remoção de itens em uma ficha V5.
+- [x] Comprovar por teste de interface que alternar fichas descarta o rascunho aberto do editor de inventário.
+- [ ] Salvar checkpoint e entregar o inventário expansível validado.
