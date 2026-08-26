@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 
 const createMutate = vi.fn();
 
-vi.mock("@/lib/trpc", () => ({ trpc: { characters: { createShareLink: { useMutation: () => ({ mutate: createMutate, isPending: false }) }, revokeShareLink: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) } } } }));
+vi.mock("@/lib/trpc", () => ({ trpc: { characters: { createShareLink: { useMutation: () => ({ mutate: createMutate, isPending: false }) }, shareLinkStatus: { useQuery: () => ({ data: null, isLoading: false, refetch: vi.fn() }) }, revokeShareLink: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) } } } }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 import { CharacterShareLinkButton } from "./CharacterShareLinkButton";

@@ -23,6 +23,7 @@ vi.mock("@/lib/trpc", () => ({
       recordRoll: { useMutation: () => ({ mutate, isPending: false }) },
       rollHistory: { useQuery: () => ({ data: [], isLoading: false }) },
       createShareLink: { useMutation: () => ({ mutate, isPending: false }) },
+      shareLinkStatus: { useQuery: () => ({ data: null, isLoading: false, refetch: vi.fn() }) },
       revokeShareLink: { useMutation: () => ({ mutate, isPending: false }) },
     },
     campaigns: { mine: { useQuery: () => ({ data: [] }) } },

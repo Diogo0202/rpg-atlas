@@ -72,3 +72,7 @@
 - [x] Animar rolagens de dados e destacar modificadores temporários aplicados ao resultado.
 - [x] Testar, revisar e publicar expiração de links e feedback visual das rolagens.
 - [x] Exibir estado animado de lançamento dos dados antes do resultado nas fichas V5 e O Um Anel.
+- [x] Adicionar predefinições de expiração de 1 hora, 24 horas e 7 dias aos links de ficha.
+- [x] Exibir status e tempo restante do link de compartilhamento ativo na ficha.
+- [x] Adicionar efeitos sonoros opcionais e controle de volume às animações de rolagem.
+- [x] Testar, revisar e publicar os atalhos de expiração, status do link e controles de áudio.
