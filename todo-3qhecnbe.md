@@ -27,3 +27,13 @@
 - [x] Aprimorar e tornar explícita a exportação em PDF para impressão da ficha preenchida.
 - [x] Cobrir páginas de detalhe e exportação em PDF com testes e validação visual.
 - [x] Criar um checkpoint publicado com a expansão concluída.
+- [x] Mapear os formatos de ficha e os exportadores atuais para persistência local e fundos temáticos.
+- [ ] Permitir salvar fichas de Vampiro localmente no navegador.
+- [ ] Permitir carregar fichas de Vampiro salvas no navegador.
+- [ ] Permitir salvar e carregar fichas de Caçador localmente no navegador.
+- [ ] Permitir salvar e carregar fichas de O Um Anel localmente no navegador.
+- [ ] Adicionar fundo temático ao PDF de Vampiro.
+- [ ] Adicionar fundo temático ao PDF de Caçador.
+- [ ] Adicionar fundo temático ao PDF de O Um Anel.
+- [ ] Criar testes e validar os fluxos locais e as exportações temáticas.
+- [ ] Criar um checkpoint publicado com a atualização concluída.
