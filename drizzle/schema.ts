@@ -83,6 +83,20 @@ export const characters = mysqlTable("characters", {
   index("characters_system_idx").on(table.systemId),
 ]);
 
+/** Link exclusivo de leitura para compartilhar uma ficha sem expor a conta do proprietário. */
+export const characterShareLinks = mysqlTable("characterShareLinks", {
+  id: int("id").autoincrement().primaryKey(),
+  characterId: int("characterId").notNull().references(() => characters.id, { onDelete: "cascade" }),
+  ownerId: int("ownerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  token: varchar("token", { length: 96 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  uniqueIndex("character_share_links_token_unique").on(table.token),
+  uniqueIndex("character_share_links_character_unique").on(table.characterId),
+  index("character_share_links_owner_idx").on(table.ownerId),
+]);
+
 /** Arquétipos pessoais, isolados por usuário e sistema de regras. */
 export const characterArchetypes = mysqlTable("characterArchetypes", {
   id: int("id").autoincrement().primaryKey(),

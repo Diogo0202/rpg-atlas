@@ -61,4 +61,10 @@
 - [x] Mapear rolagens, guias de criação e persistência de arquétipos nas fichas atuais.
 - [x] Adicionar botões de rolagem rápida e guia de criação para V5 e O Um Anel.
 - [x] Permitir criar, salvar e reutilizar arquétipos personalizados.
-- [x] Testar, validar visualmente e salvar as melhorias de criação de fichas.
+- [x] Testar, validar visualmente e salvar as melhorias de histórico e rolagens.
+- [ ] Sincronizar a pré-visualização com a versão mais recente do projeto compartilhado.
+- [ ] Sincronizar novamente a pré-visualização com a versão mais recente do projeto compartilhado.
+- [x] Mapear fichas, rolagens e modelo de dados para modificadores e compartilhamento.
+- [x] Adicionar modificadores temporários e rolagens por clique em atributos e habilidades.
+- [x] Implementar links exclusivos de compartilhamento de fichas.
+- [x] Testar, validar visualmente e salvar modificadores, rolagens diretas e compartilhamento.

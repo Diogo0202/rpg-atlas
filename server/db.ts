@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { antagonistCharacters, antagonists, antagonistSessions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characters, diceRolls, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
+import { randomBytes } from "node:crypto";
+import { antagonistCharacters, antagonists, antagonistSessions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { rankLibraryEntries } from "../shared/library-search";
 
@@ -172,6 +173,33 @@ export async function updateCharacterForUser(input: {
   return (await db.select().from(characters).where(eq(characters.id, input.characterId)).limit(1))[0];
 }
 
+export async function createCharacterShareLinkForUser(input: { ownerId: number; characterId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const owned = await db.select({ id: characters.id }).from(characters).where(and(eq(characters.id, input.characterId), eq(characters.ownerId, input.ownerId))).limit(1);
+  if (!owned[0]) throw new Error("Ficha não encontrada ou sem permissão.");
+  const token = randomBytes(24).toString("base64url");
+  const existing = await db.select({ id: characterShareLinks.id }).from(characterShareLinks).where(eq(characterShareLinks.characterId, input.characterId)).limit(1);
+  if (existing[0]) await db.update(characterShareLinks).set({ token, ownerId: input.ownerId }).where(eq(characterShareLinks.id, existing[0].id));
+  else await db.insert(characterShareLinks).values({ characterId: input.characterId, ownerId: input.ownerId, token });
+  return { token };
+}
+
+export async function getSharedCharacterByToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db.select({ id: characters.id, systemId: characters.systemId, name: characters.name, concept: characters.concept, sheetData: characters.sheetData, updatedAt: characters.updatedAt }).from(characterShareLinks).innerJoin(characters, eq(characterShareLinks.characterId, characters.id)).where(eq(characterShareLinks.token, token)).limit(1);
+  return rows[0] || null;
+}
+
+export async function revokeCharacterShareLinkForUser(input: { ownerId: number; characterId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const owned = await db.select({ id: characters.id }).from(characters).where(and(eq(characters.id, input.characterId), eq(characters.ownerId, input.ownerId))).limit(1);
+  if (!owned[0]) throw new Error("Ficha não encontrada ou sem permissão.");
+  await db.delete(characterShareLinks).where(and(eq(characterShareLinks.characterId, input.characterId), eq(characterShareLinks.ownerId, input.ownerId)));
+}
+
 export async function recordDiceRollForUser(input: {
   rollerId: number;
   systemId: string;
@@ -183,6 +211,14 @@ export async function recordDiceRollForUser(input: {
   const db = await getDb();
   if (!db) throw new Error("Banco de dados indisponível.");
   await db.insert(diceRolls).values(input);
+}
+
+export async function listDiceRollsForCharacterUser(input: { rollerId: number; characterId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const owned = await db.select({ id: characters.id }).from(characters).where(and(eq(characters.id, input.characterId), eq(characters.ownerId, input.rollerId))).limit(1);
+  if (!owned[0]) throw new Error("Ficha não encontrada ou sem permissão.");
+  return db.select().from(diceRolls).where(and(eq(diceRolls.characterId, input.characterId), eq(diceRolls.rollerId, input.rollerId))).orderBy(desc(diceRolls.createdAt));
 }
 
 export async function listCharacterArchetypesForUser(ownerId: number, systemId?: string) {

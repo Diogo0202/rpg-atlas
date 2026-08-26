@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { createCharacterForUser, listCharactersForUser, recordDiceRollForUser, updateCharacterForUser } from "../db";
-import { protectedProcedure, router } from "../_core/trpc";
+import { createCharacterForUser, createCharacterShareLinkForUser, getSharedCharacterByToken, listCharactersForUser, listDiceRollsForCharacterUser, recordDiceRollForUser, revokeCharacterShareLinkForUser, updateCharacterForUser } from "../db";
+import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 
 const systemId = z.enum(["vampiro-v5", "o-um-anel", "cacador-a-vinganca"]);
 
@@ -27,4 +27,8 @@ export const charactersRouter = router({
     context: z.string().trim().max(255).optional(),
     resultData: z.record(z.string(), z.unknown()),
   })).mutation(({ ctx, input }) => recordDiceRollForUser({ rollerId: ctx.user.id, ...input })),
+  rollHistory: protectedProcedure.input(z.object({ characterId: z.number().int().positive() })).query(({ ctx, input }) => listDiceRollsForCharacterUser({ rollerId: ctx.user.id, ...input })),
+  createShareLink: protectedProcedure.input(z.object({ characterId: z.number().int().positive() })).mutation(({ ctx, input }) => createCharacterShareLinkForUser({ ownerId: ctx.user.id, ...input })),
+  revokeShareLink: protectedProcedure.input(z.object({ characterId: z.number().int().positive() })).mutation(({ ctx, input }) => revokeCharacterShareLinkForUser({ ownerId: ctx.user.id, ...input })),
+  sharedByToken: publicProcedure.input(z.object({ token: z.string().min(20).max(96) })).query(({ input }) => getSharedCharacterByToken(input.token)),
 });

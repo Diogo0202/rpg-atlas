@@ -11,6 +11,7 @@ import OneRingSheet from "./pages/OneRingSheet";
 import Sanctum from "./pages/Sanctum";
 import VampireSheet from "./pages/VampireSheet";
 import VampireStore from "./pages/VampireStore";
+import SharedCharacterSheet from "./pages/SharedCharacterSheet";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -22,6 +23,8 @@ function Router() {
       <Route path="/ficha-v5" component={VampireSheet} />
       <Route path="/ficha-um-anel" component={OneRingSheet} />
       <Route path="/arsenal-v5" component={VampireStore} />
+      <Route path="/compartilhar/ficha/:token" component={SharedCharacterSheet} />
+      <Route path="/compartilhar/:token" component={SharedCharacterSheet} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
