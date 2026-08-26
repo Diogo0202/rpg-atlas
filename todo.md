@@ -58,3 +58,7 @@
 - [x] Adicionar modelos iniciais de personagem para orientar novos jogadores.
 - [x] Adicionar histórico compacto de alterações e organizar V5 antes de O Um Anel na alternância.
 - [x] Testar, validar visualmente e salvar as melhorias da ficha V5.
+- [x] Mapear rolagens, guias de criação e persistência de arquétipos nas fichas atuais.
+- [x] Adicionar botões de rolagem rápida e guia de criação para V5 e O Um Anel.
+- [x] Permitir criar, salvar e reutilizar arquétipos personalizados.
+- [x] Testar, validar visualmente e salvar as melhorias de criação de fichas.

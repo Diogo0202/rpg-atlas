@@ -1,5 +1,6 @@
 import { COOKIE_NAME } from "@shared/const";
 import { campaignsRouter } from "./routers/campaigns";
+import { archetypesRouter } from "./routers/archetypes";
 import { charactersRouter } from "./routers/characters";
 import { libraryRouter } from "./routers/library";
 import { systemsRouter } from "./routers/systems";
@@ -23,6 +24,7 @@ export const appRouter = router({
   systems: systemsRouter,
   campaigns: campaignsRouter,
   characters: charactersRouter,
+  archetypes: archetypesRouter,
   library: libraryRouter,
 });
 

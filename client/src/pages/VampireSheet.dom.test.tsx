@@ -15,7 +15,7 @@ vi.mock("@/components/DashboardLayout", () => ({ default: ({ children }: { child
 vi.mock("@/components/SystemRuleTooltip", () => ({ SystemRuleTooltip: () => <span>Regra V5</span>, AttributeRuleTooltip: () => <span>Regra de atributo</span> }));
 vi.mock("@/lib/trpc", () => ({
   trpc: {
-    useUtils: () => ({ characters: { mine: { invalidate } } }),
+    useUtils: () => ({ characters: { mine: { invalidate } }, archetypes: { mine: { invalidate } } }),
     characters: {
       mine: { useQuery: () => ({ data: characters }) },
       create: { useMutation: () => ({ mutate, isPending: false }) },
@@ -23,6 +23,11 @@ vi.mock("@/lib/trpc", () => ({
       recordRoll: { useMutation: () => ({ mutate, isPending: false }) },
     },
     campaigns: { mine: { useQuery: () => ({ data: [] }) } },
+    archetypes: {
+      mine: { useQuery: () => ({ data: [], isLoading: false }) },
+      create: { useMutation: () => ({ mutate, isPending: false }) },
+      remove: { useMutation: () => ({ mutate, isPending: false }) },
+    },
   },
 }));
 vi.mock("wouter", () => ({ Link: ({ children }: { children: React.ReactNode }) => <>{children}</> }));

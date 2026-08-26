@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { antagonistCharacters, antagonists, antagonistSessions, campaignMembers, campaignSessions, campaigns, characters, diceRolls, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
+import { antagonistCharacters, antagonists, antagonistSessions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characters, diceRolls, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { rankLibraryEntries } from "../shared/library-search";
 
@@ -183,6 +183,31 @@ export async function recordDiceRollForUser(input: {
   const db = await getDb();
   if (!db) throw new Error("Banco de dados indisponível.");
   await db.insert(diceRolls).values(input);
+}
+
+export async function listCharacterArchetypesForUser(ownerId: number, systemId?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const clauses = [eq(characterArchetypes.ownerId, ownerId)];
+  if (systemId) clauses.push(eq(characterArchetypes.systemId, systemId));
+  return db.select().from(characterArchetypes).where(and(...clauses)).orderBy(desc(characterArchetypes.updatedAt));
+}
+
+export async function createCharacterArchetypeForUser(input: { ownerId: number; systemId: string; title: string; summary?: string; payload: Record<string, unknown> }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const inserted = await db.insert(characterArchetypes).values({ ...input, summary: input.summary ?? null }).$returningId();
+  const archetypeId = inserted[0]?.id;
+  if (!archetypeId) throw new Error("Não foi possível salvar o arquétipo.");
+  return (await db.select().from(characterArchetypes).where(eq(characterArchetypes.id, archetypeId)).limit(1))[0];
+}
+
+export async function deleteCharacterArchetypeForUser(input: { ownerId: number; archetypeId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const owned = await db.select({ id: characterArchetypes.id }).from(characterArchetypes).where(and(eq(characterArchetypes.id, input.archetypeId), eq(characterArchetypes.ownerId, input.ownerId))).limit(1);
+  if (!owned[0]) throw new Error("Arquétipo não encontrado ou sem permissão.");
+  await db.delete(characterArchetypes).where(eq(characterArchetypes.id, input.archetypeId));
 }
 
 export async function listAntagonists(filters?: {
