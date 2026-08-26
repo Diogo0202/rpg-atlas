@@ -53,3 +53,8 @@
 - [x] Testar, validar visualmente e salvar a atualização de ficha, migração e busca.
 - [x] Reconciliar filtros, tooltips e alternância das fichas com o inventário V5 remoto.
 - [x] Salvar o checkpoint integrado após a validação da reconciliação.
+- [x] Mapear a ficha V5 e validar a cobertura de clãs, disciplinas e dados de arquétipos.
+- [x] Completar os clãs V5 e aplicar disciplinas de origem automaticamente na seleção.
+- [x] Adicionar modelos iniciais de personagem para orientar novos jogadores.
+- [x] Adicionar histórico compacto de alterações e organizar V5 antes de O Um Anel na alternância.
+- [x] Testar, validar visualmente e salvar as melhorias da ficha V5.

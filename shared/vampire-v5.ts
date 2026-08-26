@@ -44,6 +44,27 @@ export const V5_DISCIPLINES: Record<string, { description: string; powers: { lev
   "Feitiçaria de Sangue": { description: "Rituais, fórmulas e manipulação da vitae.", powers: [{ level: 1, name: "Corrosão", effect: "Deteriora um objeto pelo toque de sangue." }, { level: 1, name: "Sabor do Sangue", effect: "Lê traços de uma vítima através da vitae." }, { level: 2, name: "Extinguir Vitae", effect: "Rouba vigor de sangue de outro vampiro." }] },
 };
 
+export function getClanDisciplines(clanId: string) {
+  const clan = V5_CLANS.find((entry) => entry.id === clanId);
+  return (clan?.disciplines || []).filter((discipline) => discipline in V5_DISCIPLINES);
+}
+
+export function applyClanDisciplines(clanId: string, current: Record<string, string[]>) {
+  const disciplines = getClanDisciplines(clanId);
+  if (!disciplines.length) return current;
+  return Object.fromEntries(disciplines.map((discipline) => [discipline, current[discipline] || []]));
+}
+
+export type V5StarterArchetype = { id: string; label: string; summary: string; clanHints: string[]; attributes: Record<string, number>; skills: Record<string, number> };
+export const V5_STARTER_ARCHETYPES: V5StarterArchetype[] = [
+  { id: "combate-corpo-a-corpo", label: "Combate corpo a corpo", summary: "Linha de frente, pressão física e sobrevivência em confronto direto.", clanHints: ["brujah", "gangrel", "nosferatu"], attributes: { "Força": 3, "Destreza": 2, "Vigor": 3, "Autocontrole": 2 }, skills: { "Briga": 3, "Armas Brancas": 2, "Atletismo": 2, "Intimidação": 2, "Sobrevivência": 1 } },
+  { id: "armas-de-fogo", label: "Armas de fogo", summary: "Precisão, cobertura e leitura de riscos em cenas de violência urbana.", clanHints: ["banu-haqim", "brujah", "ventrue"], attributes: { "Destreza": 3, "Raciocínio": 2, "Autocontrole": 2, "Vigor": 2 }, skills: { "Armas de Fogo": 3, "Atletismo": 2, "Consciência": 2, "Furtividade": 2, "Condução": 1 } },
+  { id: "assassino", label: "Assassino", summary: "Infiltração, ataque preciso e retirada antes que a cena reaja.", clanHints: ["banu-haqim", "nosferatu", "ravnos"], attributes: { "Destreza": 3, "Autocontrole": 3, "Raciocínio": 2, "Força": 2 }, skills: { "Furtividade": 3, "Ladroagem": 2, "Armas Brancas": 2, "Atletismo": 2, "Armas de Fogo": 1 } },
+  { id: "manipulacao", label: "Manipulação", summary: "Pressão social, segredos e controle indireto das escolhas alheias.", clanHints: ["ventrue", "ministerio", "toreador"], attributes: { "Manipulação": 3, "Carisma": 2, "Autocontrole": 2, "Raciocínio": 2 }, skills: { "Subterfúgio": 3, "Persuasão": 2, "Empatia": 2, "Etiqueta": 2, "Liderança": 1 } },
+  { id: "social", label: "Social", summary: "Presença em Elysium, relações, reputação e apoio de mortais.", clanHints: ["toreador", "ventrue", "ministerio"], attributes: { "Carisma": 3, "Manipulação": 2, "Autocontrole": 2, "Determinação": 2 }, skills: { "Etiqueta": 3, "Persuasão": 2, "Performance": 2, "Empatia": 2, "Liderança": 1 } },
+  { id: "mental", label: "Mental", summary: "Investigação, ocultismo e análise para revelar camadas da noite.", clanHints: ["tremere", "malkavian", "hecata"], attributes: { "Inteligência": 3, "Raciocínio": 3, "Determinação": 2, "Autocontrole": 2 }, skills: { "Investigação": 3, "Ocultismo": 2, "Consciência": 2, "Acadêmicos": 2, "Tecnologia": 1 } },
+];
+
 export const V5_PREDATORS = [
   { id: "alleycat", name: "Gato de Beco", bonus: "Especialidade em Briga ou Intimidação; acesso a uma disciplina física." },
   { id: "bagger", name: "Ensacador", bonus: "Especialidade em Medicina ou Ocultismo; acesso a contatos de bancos de sangue." },
@@ -246,15 +267,20 @@ export type V5SheetData = {
   clan: string; predator: string; generation: number; bloodPotency: number; humanity: number; hunger: number;
   attributes: Record<string, number>; skills: Record<string, number>; disciplines: Record<string, string[]>;
   advantages: { name: string; dots: number }[]; flaws: { name: string; dots: number }[]; inventory: V5InventoryEntry[]; equippedWeaponId: string | null; equippedArmorId: string | null;
-  experienceHistory: V5ExperienceRecord[];
+  experienceHistory: V5ExperienceRecord[]; history: V5HistoryRecord[];
 };
 
 export type V5ExperienceRecord = { id: string; kind: V5AdvancementKind; currentDots: number; targetDots: number; cost: number; recordedAt: number };
+export type V5HistoryRecord = { id: string; label: string; recordedAt: number };
 
 export function createV5SheetData(): V5SheetData {
   const attributes = Object.values(V5_ATTRIBUTES).flat().reduce<Record<string, number>>((acc, name) => ({ ...acc, [name]: 1 }), {});
   const skills = Object.values(V5_SKILLS).flat().reduce<Record<string, number>>((acc, name) => ({ ...acc, [name]: 0 }), {});
-  return { clan: "", predator: "", generation: 13, bloodPotency: 0, humanity: 7, hunger: 1, attributes, skills, disciplines: {}, advantages: [], flaws: [], inventory: [], equippedWeaponId: null, equippedArmorId: null, experienceHistory: [] };
+  return { clan: "", predator: "", generation: 13, bloodPotency: 0, humanity: 7, hunger: 1, attributes, skills, disciplines: {}, advantages: [], flaws: [], inventory: [], equippedWeaponId: null, equippedArmorId: null, experienceHistory: [], history: [] };
+}
+
+export function appendV5History(sheet: V5SheetData, label: string, recordedAt = Date.now()): V5SheetData {
+  return { ...sheet, history: [{ id: `history-${recordedAt}-${sheet.history.length}`, label, recordedAt }, ...sheet.history].slice(0, 8) };
 }
 
 export function v5HealthTrack(attributes: Record<string, number>) { return Math.max(1, (attributes["Vigor"] || 1) + 3); }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { V5_CLANS, V5_STORE, buildV5SheetExportSections, calculateV5ExperienceCost, createV5CatalogInventoryItem, createV5SheetData, filterV5Store, getV5EquippedArmor, getV5EquippedWeapon, normalizeV5Inventory, reconcileV5EquipmentAfterInventoryEdit, v5HealthTrack, v5WillpowerTrack } from "./vampire-v5";
+import { V5_CLANS, V5_STARTER_ARCHETYPES, V5_STORE, appendV5History, applyClanDisciplines, buildV5SheetExportSections, calculateV5ExperienceCost, createV5CatalogInventoryItem, createV5SheetData, filterV5Store, getV5EquippedArmor, getV5EquippedWeapon, normalizeV5Inventory, reconcileV5EquipmentAfterInventoryEdit, v5HealthTrack, v5WillpowerTrack } from "./vampire-v5";
 
 describe("fundação da ficha V5", () => {
   it("inicia a ficha com os marcadores centrais da criação", () => {
@@ -16,7 +16,20 @@ describe("fundação da ficha V5", () => {
 
   it("oferece linhagens e aquisições em todas as categorias de consulta", () => {
     expect(V5_CLANS.length).toBeGreaterThanOrEqual(16);
+    expect(V5_CLANS.map((clan) => clan.id)).toEqual(expect.arrayContaining(["banu-haqim", "brujah", "gangrel", "hecata", "lasombra", "malkavian", "ministerio", "nosferatu", "ravnos", "salubri", "toreador", "tremere", "tzimisce", "ventrue", "caitiff", "sangue-ralo"]));
     expect(new Set(V5_STORE.map((item) => item.category))).toEqual(new Set(["arma", "armadura", "equipamento", "roupa", "moradia", "veiculo", "montaria"]));
+  });
+
+  it("prepara as disciplinas de origem e oferece modelos iniciais para novos jogadores", () => {
+    expect(applyClanDisciplines("toreador", { "Auspícios": ["Sentidos Aguçados"], "Potência": ["Salto"] })).toEqual({ "Auspícios": ["Sentidos Aguçados"], "Celeridade": [], "Presença": [] });
+    expect(V5_STARTER_ARCHETYPES.map((archetype) => archetype.id)).toEqual(expect.arrayContaining(["combate-corpo-a-corpo", "armas-de-fogo", "assassino", "manipulacao", "social", "mental"]));
+  });
+
+  it("mantém um histórico compacto com as alterações mais recentes da ficha", () => {
+    let sheet = createV5SheetData();
+    sheet = appendV5History(sheet, "Clã definido: Toreador.", 100);
+    sheet = appendV5History(sheet, "Modelo social aplicado.", 200);
+    expect(sheet.history).toEqual([{ id: "history-200-1", label: "Modelo social aplicado.", recordedAt: 200 }, { id: "history-100-0", label: "Clã definido: Toreador.", recordedAt: 100 }]);
   });
 
   it("calcula a evolução por cada nível adquirido e encontra a arma equipada", () => {
