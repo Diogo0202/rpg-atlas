@@ -28,7 +28,7 @@ export const charactersRouter = router({
     resultData: z.record(z.string(), z.unknown()),
   })).mutation(({ ctx, input }) => recordDiceRollForUser({ rollerId: ctx.user.id, ...input })),
   rollHistory: protectedProcedure.input(z.object({ characterId: z.number().int().positive() })).query(({ ctx, input }) => listDiceRollsForCharacterUser({ rollerId: ctx.user.id, ...input })),
-  createShareLink: protectedProcedure.input(z.object({ characterId: z.number().int().positive() })).mutation(({ ctx, input }) => createCharacterShareLinkForUser({ ownerId: ctx.user.id, ...input })),
+  createShareLink: protectedProcedure.input(z.object({ characterId: z.number().int().positive(), expiresAt: z.date().refine((value) => value > new Date(), "A expiração deve estar no futuro.").nullable().optional() })).mutation(({ ctx, input }) => createCharacterShareLinkForUser({ ownerId: ctx.user.id, ...input })),
   revokeShareLink: protectedProcedure.input(z.object({ characterId: z.number().int().positive() })).mutation(({ ctx, input }) => revokeCharacterShareLinkForUser({ ownerId: ctx.user.id, ...input })),
   sharedByToken: publicProcedure.input(z.object({ token: z.string().min(20).max(96) })).query(({ input }) => getSharedCharacterByToken(input.token)),
 });

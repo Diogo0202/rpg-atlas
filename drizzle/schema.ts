@@ -89,6 +89,7 @@ export const characterShareLinks = mysqlTable("characterShareLinks", {
   characterId: int("characterId").notNull().references(() => characters.id, { onDelete: "cascade" }),
   ownerId: int("ownerId").notNull().references(() => users.id, { onDelete: "cascade" }),
   token: varchar("token", { length: 96 }).notNull(),
+  expiresAt: timestamp("expiresAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => [

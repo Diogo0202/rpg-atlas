@@ -68,3 +68,7 @@
 - [x] Adicionar modificadores temporários e rolagens por clique em atributos e habilidades.
 - [x] Implementar links exclusivos de compartilhamento de fichas.
 - [x] Testar, validar visualmente e salvar modificadores, rolagens diretas e compartilhamento.
+- [x] Permitir definir uma data de expiração personalizada para links de fichas compartilhadas.
+- [x] Animar rolagens de dados e destacar modificadores temporários aplicados ao resultado.
+- [x] Testar, revisar e publicar expiração de links e feedback visual das rolagens.
+- [x] Exibir estado animado de lançamento dos dados antes do resultado nas fichas V5 e O Um Anel.

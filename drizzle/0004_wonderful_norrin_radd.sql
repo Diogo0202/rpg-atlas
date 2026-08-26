@@ -1,0 +1,1 @@
+ALTER TABLE `characterShareLinks` ADD `expiresAt` timestamp;

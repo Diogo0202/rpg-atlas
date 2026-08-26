@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, or } from "drizzle-orm";
+import { and, asc, desc, eq, gt, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomBytes } from "node:crypto";
 import { antagonistCharacters, antagonists, antagonistSessions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
@@ -173,22 +173,23 @@ export async function updateCharacterForUser(input: {
   return (await db.select().from(characters).where(eq(characters.id, input.characterId)).limit(1))[0];
 }
 
-export async function createCharacterShareLinkForUser(input: { ownerId: number; characterId: number }) {
+export async function createCharacterShareLinkForUser(input: { ownerId: number; characterId: number; expiresAt?: Date | null }) {
   const db = await getDb();
   if (!db) throw new Error("Banco de dados indisponível.");
   const owned = await db.select({ id: characters.id }).from(characters).where(and(eq(characters.id, input.characterId), eq(characters.ownerId, input.ownerId))).limit(1);
   if (!owned[0]) throw new Error("Ficha não encontrada ou sem permissão.");
   const token = randomBytes(24).toString("base64url");
   const existing = await db.select({ id: characterShareLinks.id }).from(characterShareLinks).where(eq(characterShareLinks.characterId, input.characterId)).limit(1);
-  if (existing[0]) await db.update(characterShareLinks).set({ token, ownerId: input.ownerId }).where(eq(characterShareLinks.id, existing[0].id));
-  else await db.insert(characterShareLinks).values({ characterId: input.characterId, ownerId: input.ownerId, token });
-  return { token };
+  const expiresAt = input.expiresAt || null;
+  if (existing[0]) await db.update(characterShareLinks).set({ token, ownerId: input.ownerId, expiresAt }).where(eq(characterShareLinks.id, existing[0].id));
+  else await db.insert(characterShareLinks).values({ characterId: input.characterId, ownerId: input.ownerId, token, expiresAt });
+  return { token, expiresAt };
 }
 
 export async function getSharedCharacterByToken(token: string) {
   const db = await getDb();
   if (!db) return null;
-  const rows = await db.select({ id: characters.id, systemId: characters.systemId, name: characters.name, concept: characters.concept, sheetData: characters.sheetData, updatedAt: characters.updatedAt }).from(characterShareLinks).innerJoin(characters, eq(characterShareLinks.characterId, characters.id)).where(eq(characterShareLinks.token, token)).limit(1);
+  const rows = await db.select({ id: characters.id, systemId: characters.systemId, name: characters.name, concept: characters.concept, sheetData: characters.sheetData, updatedAt: characters.updatedAt }).from(characterShareLinks).innerJoin(characters, eq(characterShareLinks.characterId, characters.id)).where(and(eq(characterShareLinks.token, token), or(isNull(characterShareLinks.expiresAt), gt(characterShareLinks.expiresAt, new Date())))).limit(1);
   return rows[0] || null;
 }
 
