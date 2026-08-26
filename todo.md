@@ -51,3 +51,5 @@
 - [x] Migrar a seleção de campanhas do workbench para campanhas tRPC com fallback local compatível.
 - [x] Adicionar busca textual de crises e itens no workbench da campanha.
 - [x] Testar, validar visualmente e salvar a atualização de ficha, migração e busca.
+- [x] Reconciliar filtros, tooltips e alternância das fichas com o inventário V5 remoto.
+- [x] Salvar o checkpoint integrado após a validação da reconciliação.

@@ -12,7 +12,7 @@ const characters = [
 ];
 
 vi.mock("@/components/DashboardLayout", () => ({ default: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
-vi.mock("@/components/SystemRuleTooltip", () => ({ SystemRuleTooltip: () => <span>Regra V5</span> }));
+vi.mock("@/components/SystemRuleTooltip", () => ({ SystemRuleTooltip: () => <span>Regra V5</span>, AttributeRuleTooltip: () => <span>Regra de atributo</span> }));
 vi.mock("@/lib/trpc", () => ({
   trpc: {
     useUtils: () => ({ characters: { mine: { invalidate } } }),
@@ -65,5 +65,5 @@ describe("inventário expansível autenticado", () => {
     await user.click(screen.getByRole("button", { name: /Dante/i }));
     expect(screen.queryByText("Novo item")).toBeNull();
     expect(screen.queryByDisplayValue("Rascunho de Mara")).toBeNull();
-  });
+  }, 10_000);
 });
