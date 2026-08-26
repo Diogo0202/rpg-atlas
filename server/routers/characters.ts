@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createCharacterForUser, listCharactersForUser, recordDiceRollForUser, updateCharacterForUser } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 
-const systemId = z.enum(["vampiro-v5", "o-um-anel"]);
+const systemId = z.enum(["vampiro-v5", "o-um-anel", "cacador-a-vinganca"]);
 
 export const charactersRouter = router({
   mine: protectedProcedure.query(({ ctx }) => listCharactersForUser(ctx.user.id)),

@@ -83,7 +83,7 @@ export const characters = mysqlTable("characters", {
   index("characters_system_idx").on(table.systemId),
 ]);
 
-/** Arquétipos próprios reutilizáveis, separados das fichas e pertencentes ao criador. */
+/** Arquétipos pessoais, isolados por usuário e sistema de regras. */
 export const characterArchetypes = mysqlTable("characterArchetypes", {
   id: int("id").autoincrement().primaryKey(),
   ownerId: int("ownerId").notNull().references(() => users.id, { onDelete: "cascade" }),
@@ -94,8 +94,7 @@ export const characterArchetypes = mysqlTable("characterArchetypes", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => [
-  index("character_archetypes_owner_idx").on(table.ownerId),
-  index("character_archetypes_system_idx").on(table.systemId),
+  index("character_archetypes_owner_system_idx").on(table.ownerId, table.systemId),
 ]);
 
 /** Registro auditável de rolagens para personagens e sessões futuras. */
@@ -202,5 +201,4 @@ export type Campaign = typeof campaigns.$inferSelect;
 export type CampaignMember = typeof campaignMembers.$inferSelect;
 export type Character = typeof characters.$inferSelect;
 export type InsertCharacter = typeof characters.$inferInsert;
-export type CharacterArchetype = typeof characterArchetypes.$inferSelect;
 export type DiceRoll = typeof diceRolls.$inferSelect;

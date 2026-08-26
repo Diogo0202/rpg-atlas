@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
-type SystemId = "vampiro-v5" | "o-um-anel";
+type SystemId = "vampiro-v5" | "o-um-anel" | "cacador-a-vinganca";
 
 export function CustomArchetypePanel({ systemId, snapshot, onApply }: { systemId: SystemId; snapshot: Record<string, unknown>; onApply: (payload: Record<string, unknown>, title: string) => void }) {
   const utils = trpc.useUtils();

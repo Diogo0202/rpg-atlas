@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createCharacterArchetypeForUser, deleteCharacterArchetypeForUser, listCharacterArchetypesForUser } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 
-const systemId = z.enum(["vampiro-v5", "o-um-anel"]);
+const systemId = z.enum(["vampiro-v5", "o-um-anel", "cacador-a-vinganca"]);
 
 export const archetypesRouter = router({
   mine: protectedProcedure.input(z.object({ systemId }).optional()).query(({ ctx, input }) => listCharacterArchetypesForUser(ctx.user.id, input?.systemId)),
