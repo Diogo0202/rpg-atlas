@@ -539,3 +539,21 @@ export async function searchLibraryContext(query: string) {
     ...documents.map((item) => ({ id: item.id, kind: "material" as const, title: item.title, body: item.notes || "", metadata: `${item.category} ${item.integrationStatus}` })),
   ], query);
 }
+
+export async function searchGlobalContextForUser(userId: number, query: string) {
+  const normalized = query.trim().toLocaleLowerCase("pt-BR");
+  if (!normalized) return [];
+  const matches = (...values: Array<string | null | undefined>) => values.some((value) => value?.toLocaleLowerCase("pt-BR").includes(normalized));
+  const [userCampaigns, userCharacters, userAntagonists] = await Promise.all([listCampaignsForUser(userId), listCharactersForUser(userId), listAntagonistsForUser(userId)]);
+  const campaignResults = userCampaigns.filter((campaign) => matches(campaign.title, campaign.description)).map((campaign) => ({ id: `campaign-${campaign.id}`, type: "campaign" as const, title: campaign.title, detail: campaign.description || "Campanha preservada", systemId: campaign.systemId, href: "/santuario" }));
+  const characterResults = userCharacters.filter((character) => matches(character.name, character.concept, character.systemId)).map((character) => ({ id: `character-${character.id}`, type: "character" as const, title: character.name, detail: character.concept || "Ficha preservada", systemId: character.systemId, href: character.systemId === "vampiro-v5" ? "/ficha-v5" : character.systemId === "o-um-anel" ? "/ficha-um-anel" : "/ficha-cacador" }));
+  const antagonistResults = userAntagonists.filter((antagonist) => matches(antagonist.name, antagonist.summary, antagonist.creatureType, antagonist.threatLevel)).map((antagonist) => ({ id: `antagonist-${antagonist.id}`, type: "antagonist" as const, title: antagonist.name, detail: antagonist.summary, systemId: antagonist.systemId, href: "/antagonistas" }));
+  const related = await Promise.all(userCampaigns.map(async (campaign) => {
+    const [sessions, events] = await Promise.all([listCampaignSessionsForUser(campaign.id, userId), listCampaignEventsForUser({ campaignId: campaign.id, userId })]);
+    return [
+      ...sessions.filter((session) => matches(session.title, session.summary)).map((session) => ({ id: `session-${session.id}`, type: "session" as const, title: session.title, detail: `${campaign.title} · Sessão ${session.sequence}`, systemId: campaign.systemId, href: "/santuario" })),
+      ...events.filter((event) => matches(event.title, event.description, event.status)).map((event) => ({ id: `event-${event.id}`, type: "event" as const, title: event.title, detail: `${campaign.title} · ${event.status}`, systemId: campaign.systemId, href: "/santuario" })),
+    ];
+  }));
+  return [...campaignResults, ...characterResults, ...antagonistResults, ...related.flat()].slice(0, 60);
+}

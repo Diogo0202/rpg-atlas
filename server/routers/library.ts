@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createAntagonistForUser, linkAntagonistToCharacter, linkAntagonistToSession, listAntagonists, listAntagonistsForUser, listSourceDocuments, searchLibraryContext, updateAntagonistForUser } from "../db";
+import { createAntagonistForUser, linkAntagonistToCharacter, linkAntagonistToSession, listAntagonists, listAntagonistsForUser, listSourceDocuments, searchGlobalContextForUser, searchLibraryContext, updateAntagonistForUser } from "../db";
 import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 
 const systemId = z.enum(["vampiro-v5", "o-um-anel", "cacador-a-vinganca"]);
@@ -16,4 +16,5 @@ export const libraryRouter = router({
   linkSession: protectedProcedure.input(z.object({ antagonistId: z.number().int().positive(), sessionId: z.number().int().positive(), role: z.enum(["rumor", "presence", "confrontation", "aftermath"]), notes: z.string().trim().max(2000).optional() })).mutation(({ ctx, input }) => linkAntagonistToSession({ ownerId: ctx.user.id, ...input })),
   linkCharacter: protectedProcedure.input(z.object({ antagonistId: z.number().int().positive(), characterId: z.number().int().positive(), relation: z.enum(["enemy", "rival", "target", "ally", "patron", "debt"]), notes: z.string().trim().max(2000).optional() })).mutation(({ ctx, input }) => linkAntagonistToCharacter({ ownerId: ctx.user.id, ...input })),
   search: publicProcedure.input(z.object({ query: z.string().trim().min(2).max(120) })).query(({ input }) => searchLibraryContext(input.query)),
+  globalSearch: protectedProcedure.input(z.object({ query: z.string().trim().min(2).max(120) })).query(({ ctx, input }) => searchGlobalContextForUser(ctx.user.id, input.query)),
 });

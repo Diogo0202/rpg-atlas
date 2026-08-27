@@ -99,7 +99,10 @@
 - [x] Definir o próximo módulo prioritário do roteiro amplo antes de iniciar outra frente de implementação.
 - [x] Evoluir Ficha e Rules Engine com cálculos derivados, dano e rolagens específicas.
 - [x] Centralizar os estados derivados de O Um Anel e aplicá-los às rolagens específicas da ficha.
-- [ ] Evoluir Biblioteca e busca global após concluir o ciclo de fichas.
+- [x] Evoluir Biblioteca e busca global após concluir o ciclo de fichas.
+- [x] Implementar busca global protegida para campanhas, fichas, sessões, eventos e antagonistas.
+- [x] Integrar a pesquisa global e filtros de sistema ao Acervo sem expor registros privados.
+- [x] Adicionar estado de erro e nova tentativa à busca global protegida no Acervo.
 - [ ] Implementar Mapas e a base de mesa virtual após biblioteca e busca.
 - [ ] Integrar o Campaign Workbench às sessões após mapas e mesa virtual.
 - [ ] Implementar Música e assistência de IA após o Campaign Workbench.
