@@ -4,13 +4,13 @@ import userEvent from "@testing-library/user-event";
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const { configureMutate, createMutate, invalidate, selectCellName } = vi.hoisted(() => ({ configureMutate: vi.fn(), createMutate: vi.fn(), invalidate: vi.fn(), selectCellName: vi.fn() }));
+const { configureMutate, createMutate, invalidate, selectCellName, cellRecords } = vi.hoisted(() => ({ configureMutate: vi.fn(), createMutate: vi.fn(), invalidate: vi.fn(), selectCellName: vi.fn(), cellRecords: [{ id: 4, name: "Vigília da Ponte", description: "Sem trégua", campaignId: 8, campaign: { id: 8, title: "A Última Vigília" }, members: [], antagonists: [] }] as any[] }));
 
 vi.mock("@/lib/trpc", () => ({
   trpc: {
     useUtils: () => ({ hunterCells: { mine: { invalidate } } }),
     hunterCells: {
-      mine: { useQuery: () => ({ data: [{ id: 4, name: "Vigília da Ponte", description: "Sem trégua", campaignId: 8, campaign: { id: 8, title: "A Última Vigília" }, members: [], antagonists: [] }], isLoading: false }) },
+      mine: { useQuery: () => ({ data: cellRecords, isLoading: false }) },
       create: { useMutation: () => ({ mutate: createMutate, isPending: false }) },
       configure: { useMutation: () => ({ mutate: configureMutate, isPending: false }) },
     },

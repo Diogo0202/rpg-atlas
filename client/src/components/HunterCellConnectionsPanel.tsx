@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { HUNTER_SYSTEM_ID } from "@shared/hunter";
 import { GitFork, Link2, LoaderCircle, Plus, UsersRound } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 type HunterRecord = { id: number; name: string; concept: string | null; campaignId: number | null };
