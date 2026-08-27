@@ -84,6 +84,9 @@
 - [x] Testar, revisar e publicar a preferência de animação e os metadados dos links.
 - [x] Analisar as instruções de Documento.docx e traduzir as melhorias viáveis em tarefas de implementação.
 - [ ] Implementar e validar as melhorias priorizadas a partir do documento fornecido.
+- [x] Implementar facções persistentes por campanha, com tensão, objetivo e consequência de ruptura.
+- [x] Integrar relógios de consequência persistentes ao Santuário e às permissões de narrador.
+- [x] Testar, revisar e publicar o ciclo de facções e consequências do roteiro.
 - [x] Implementar edição persistente de sessões com status e resumo, restrita a narradores.
 - [x] Integrar a linha de sessões e o diário ao Santuário de campanhas.
 - [x] Testar, revisar e publicar a continuidade do roteiro com sessões.

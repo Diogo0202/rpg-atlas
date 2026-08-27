@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, gt, inArray, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomBytes } from "node:crypto";
-import { antagonistCharacters, antagonists, antagonistSessions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
+import { antagonistCharacters, antagonists, antagonistSessions, campaignFactions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { rankLibraryEntries } from "../shared/library-search";
 
@@ -367,6 +367,34 @@ export async function removeCampaignMemberForOwner(input: { campaignId: number; 
   const campaign = await db.select({ ownerId: campaigns.ownerId }).from(campaigns).where(eq(campaigns.id, input.campaignId)).limit(1);
   if (campaign[0]?.ownerId === input.userId) throw new Error("A pessoa proprietária não pode ser removida da própria campanha.");
   await db.delete(campaignMembers).where(and(eq(campaignMembers.campaignId, input.campaignId), eq(campaignMembers.userId, input.userId)));
+}
+
+export async function listCampaignFactionsForUser(input: { campaignId: number; userId: number }) {
+  if (!await campaignBelongsToUser(input.campaignId, input.userId)) return [];
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(campaignFactions).where(eq(campaignFactions.campaignId, input.campaignId)).orderBy(asc(campaignFactions.createdAt));
+}
+
+export async function createCampaignFactionForUser(input: { campaignId: number; userId: number; name: string; description?: string; objective?: string; maxTension: number; ruptureConsequence?: string }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem criar facções nesta campanha.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const inserted = await db.insert(campaignFactions).values({ campaignId: input.campaignId, createdBy: input.userId, name: input.name, description: input.description ?? null, objective: input.objective ?? null, maxTension: input.maxTension, ruptureConsequence: input.ruptureConsequence ?? null }).$returningId();
+  const id = inserted[0]?.id;
+  if (!id) throw new Error("Não foi possível registrar a facção.");
+  return (await db.select().from(campaignFactions).where(eq(campaignFactions.id, id)).limit(1))[0];
+}
+
+export async function updateCampaignFactionTensionForUser(input: { campaignId: number; factionId: number; userId: number; tension: number }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem ajustar a tensão desta campanha.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const faction = await db.select({ maxTension: campaignFactions.maxTension }).from(campaignFactions).where(and(eq(campaignFactions.id, input.factionId), eq(campaignFactions.campaignId, input.campaignId))).limit(1);
+  if (!faction[0]) throw new Error("Facção não encontrada nesta campanha.");
+  const tension = Math.max(0, Math.min(faction[0].maxTension, Math.round(input.tension)));
+  await db.update(campaignFactions).set({ tension }).where(eq(campaignFactions.id, input.factionId));
+  return { tension };
 }
 
 export async function listAntagonistsForUser(userId: number, filters?: { campaignId?: number; systemId?: string }) {

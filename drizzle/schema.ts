@@ -146,6 +146,24 @@ export const campaignSessions = mysqlTable("campaignSessions", {
   index("campaign_sessions_campaign_idx").on(table.campaignId),
 ]);
 
+/** Facções vinculadas à campanha, com relógio de tensão e consequência de ruptura. */
+export const campaignFactions = mysqlTable("campaignFactions", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
+  createdBy: int("createdBy").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 160 }).notNull(),
+  description: text("description"),
+  objective: varchar("objective", { length: 255 }),
+  tension: int("tension").default(0).notNull(),
+  maxTension: int("maxTension").default(6).notNull(),
+  ruptureConsequence: text("ruptureConsequence"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  index("campaign_factions_campaign_idx").on(table.campaignId),
+  index("campaign_factions_creator_idx").on(table.createdBy),
+]);
+
 /** Dossiê de antagonista público ou pertencente ao arquivo particular de um cronista. */
 export const antagonists = mysqlTable("antagonists", {
   id: int("id").autoincrement().primaryKey(),
