@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createAntagonistForUser, linkAntagonistToCharacter, linkAntagonistToSession, listAntagonists, listAntagonistsForUser, listSourceDocuments, searchLibraryContext, updateAntagonistForUser } from "../db";
 import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 
-const systemId = z.enum(["vampiro-v5", "o-um-anel"]);
+const systemId = z.enum(["vampiro-v5", "o-um-anel", "cacador-a-vinganca"]);
 const creatureType = z.enum(["vampire", "werewolf", "mage", "mortal", "faction", "entity", "other"]);
 const threatLevel = z.enum(["minor", "moderate", "major", "critical", "cataclysmic"]);
 const antagonistInput = z.object({ campaignId: z.number().int().positive().nullable().optional(), systemId, name: z.string().trim().min(2).max(160), creatureType, threatLevel, summary: z.string().trim().min(12).max(6000), hooks: z.array(z.string().trim().min(2).max(300)).min(1).max(6) });

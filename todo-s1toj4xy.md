@@ -95,3 +95,9 @@
 - [x] Cobrir a importação e a persistência da ficha de Caçador na página do módulo.
 - [x] Revalidar os testes, a tipagem e o build após a nova cobertura e salvar o checkpoint publicado.
 - [x] Salvar o checkpoint final após a cobertura DOM de importação de arquétipos e da ficha de Caçador.
+- [ ] Modelar e persistir vínculos entre células de Caçador, campanhas e antagonistas.
+- [ ] Exibir e editar visualmente os vínculos no módulo de Caçador.
+- [ ] Exportar fichas de Caçador em JSON compatível com a importação existente.
+- [ ] Implementar rolagens V5 de Caçador com animação e dados de Desespero.
+- [ ] Cobrir vínculos, exportação e rolagens de Desespero com testes automatizados.
+- [ ] Validar em desktop e mobile, salvar checkpoint e publicar a atualização.

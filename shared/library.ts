@@ -1,4 +1,4 @@
-export type LibrarySystemFilter = "all" | "vampiro-v5" | "o-um-anel";
+export type LibrarySystemFilter = "all" | "vampiro-v5" | "o-um-anel" | "cacador-a-vinganca";
 export type LibraryCreatureFilter = "all" | "vampire" | "werewolf" | "mage" | "mortal" | "faction" | "entity" | "other";
 export type LibraryThreatFilter = "all" | "minor" | "moderate" | "major" | "critical" | "cataclysmic";
 
@@ -17,7 +17,7 @@ export const threatLevelLabels: Record<Exclude<LibraryThreatFilter, "all">, stri
 };
 
 export const rpgSystemLabels: Record<Exclude<LibrarySystemFilter, "all">, string> = {
-  "vampiro-v5": "Vampiro: A Máscara V5", "o-um-anel": "O Um Anel",
+  "vampiro-v5": "Vampiro: A Máscara V5", "o-um-anel": "O Um Anel", "cacador-a-vinganca": "Caçador: A Revanche",
 };
 
 export function buildLibraryFilters(state: LibraryFilterState) {

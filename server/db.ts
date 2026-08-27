@@ -1,7 +1,7 @@
-import { and, asc, desc, eq, gt, isNull, or } from "drizzle-orm";
+import { and, asc, desc, eq, gt, inArray, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomBytes } from "node:crypto";
-import { antagonistCharacters, antagonists, antagonistSessions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
+import { antagonistCharacters, antagonists, antagonistSessions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { rankLibraryEntries } from "../shared/library-search";
 
@@ -364,6 +364,52 @@ export async function linkAntagonistToCharacter(input: { ownerId: number; antago
   const character = await db.select({ ownerId: characters.ownerId }).from(characters).where(eq(characters.id, input.characterId)).limit(1);
   if (!character[0] || character[0].ownerId !== input.ownerId) throw new Error("Ficha não encontrada ou sem permissão.");
   await db.insert(antagonistCharacters).values({ antagonistId: input.antagonistId, characterId: input.characterId, relation: input.relation, notes: input.notes ?? null }).onDuplicateKeyUpdate({ set: { relation: input.relation, notes: input.notes ?? null } });
+}
+
+export async function listHunterCellsForUser(ownerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const cells = await db.select().from(hunterCells).where(eq(hunterCells.ownerId, ownerId)).orderBy(desc(hunterCells.updatedAt));
+  return Promise.all(cells.map(async (cell) => {
+    const [campaign] = cell.campaignId ? await db.select({ id: campaigns.id, title: campaigns.title }).from(campaigns).where(eq(campaigns.id, cell.campaignId)).limit(1) : [];
+    const members = await db.select({ id: characters.id, name: characters.name, concept: characters.concept }).from(hunterCellMembers).innerJoin(characters, eq(hunterCellMembers.characterId, characters.id)).where(eq(hunterCellMembers.cellId, cell.id)).orderBy(asc(characters.name));
+    const linkedAntagonists = await db.select({ id: antagonists.id, name: antagonists.name, threatLevel: antagonists.threatLevel }).from(hunterCellAntagonists).innerJoin(antagonists, eq(hunterCellAntagonists.antagonistId, antagonists.id)).where(eq(hunterCellAntagonists.cellId, cell.id)).orderBy(asc(antagonists.name));
+    return { ...cell, campaign: campaign ?? null, members, antagonists: linkedAntagonists };
+  }));
+}
+
+export async function createHunterCellForUser(input: { ownerId: number; campaignId?: number | null; name: string; description?: string }) {
+  if (input.campaignId && !await campaignBelongsToUser(input.campaignId, input.ownerId)) throw new Error("Campanha não encontrada ou sem permissão.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const inserted = await db.insert(hunterCells).values({ ownerId: input.ownerId, campaignId: input.campaignId ?? null, name: input.name, description: input.description ?? null }).$returningId();
+  const cellId = inserted[0]?.id;
+  if (!cellId) throw new Error("Não foi possível registrar a célula.");
+  return (await listHunterCellsForUser(input.ownerId)).find((cell) => cell.id === cellId);
+}
+
+export async function configureHunterCellForUser(input: { ownerId: number; cellId: number; campaignId?: number | null; characterIds: number[]; antagonistIds: number[] }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const [cell] = await db.select({ id: hunterCells.id }).from(hunterCells).where(and(eq(hunterCells.id, input.cellId), eq(hunterCells.ownerId, input.ownerId))).limit(1);
+  if (!cell) throw new Error("Célula não encontrada ou sem permissão.");
+  if (input.campaignId && !await campaignBelongsToUser(input.campaignId, input.ownerId)) throw new Error("Campanha não encontrada ou sem permissão.");
+  const characterIds = Array.from(new Set(input.characterIds));
+  const antagonistIds = Array.from(new Set(input.antagonistIds));
+  if (characterIds.length) {
+    const ownedHunters = await db.select({ id: characters.id }).from(characters).where(and(inArray(characters.id, characterIds), eq(characters.ownerId, input.ownerId), eq(characters.systemId, "cacador-a-vinganca")));
+    if (ownedHunters.length !== characterIds.length) throw new Error("A célula só pode receber fichas próprias de Caçador.");
+  }
+  if (antagonistIds.length) {
+    const visibleAntagonists = await db.select({ id: antagonists.id }).from(antagonists).where(and(inArray(antagonists.id, antagonistIds), eq(antagonists.systemId, "cacador-a-vinganca"), or(eq(antagonists.visibility, "public"), eq(antagonists.ownerId, input.ownerId))));
+    if (visibleAntagonists.length !== antagonistIds.length) throw new Error("Um ou mais antagonistas não podem ser vinculados a esta célula.");
+  }
+  await db.update(hunterCells).set({ campaignId: input.campaignId ?? null }).where(eq(hunterCells.id, input.cellId));
+  await db.delete(hunterCellMembers).where(eq(hunterCellMembers.cellId, input.cellId));
+  await db.delete(hunterCellAntagonists).where(eq(hunterCellAntagonists.cellId, input.cellId));
+  if (characterIds.length) await db.insert(hunterCellMembers).values(characterIds.map((characterId) => ({ cellId: input.cellId, characterId })));
+  if (antagonistIds.length) await db.insert(hunterCellAntagonists).values(antagonistIds.map((antagonistId) => ({ cellId: input.cellId, antagonistId })));
+  return (await listHunterCellsForUser(input.ownerId)).find((entry) => entry.id === input.cellId);
 }
 
 export async function searchLibraryContext(query: string) {

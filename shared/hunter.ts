@@ -2,6 +2,7 @@ import { getRpgSystem } from "./rpg-systems";
 
 export const HUNTER_SYSTEM_ID = "cacador-a-vinganca" as const;
 export const HUNTER_IMPORT_FORMAT = "rpg-atlas-hunter-character-v1";
+export const HUNTER_EXPORT_FORMAT = HUNTER_IMPORT_FORMAT;
 const HUNTER = getRpgSystem(HUNTER_SYSTEM_ID)!;
 
 export type HunterSheetData = {
@@ -60,4 +61,28 @@ export function parseHunterCharacterImport(value: unknown): ImportedHunterCharac
   const sheetSource = isRecord(candidate.sheetData) ? candidate.sheetData : candidate;
   if (name.length < 2 || !isRecord(sheetSource) || (!isRecord(sheetSource.attributes) && !isRecord(sheetSource.skills))) return null;
   return { name, concept: typeof candidate.concept === "string" ? candidate.concept : "", sheetData: hydrateHunterSheet(sheetSource) };
+}
+
+export type HunterRollResult = {
+  pool: number;
+  dice: number[];
+  successes: number;
+  desperationDice: number;
+  desperateCritical: boolean;
+  desperateFailure: boolean;
+  verdict: "Crítico desesperado" | "Falha desesperada" | "Crítico" | "Êxito" | "Falha";
+};
+
+/** Resolve uma reserva Storyteller V5 e substitui os primeiros dados pela tensão do Desespero. */
+export function rollHunterV5(pool: number, desperation: number, roll: () => number = () => Math.floor(Math.random() * 10) + 1): HunterRollResult {
+  const finalPool = Math.max(1, Math.floor(pool));
+  const desperationDice = Math.min(finalPool, Math.max(0, Math.floor(desperation)));
+  const dice = Array.from({ length: finalPool }, roll);
+  const tens = dice.filter((die) => die === 10).length;
+  const successes = dice.filter((die) => die >= 6).length + Math.floor(tens / 2) * 2;
+  const critical = tens >= 2;
+  const desperateCritical = critical && dice.slice(0, desperationDice).includes(10);
+  const desperateFailure = successes === 0 && dice.slice(0, desperationDice).includes(1);
+  const verdict = desperateCritical ? "Crítico desesperado" : desperateFailure ? "Falha desesperada" : critical ? "Crítico" : successes > 0 ? "Êxito" : "Falha";
+  return { pool: finalPool, dice, successes, desperationDice, desperateCritical, desperateFailure, verdict };
 }

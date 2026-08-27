@@ -13,7 +13,7 @@ const characterRelationLabels = { enemy: "inimigo", rival: "rival", target: "alv
 
 type DossierForm = {
   campaignId: string;
-  systemId: "vampiro-v5" | "o-um-anel";
+  systemId: "vampiro-v5" | "o-um-anel" | "cacador-a-vinganca";
   name: string;
   creatureType: Exclude<LibraryCreatureFilter, "all">;
   threatLevel: Exclude<LibraryThreatFilter, "all">;
@@ -64,7 +64,7 @@ function AntagonistLibraryContent() {
   };
   const openDossier = (item: typeof personalDossiers[number]) => {
     setEditingId(item.id); setSessionId(""); setCharacterId("");
-    setDossier({ campaignId: item.campaignId ? String(item.campaignId) : "", systemId: item.systemId as "vampiro-v5" | "o-um-anel", name: item.name, creatureType: item.creatureType as Exclude<LibraryCreatureFilter, "all">, threatLevel: item.threatLevel as Exclude<LibraryThreatFilter, "all">, summary: item.summary, hooks: (item.hooks || []).join("\n") });
+    setDossier({ campaignId: item.campaignId ? String(item.campaignId) : "", systemId: item.systemId as "vampiro-v5" | "o-um-anel" | "cacador-a-vinganca", name: item.name, creatureType: item.creatureType as Exclude<LibraryCreatureFilter, "all">, threatLevel: item.threatLevel as Exclude<LibraryThreatFilter, "all">, summary: item.summary, hooks: (item.hooks || []).join("\n") });
   };
   const resetDossier = () => { setEditingId(null); setSessionId(""); setCharacterId(""); setDossier(blankDossier()); };
 

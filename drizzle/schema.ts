@@ -211,9 +211,46 @@ export const antagonistCharacters = mysqlTable("antagonistCharacters", {
   index("antagonist_characters_character_idx").on(table.characterId),
 ]);
 
+/** Célula de Caçador pertencente ao narrador, com uma crônica opcional como eixo operacional. */
+export const hunterCells = mysqlTable("hunterCells", {
+  id: int("id").autoincrement().primaryKey(),
+  ownerId: int("ownerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  campaignId: int("campaignId").references(() => campaigns.id, { onDelete: "set null" }),
+  name: varchar("name", { length: 120 }).notNull(),
+  description: text("description"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  index("hunter_cells_owner_idx").on(table.ownerId),
+  index("hunter_cells_campaign_idx").on(table.campaignId),
+]);
+
+/** Fichas de Caçador que atuam como integrantes de uma célula. */
+export const hunterCellMembers = mysqlTable("hunterCellMembers", {
+  id: int("id").autoincrement().primaryKey(),
+  cellId: int("cellId").notNull().references(() => hunterCells.id, { onDelete: "cascade" }),
+  characterId: int("characterId").notNull().references(() => characters.id, { onDelete: "cascade" }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("hunter_cell_members_unique").on(table.cellId, table.characterId),
+  index("hunter_cell_members_character_idx").on(table.characterId),
+]);
+
+/** Antagonistas investigados, caçados ou protegidos por uma célula. */
+export const hunterCellAntagonists = mysqlTable("hunterCellAntagonists", {
+  id: int("id").autoincrement().primaryKey(),
+  cellId: int("cellId").notNull().references(() => hunterCells.id, { onDelete: "cascade" }),
+  antagonistId: int("antagonistId").notNull().references(() => antagonists.id, { onDelete: "cascade" }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("hunter_cell_antagonists_unique").on(table.cellId, table.antagonistId),
+  index("hunter_cell_antagonists_antagonist_idx").on(table.antagonistId),
+]);
+
 export type RpgSystem = typeof rpgSystems.$inferSelect;
 export type Campaign = typeof campaigns.$inferSelect;
 export type CampaignMember = typeof campaignMembers.$inferSelect;
 export type Character = typeof characters.$inferSelect;
 export type InsertCharacter = typeof characters.$inferInsert;
 export type DiceRoll = typeof diceRolls.$inferSelect;
+export type HunterCell = typeof hunterCells.$inferSelect;
