@@ -23,7 +23,7 @@ it("mostra totais e permite marcar um item como adquirido", async () => {
   const user = userEvent.setup(); render(<V5CampaignShoppingListsPanel />);
   await user.click(screen.getByRole("button", { name: /Cavalaria/i }));
   expect(screen.getByText("8")).toBeTruthy();
-  expect(screen.getByText("4")).toBeTruthy();
+  expect(screen.getAllByText("4").length).toBe(2);
   await user.click(screen.getByLabelText("Marcar Destrier como adquirido"));
   expect(mocks.setItemAcquiredMutate).toHaveBeenCalledWith({ listId: 4, itemId: "destrier", acquired: true });
 });
