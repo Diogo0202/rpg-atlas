@@ -110,5 +110,8 @@
 - [x] Permitir editar os metadados de marcadores persistentes na mesa virtual.
 - [x] Expor a criação de mapas adicionais quando uma campanha já possui uma mesa.
 - [ ] Testar, validar em desktop/mobile e publicar o ciclo de mapas e mesa virtual.
+- [x] Confirmar a integração pós-mesclagem entre eventos, facções e o esquema do banco.
+- [x] Reexecutar testes, tipos e build no estado conciliado antes de concluir a mesa virtual.
+- [ ] Salvar um checkpoint limpo da mesa virtual após a validação pós-mesclagem.
 - [ ] Integrar o Campaign Workbench às sessões após mapas e mesa virtual.
 - [ ] Implementar Música e assistência de IA após o Campaign Workbench.
