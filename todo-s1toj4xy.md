@@ -100,4 +100,4 @@
 - [x] Exportar fichas de Caçador em JSON compatível com a importação existente.
 - [x] Implementar rolagens V5 de Caçador com animação e dados de Desespero.
 - [x] Cobrir vínculos, exportação e rolagens de Desespero com testes automatizados.
-- [ ] Salvar checkpoint e publicar os vínculos, a exportação e as rolagens de Desespero de Caçador.
+- [x] Salvar checkpoint e publicar os vínculos, a exportação e as rolagens de Desespero de Caçador.
