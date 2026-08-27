@@ -147,4 +147,4 @@
 - [x] Revisar a aba de Magias de O Um Anel quanto à navegação, acessibilidade, persistência e exportação da ficha.
 - [x] Executar novamente a suíte de testes, a checagem de tipos e o build sem criar checkpoint.
 - [x] Reconciliar o remodelamento remoto das fichas com as alterações locais de NPCs Kane e Magias de O Um Anel.
-- [ ] Validar e publicar o checkpoint de integração com o GitHub.
+- [x] Validar e publicar o checkpoint de integração com o GitHub.
