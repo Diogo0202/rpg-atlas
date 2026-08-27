@@ -11,6 +11,7 @@ vi.stubGlobal("ResizeObserver", class {
 });
 
 const createMapMutate = vi.fn();
+const updateMarkerMutate = vi.fn();
 const mapsState = vi.hoisted(() => ({ data: [] as Array<any> }));
 
 vi.mock("@/lib/trpc", () => ({
@@ -22,6 +23,7 @@ vi.mock("@/lib/trpc", () => ({
       update: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
       uploadImage: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
       createMarker: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
+      updateMarker: { useMutation: () => ({ mutate: updateMarkerMutate, isPending: false }) },
       moveMarker: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
       removeMarker: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
     },
@@ -34,6 +36,7 @@ import { CampaignMapTabletop } from "./CampaignMapTabletop";
 afterEach(() => {
   cleanup();
   createMapMutate.mockReset();
+  updateMarkerMutate.mockReset();
   mapsState.data = [];
 });
 
@@ -57,4 +60,17 @@ it("exibe controles e marcadores de um mapa disponível à campanha", () => {
   expect(screen.getByRole("button", { name: "Aumentar zoom" })).toBeTruthy();
   expect(screen.getByLabelText("Ameaça: Vigia do portão")).toBeTruthy();
   expect(screen.getByText("Ameaça visível.")).toBeTruthy();
+  expect(screen.getByRole("button", { name: /adicionar mapa/i })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Editar Vigia do portão" })).toBeTruthy();
+});
+
+it("permite ao narrador editar os metadados de um marcador persistente", async () => {
+  const user = userEvent.setup();
+  mapsState.data = [{ id: 17, title: "Ruínas sob a chuva", imageUrl: null, gridEnabled: 1, gridSize: 50, markers: [{ id: 28, label: "Vigia do portão", description: "Ameaça visível.", markerType: "threat", color: "#b55b32", positionX: 3750, positionY: 4600 }] }];
+  render(<CampaignMapTabletop campaigns={[{ id: 12, title: "A Coroa Partida", memberRole: "narrator" }]} initialCampaignId={12} />);
+  await user.click(screen.getByRole("button", { name: "Editar Vigia do portão" }));
+  await user.clear(screen.getByLabelText("Identificação"));
+  await user.type(screen.getByLabelText("Identificação"), "Vigia ferido");
+  await user.click(screen.getByRole("button", { name: /salvar marcador/i }));
+  expect(updateMarkerMutate).toHaveBeenCalledWith({ campaignId: 12, mapId: 17, markerId: 28, label: "Vigia ferido", description: "Ameaça visível.", markerType: "threat", color: "#b55b32" });
 });

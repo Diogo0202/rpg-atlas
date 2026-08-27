@@ -509,6 +509,17 @@ export async function createCampaignMapMarkerForUser(input: { campaignId: number
   return (await db.select().from(campaignMapMarkers).where(eq(campaignMapMarkers.id, markerId)).limit(1))[0];
 }
 
+export async function updateCampaignMapMarkerForUser(input: { campaignId: number; mapId: number; markerId: number; userId: number; label: string; description?: string; markerType: CampaignMapMarkerType; color: string }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem editar marcadores.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  await assertMapInCampaign(db, input.campaignId, input.mapId);
+  const marker = await db.select({ id: campaignMapMarkers.id }).from(campaignMapMarkers).where(and(eq(campaignMapMarkers.id, input.markerId), eq(campaignMapMarkers.mapId, input.mapId))).limit(1);
+  if (!marker[0]) throw new Error("Marcador não encontrado neste mapa.");
+  await db.update(campaignMapMarkers).set({ label: input.label, description: input.description ?? null, markerType: input.markerType, color: input.color }).where(eq(campaignMapMarkers.id, input.markerId));
+  return (await db.select().from(campaignMapMarkers).where(eq(campaignMapMarkers.id, input.markerId)).limit(1))[0];
+}
+
 export async function moveCampaignMapMarkerForUser(input: { campaignId: number; mapId: number; markerId: number; userId: number; positionX: number; positionY: number }) {
   if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem mover marcadores.");
   const db = await getDb();

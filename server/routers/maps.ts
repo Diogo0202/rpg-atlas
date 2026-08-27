@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createCampaignMapForUser, createCampaignMapMarkerForUser, listCampaignMapsForUser, moveCampaignMapMarkerForUser, removeCampaignMapMarkerForUser, updateCampaignMapForUser, uploadCampaignMapImageForUser } from "../db";
+import { createCampaignMapForUser, createCampaignMapMarkerForUser, listCampaignMapsForUser, moveCampaignMapMarkerForUser, removeCampaignMapMarkerForUser, updateCampaignMapForUser, updateCampaignMapMarkerForUser, uploadCampaignMapImageForUser } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 
 const markerType = z.enum(["location", "character", "threat", "objective", "secret"]);
@@ -22,6 +22,7 @@ export const mapsRouter = router({
     return uploadCampaignMapImageForUser({ userId: ctx.user.id, campaignId: input.campaignId, mapId: input.mapId, ...image });
   }),
   createMarker: protectedProcedure.input(mapContext.extend({ label: z.string().trim().min(1).max(120), description: z.string().trim().max(2000).optional(), markerType, color: z.string().regex(/^#[0-9a-fA-F]{6}$/), positionX: z.number().int().min(0).max(10_000), positionY: z.number().int().min(0).max(10_000) })).mutation(({ ctx, input }) => createCampaignMapMarkerForUser({ userId: ctx.user.id, ...input })),
+  updateMarker: protectedProcedure.input(mapContext.extend({ markerId: z.number().int().positive(), label: z.string().trim().min(1).max(120), description: z.string().trim().max(2000).optional(), markerType, color: z.string().regex(/^#[0-9a-fA-F]{6}$/) })).mutation(({ ctx, input }) => updateCampaignMapMarkerForUser({ userId: ctx.user.id, ...input })),
   moveMarker: protectedProcedure.input(mapContext.extend({ markerId: z.number().int().positive(), positionX: z.number().int().min(0).max(10_000), positionY: z.number().int().min(0).max(10_000) })).mutation(({ ctx, input }) => moveCampaignMapMarkerForUser({ userId: ctx.user.id, ...input })),
   removeMarker: protectedProcedure.input(mapContext.extend({ markerId: z.number().int().positive() })).mutation(({ ctx, input }) => removeCampaignMapMarkerForUser({ userId: ctx.user.id, ...input })),
 });
