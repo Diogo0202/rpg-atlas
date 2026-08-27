@@ -137,9 +137,14 @@
 - [x] Gerar, validar e armazenar em S3 imagens automáticas vinculadas ao mapa e à campanha correta.
 - [x] Adicionar controles de prompt, proporção e geração à mesa virtual apenas para narradores.
 - [x] Cobrir os fluxos de geração, falha e recuperação em testes e validar o refinamento em desktop e mobile.
-- [ ] Inventariar os NPCs e magias relevantes nas duas pastas do Drive fornecidas.
-- [ ] Reconciliar as alterações locais de mapas procedurais com a versão compartilhada mais recente antes de continuar.
-- [ ] Criar um compêndio de NPCs dividido em aliados, inimigos e neutros, com a fonte registrada.
-- [ ] Modelar a biblioteca e as magias selecionadas de O Um Anel na ficha persistente.
-- [ ] Adicionar uma aba de magias com seleção e arrastar/soltar para a ficha de O Um Anel.
-- [ ] Testar os fluxos de NPCs e magias sem criar um novo checkpoint até autorização do usuário.
+- [x] Inventariar os NPCs e magias relevantes nas duas pastas do Drive fornecidas.
+- [x] Reconciliar as alterações locais de mapas procedurais com a versão compartilhada mais recente antes de continuar.
+- [x] Criar um compêndio de NPCs dividido em aliados, inimigos e neutros, com a fonte registrada.
+- [x] Modelar a biblioteca e as magias selecionadas de O Um Anel na ficha persistente.
+- [x] Adicionar uma aba de magias com seleção e arrastar/soltar para a ficha de O Um Anel.
+- [x] Testar os fluxos de NPCs e magias sem criar um novo checkpoint até autorização do usuário.
+- [x] Incorporar ao compêndio os personagens Kane inventariados, preservando a relação, a fonte e a página de cada entrada.
+- [x] Revisar a aba de Magias de O Um Anel quanto à navegação, acessibilidade, persistência e exportação da ficha.
+- [x] Executar novamente a suíte de testes, a checagem de tipos e o build sem criar checkpoint.
+- [x] Reconciliar o remodelamento remoto das fichas com as alterações locais de NPCs Kane e Magias de O Um Anel.
+- [ ] Validar e publicar o checkpoint de integração com o GitHub.
