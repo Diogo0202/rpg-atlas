@@ -116,7 +116,7 @@
 - [x] Exibir notificações de sucesso ou erro na exportação JSON e PDF do diário de sessões.
 - [x] Cobrir favoritos, painel rápido e notificações de exportação com testes automatizados.
 - [x] Validar os novos controles em desktop e mobile, com checagem de tipos e build aprovados.
-- [ ] Salvar checkpoint e publicar os favoritos, o painel rápido de animais e os avisos de exportação do diário.
+- [x] Salvar checkpoint e publicar os favoritos, o painel rápido de animais e os avisos de exportação do diário.
 - [x] Revisar em desktop e mobile a área do diário após adicionar os controles de exportação PDF e JSON.
 - [x] Confirmar e testar a exportação PDF do diário de sessões com avisos de sucesso e falha.
 - [x] Revalidar testes, tipagem e build após a exportação PDF do diário.
