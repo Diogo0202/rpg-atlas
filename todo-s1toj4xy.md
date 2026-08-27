@@ -133,3 +133,5 @@
 - [x] Examinar a conversa referenciada e preparar uma configuração de integração automática compatível com seu escopo.
 - [x] Cobrir aquisição, totais e compartilhamento com testes automatizados.
 - [x] Validar os novos controles em desktop e mobile, salvar checkpoint e publicar a atualização.
+- [x] Adicionar filtro de itens pendentes de aquisição às listas de favoritos por campanha.
+- [x] Cobrir o filtro de pendências, validar a interface e publicar a atualização.

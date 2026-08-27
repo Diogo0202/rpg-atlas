@@ -28,6 +28,16 @@ it("mostra totais e permite marcar um item como adquirido", async () => {
   expect(mocks.setItemAcquiredMutate).toHaveBeenCalledWith({ listId: 4, itemId: "destrier", acquired: true });
 });
 
+it("exibe somente os favoritos pendentes quando o filtro é ativado", async () => {
+  const user = userEvent.setup(); render(<V5CampaignShoppingListsPanel />);
+  await user.click(screen.getByRole("button", { name: /Cavalaria/i }));
+  await user.click(screen.getByRole("button", { name: /ver só pendentes/i }));
+  expect(screen.getByText("1 pendente(s) em foco")).toBeTruthy();
+  expect(screen.getByLabelText("Marcar Destrier como adquirido")).toBeTruthy();
+  expect(screen.queryByLabelText(/Desmarcar .* como adquirido/)).toBeNull();
+  expect(screen.getByRole("button", { name: /ver todos/i })).toBeTruthy();
+});
+
 it("gera um link para compartilhar a lista com o narrador", async () => {
   const user = userEvent.setup(); render(<V5CampaignShoppingListsPanel />);
   await user.click(screen.getByRole("button", { name: /Cavalaria/i }));
