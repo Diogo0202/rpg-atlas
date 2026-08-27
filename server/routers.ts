@@ -7,6 +7,7 @@ import { hunterCellsRouter } from "./routers/hunterCells";
 import { mapsRouter } from "./routers/maps";
 import { musicRouter } from "./routers/music";
 import { systemsRouter } from "./routers/systems";
+import { storeRouter } from "./routers/store";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
@@ -32,6 +33,7 @@ export const appRouter = router({
   hunterCells: hunterCellsRouter,
   maps: mapsRouter,
   music: musicRouter,
+  store: storeRouter,
 });
 
 export type AppRouter = typeof appRouter;
