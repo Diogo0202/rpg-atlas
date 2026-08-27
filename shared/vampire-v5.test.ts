@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { V5_CLANS, V5_STARTER_ARCHETYPES, V5_STORE, appendV5History, applyClanDisciplines, buildV5SheetExportSections, calculateV5ExperienceCost, createV5CatalogInventoryItem, createV5SheetData, filterV5Store, getV5EquippedArmor, getV5EquippedWeapon, normalizeV5Inventory, reconcileV5EquipmentAfterInventoryEdit, v5HealthTrack, v5WillpowerTrack } from "./vampire-v5";
+import { V5_CLANS, V5_STARTER_ARCHETYPES, V5_STORE, appendV5History, applyClanDisciplines, buildV5SheetExportSections, calculateV5ExperienceCost, createV5CatalogInventoryItem, createV5SheetData, filterV5Store, getV5AnimalCompanions, getV5EquippedArmor, getV5EquippedWeapon, normalizeV5Inventory, reconcileV5EquipmentAfterInventoryEdit, v5HealthTrack, v5WillpowerTrack } from "./vampire-v5";
 
 describe("fundação da ficha V5", () => {
   it("inicia a ficha com os marcadores centrais da criação", () => {
@@ -18,7 +18,7 @@ describe("fundação da ficha V5", () => {
   it("oferece linhagens e aquisições em todas as categorias de consulta", () => {
     expect(V5_CLANS.length).toBeGreaterThanOrEqual(16);
     expect(V5_CLANS.map((clan) => clan.id)).toEqual(expect.arrayContaining(["banu-haqim", "brujah", "gangrel", "hecata", "lasombra", "malkavian", "ministerio", "nosferatu", "ravnos", "salubri", "toreador", "tremere", "tzimisce", "ventrue", "caitiff", "sangue-ralo"]));
-    expect(new Set(V5_STORE.map((item) => item.category))).toEqual(new Set(["arma", "armadura", "equipamento", "roupa", "moradia", "veiculo", "montaria"]));
+    expect(new Set(V5_STORE.map((item) => item.category))).toEqual(new Set(["arma", "armadura", "equipamento", "roupa", "moradia", "veiculo", "montaria", "animal"]));
   });
 
   it("prepara as disciplinas de origem e oferece modelos iniciais para novos jogadores", () => {
@@ -45,6 +45,14 @@ describe("fundação da ficha V5", () => {
     const results = filterV5Store(V5_STORE, { categories: ["arma"], category: "arma", maxResources: 2, damageType: "contundente" });
     expect(results.map((item) => item.id)).toContain("taco");
     expect(results.every((item) => item.resources <= 2)).toBe(true);
+  });
+
+  it("filtra o catálogo pela época e preserva a ficha do animal na aquisição", () => {
+    const medieval = filterV5Store(V5_STORE, { categories: ["animal", "veiculo"], category: "all", maxResources: 5, era: "medieval" });
+    expect(medieval.map((item) => item.id)).toEqual(expect.arrayContaining(["destrier", "mastim-molosso"]));
+    expect(medieval.map((item) => item.id)).not.toContain("van-operacional");
+    const destrier = createV5CatalogInventoryItem("destrier")!;
+    expect(getV5AnimalCompanions({ inventory: [destrier] })[0]).toMatchObject({ name: "Destrier", animalProfile: { strength: 4, health: 6 } });
   });
 
   it("resume inventário equipado e histórico de experiência para exportação", () => {

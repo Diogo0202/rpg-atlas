@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, gt, inArray, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomBytes } from "node:crypto";
-import { antagonistCharacters, antagonists, antagonistSessions, campaignEvents, campaignFactions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
+import { antagonistCharacters, antagonists, antagonistSessions, campaignEventFactions, campaignEvents, campaignFactions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { rankLibraryEntries } from "../shared/library-search";
 
@@ -401,7 +401,11 @@ export async function listCampaignEventsForUser(input: { campaignId: number; use
   if (!await campaignBelongsToUser(input.campaignId, input.userId)) return [];
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(campaignEvents).where(eq(campaignEvents.campaignId, input.campaignId)).orderBy(desc(campaignEvents.occurredAt));
+  const events = await db.select().from(campaignEvents).where(eq(campaignEvents.campaignId, input.campaignId)).orderBy(desc(campaignEvents.occurredAt));
+  return Promise.all(events.map(async (event) => {
+    const factions = await db.select({ id: campaignFactions.id, name: campaignFactions.name, tension: campaignFactions.tension, maxTension: campaignFactions.maxTension }).from(campaignEventFactions).innerJoin(campaignFactions, eq(campaignEventFactions.factionId, campaignFactions.id)).where(eq(campaignEventFactions.eventId, event.id)).orderBy(asc(campaignFactions.name));
+    return { ...event, factions };
+  }));
 }
 
 async function assertSessionInCampaign(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, campaignId: number, sessionId?: number | null) {
@@ -410,26 +414,39 @@ async function assertSessionInCampaign(db: NonNullable<Awaited<ReturnType<typeof
   if (!session[0]) throw new Error("A sessão informada não pertence a esta campanha.");
 }
 
-export async function createCampaignEventForUser(input: { campaignId: number; userId: number; sessionId?: number | null; title: string; description?: string; status: "planned" | "active" | "resolved" | "failed" | "consequence"; occurredAt?: Date }) {
+async function assertFactionsInCampaign(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, campaignId: number, factionIds: number[]) {
+  const ids = Array.from(new Set(factionIds));
+  if (!ids.length) return ids;
+  const factions = await db.select({ id: campaignFactions.id }).from(campaignFactions).where(and(eq(campaignFactions.campaignId, campaignId), inArray(campaignFactions.id, ids)));
+  if (factions.length !== ids.length) throw new Error("Uma ou mais facções não pertencem a esta campanha.");
+  return ids;
+}
+
+export async function createCampaignEventForUser(input: { campaignId: number; userId: number; sessionId?: number | null; factionIds?: number[]; title: string; description?: string; status: "planned" | "active" | "resolved" | "failed" | "consequence"; occurredAt?: Date }) {
   if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem registrar eventos nesta campanha.");
   const db = await getDb();
   if (!db) throw new Error("Banco de dados indisponível.");
   await assertSessionInCampaign(db, input.campaignId, input.sessionId);
+  const factionIds = await assertFactionsInCampaign(db, input.campaignId, input.factionIds || []);
   const inserted = await db.insert(campaignEvents).values({ campaignId: input.campaignId, createdBy: input.userId, sessionId: input.sessionId ?? null, title: input.title, description: input.description ?? null, status: input.status, occurredAt: input.occurredAt ?? new Date() }).$returningId();
   const id = inserted[0]?.id;
   if (!id) throw new Error("Não foi possível registrar o evento.");
-  return (await db.select().from(campaignEvents).where(eq(campaignEvents.id, id)).limit(1))[0];
+  if (factionIds.length) await db.insert(campaignEventFactions).values(factionIds.map((factionId) => ({ eventId: id, factionId })));
+  return (await listCampaignEventsForUser({ campaignId: input.campaignId, userId: input.userId })).find((event) => event.id === id);
 }
 
-export async function updateCampaignEventForUser(input: { campaignId: number; eventId: number; userId: number; sessionId?: number | null; title: string; description?: string; status: "planned" | "active" | "resolved" | "failed" | "consequence"; occurredAt: Date }) {
+export async function updateCampaignEventForUser(input: { campaignId: number; eventId: number; userId: number; sessionId?: number | null; factionIds?: number[]; title: string; description?: string; status: "planned" | "active" | "resolved" | "failed" | "consequence"; occurredAt: Date }) {
   if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem atualizar eventos nesta campanha.");
   const db = await getDb();
   if (!db) throw new Error("Banco de dados indisponível.");
   await assertSessionInCampaign(db, input.campaignId, input.sessionId);
+  const factionIds = await assertFactionsInCampaign(db, input.campaignId, input.factionIds || []);
   const event = await db.select({ id: campaignEvents.id }).from(campaignEvents).where(and(eq(campaignEvents.id, input.eventId), eq(campaignEvents.campaignId, input.campaignId))).limit(1);
   if (!event[0]) throw new Error("Evento não encontrado nesta campanha.");
   await db.update(campaignEvents).set({ sessionId: input.sessionId ?? null, title: input.title, description: input.description ?? null, status: input.status, occurredAt: input.occurredAt }).where(eq(campaignEvents.id, input.eventId));
-  return (await db.select().from(campaignEvents).where(eq(campaignEvents.id, input.eventId)).limit(1))[0];
+  await db.delete(campaignEventFactions).where(eq(campaignEventFactions.eventId, input.eventId));
+  if (factionIds.length) await db.insert(campaignEventFactions).values(factionIds.map((factionId) => ({ eventId: input.eventId, factionId })));
+  return (await listCampaignEventsForUser({ campaignId: input.campaignId, userId: input.userId })).find((item) => item.id === input.eventId);
 }
 
 export async function listAntagonistsForUser(userId: number, filters?: { campaignId?: number; systemId?: string }) {

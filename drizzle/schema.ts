@@ -182,6 +182,17 @@ export const campaignEvents = mysqlTable("campaignEvents", {
   index("campaign_events_occurred_idx").on(table.occurredAt),
 ]);
 
+/** Facções diretamente implicadas em um evento da linha do tempo da campanha. */
+export const campaignEventFactions = mysqlTable("campaignEventFactions", {
+  id: int("id").autoincrement().primaryKey(),
+  eventId: int("eventId").notNull().references(() => campaignEvents.id, { onDelete: "cascade" }),
+  factionId: int("factionId").notNull().references(() => campaignFactions.id, { onDelete: "cascade" }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("campaign_event_factions_unique").on(table.eventId, table.factionId),
+  index("campaign_event_factions_faction_idx").on(table.factionId),
+]);
+
 /** Dossiê de antagonista público ou pertencente ao arquivo particular de um cronista. */
 export const antagonists = mysqlTable("antagonists", {
   id: int("id").autoincrement().primaryKey(),

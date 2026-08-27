@@ -133,10 +133,13 @@ export const V5_DISCIPLINE_ADVANCED_POWERS: Record<string, { level: number; name
   "Feitiçaria de Sangue": [{ level: 3, name: "Toque do Escorpião", effect: "Contamina o alvo com vitae agressiva." }, { level: 4, name: "Roubo de Vitae", effect: "Drena força de sangue de outro vampiro." }, { level: 5, name: "Caldeirão de Sangue", effect: "Provoca devastação interna pela vitae do alvo." }],
 };
 
-export type V5StoreItem = { id: string; category: "arma" | "armadura" | "equipamento" | "roupa" | "moradia" | "veiculo" | "montaria"; name: string; resources: number; damage?: number; armor?: number; specification: string };
+export type V5Era = "antiga" | "medieval" | "revolucao-industrial" | "moderna";
+export const V5_ERA_LABELS: Record<V5Era, string> = { antiga: "Era Antiga", medieval: "Medieval", "revolucao-industrial": "Revolução Industrial", moderna: "Moderna" };
+export type V5AnimalProfile = { species: string; strength: number; dexterity: number; stamina: number; health: number; speed: string; attack: string; traits: string[]; priceLabel?: string };
+export type V5StoreItem = { id: string; category: "arma" | "armadura" | "equipamento" | "roupa" | "moradia" | "veiculo" | "montaria" | "animal"; name: string; resources: number; damage?: number; armor?: number; specification: string; eras?: V5Era[]; priceLabel?: string; animalProfile?: V5AnimalProfile };
 export type V5StoreCategory = V5StoreItem["category"];
 export type V5DamageFilter = "all" | "balistico" | "cortante" | "contundente" | "incapacitante" | "narrativo";
-export type V5StoreFilter = { categories: V5StoreCategory[]; category?: V5StoreCategory | "all"; maxResources: number; damageType?: V5DamageFilter };
+export type V5StoreFilter = { categories: V5StoreCategory[]; category?: V5StoreCategory | "all"; maxResources: number; damageType?: V5DamageFilter; era?: V5Era | "all" };
 
 export function getV5DamageType(item: V5StoreItem): V5DamageFilter {
   if (item.damage === undefined) return "narrativo";
@@ -147,12 +150,12 @@ export function getV5DamageType(item: V5StoreItem): V5DamageFilter {
 }
 
 export function filterV5Store(items: readonly V5StoreItem[], filter: V5StoreFilter) {
-  return items.filter((item) => filter.categories.includes(item.category) && (!filter.category || filter.category === "all" || item.category === filter.category) && item.resources <= filter.maxResources && (!filter.damageType || filter.damageType === "all" || getV5DamageType(item) === filter.damageType));
+  return items.filter((item) => filter.categories.includes(item.category) && (!filter.category || filter.category === "all" || item.category === filter.category) && item.resources <= filter.maxResources && (!filter.damageType || filter.damageType === "all" || getV5DamageType(item) === filter.damageType) && (!filter.era || filter.era === "all" || item.eras?.includes(filter.era) || (!item.eras?.length && filter.era === "moderna")));
 }
 export const V5_STORE: V5StoreItem[] = [
   { id: "faca", category: "arma", name: "Faca robusta", resources: 1, damage: 1, specification: "Arma branca discreta, fácil de ocultar." },
   { id: "taco", category: "arma", name: "Taco ou bastão", resources: 1, damage: 2, specification: "Arma contundente comum, pouco discreta." },
-  { id: "espada", category: "arma", name: "Espada cerimonial", resources: 3, damage: 3, specification: "Lâmina longa, exige porte e manutenção." },
+  { id: "espada", category: "arma", name: "Espada cerimonial", resources: 3, damage: 3, specification: "Lâmina longa, exige porte e manutenção.", eras: ["antiga", "medieval"] },
   { id: "pistola", category: "arma", name: "Pistola compacta", resources: 2, damage: 2, specification: "Arma de fogo curta, ocultável com preparo." },
   { id: "espingarda", category: "arma", name: "Espingarda", resources: 3, damage: 4, specification: "Alto impacto em curta distância, difícil de dissimular." },
   { id: "colete", category: "armadura", name: "Colete balístico leve", resources: 2, armor: 2, specification: "Proteção portátil contra impactos balísticos e contundentes." },
@@ -165,7 +168,7 @@ export const V5_STORE: V5StoreItem[] = [
   { id: "refugio", category: "moradia", name: "Refúgio fortificado", resources: 4, specification: "Acesso controlado, camadas de segurança e isolamento diurno." },
   { id: "sedan", category: "veiculo", name: "Sedã executivo", resources: 3, specification: "Veículo confortável com discrição em áreas urbanas." },
   { id: "moto", category: "veiculo", name: "Motocicleta de fuga", resources: 2, specification: "Mobilidade alta e perfil baixo em tráfego denso." },
-  { id: "cavalo", category: "montaria", name: "Cavalo treinado", resources: 3, specification: "Montaria para deslocamento rural, histórico ou de domínio próprio." },
+  { id: "cavalo", category: "montaria", name: "Cavalo treinado", resources: 3, specification: "Montaria para deslocamento rural, histórico ou de domínio próprio.", eras: ["medieval", "revolucao-industrial"] },
   { id: "machado", category: "arma", name: "Machado de mão", resources: 2, damage: 2, specification: "Ferramenta de impacto cortante, barulhenta e de difícil ocultação." },
   { id: "machete", category: "arma", name: "Facão", resources: 2, damage: 2, specification: "Lâmina longa para trabalho pesado ou combate de proximidade." },
   { id: "revolver", category: "arma", name: "Revólver", resources: 2, damage: 2, specification: "Arma curta robusta; exige atenção a ruído e rastreabilidade." },
@@ -186,7 +189,7 @@ export const V5_STORE: V5StoreItem[] = [
   { id: "utilitario", category: "veiculo", name: "Utilitário blindado", resources: 5, specification: "Transporte robusto para equipamento, aliados e viagens arriscadas." },
   { id: "cavalo-raca", category: "montaria", name: "Cavalo de raça", resources: 5, specification: "Montaria de prestígio, treinamento elevado e manutenção contínua." },
   { id: "soco-ingles", category: "arma", name: "Soco-inglês", resources: 1, damage: 1, specification: "Impacto curto e discreto, associado a confronto de rua." },
-  { id: "arco", category: "arma", name: "Arco composto", resources: 3, damage: 3, specification: "Arma de distância silenciosa que requer prática e espaço." },
+  { id: "arco", category: "arma", name: "Arco composto", resources: 3, damage: 3, specification: "Arma de distância silenciosa que requer prática e espaço.", eras: ["medieval", "moderna"] },
   { id: "gas", category: "arma", name: "Agente incapacitante", resources: 2, damage: 0, specification: "Ferramenta de controle de cena; seus efeitos dependem da proteção do alvo." },
   { id: "traje-antimotim", category: "armadura", name: "Traje antimotim", resources: 4, armor: 3, specification: "Proteção ampla contra impacto; impossível de confundir com vestimenta comum." },
   { id: "casaco-fogo", category: "armadura", name: "Casaco resistente ao fogo", resources: 3, armor: 1, specification: "Camada especializada para mitigar risco ambiental e faíscas." },
@@ -199,8 +202,22 @@ export const V5_STORE: V5StoreItem[] = [
   { id: "hotel", category: "moradia", name: "Suíte de hotel de longa estadia", resources: 3, specification: "Cobertura urbana temporária com serviço, anonimato relativo e custo recorrente." },
   { id: "furgoneta", category: "veiculo", name: "Furgoneta de carga", resources: 3, specification: "Transporte de pessoas, equipamento ou cobertura de trabalho logístico." },
   { id: "classico", category: "veiculo", name: "Automóvel clássico", resources: 4, specification: "Veículo de prestígio, memorável e menos adequado a passar despercebido." },
-  { id: "mula", category: "montaria", name: "Mula de carga", resources: 1, specification: "Montaria resistente para trilhas, viagem e transporte de suprimentos." },
-  { id: "carruagem", category: "montaria", name: "Carruagem restaurada", resources: 4, specification: "Veículo histórico para domínios tradicionais, eventos ou cenários rurais." },
+  { id: "mula", category: "montaria", name: "Mula de carga", resources: 1, specification: "Montaria resistente para trilhas, viagem e transporte de suprimentos.", eras: ["medieval", "revolucao-industrial"] },
+  { id: "carruagem", category: "montaria", name: "Carruagem restaurada", resources: 4, specification: "Veículo histórico para domínios tradicionais, eventos ou cenários rurais.", eras: ["revolucao-industrial"] },
+  { id: "gladio-cerimonial", category: "arma", name: "Gládio cerimonial", resources: 3, damage: 2, specification: "Lâmina curta para uma corte antiga, procissão ou vigília de domínio.", eras: ["antiga"] },
+  { id: "litiga-antiga", category: "veiculo", name: "Litiga de viagem", resources: 3, specification: "Transporte de status para deslocamento urbano ou rotas antigas, conduzido por servos ou animais.", eras: ["antiga"] },
+  { id: "cavalo-sela-antigo", category: "animal", name: "Cavalo de sela antigo", resources: 3, specification: "Montaria de viagem para estradas, patrulhas e jornadas por territórios clássicos.", eras: ["antiga"], animalProfile: { species: "Equino", strength: 3, dexterity: 2, stamina: 3, health: 5, speed: "Trote sustentado", attack: "Coice +1 superficial", traits: ["Dócil", "Resistente"] } },
+  { id: "destrier", category: "animal", name: "Destrier", resources: 4, specification: "Cavalo de guerra treinado para carga e combate montado.", eras: ["medieval"], animalProfile: { species: "Equino", strength: 4, dexterity: 2, stamina: 4, health: 6, speed: "30 km/h em galope", attack: "Coice +2 superficial", traits: ["Intimidador", "Treinado para guerra"] } },
+  { id: "corcel", category: "animal", name: "Corcel", resources: 3, specification: "Montaria ágil para mensageiros, caçadores e perseguições.", eras: ["medieval"], animalProfile: { species: "Equino", strength: 3, dexterity: 3, stamina: 3, health: 5, speed: "45 km/h em galope", attack: "Coice +1 superficial", traits: ["Ágil", "Resistente"] } },
+  { id: "mastim-molosso", category: "animal", name: "Mastim Molosso", resources: 2, specification: "Cão de guarda e combate, leal sob orientação firme.", eras: ["medieval"], priceLabel: "5 moedas de ouro", animalProfile: { species: "Canino", strength: 4, dexterity: 2, stamina: 4, health: 6, speed: "Corrida curta", attack: "Mordida +2 agravado", traits: ["Guarda", "Combate"], priceLabel: "5 moedas de ouro" } },
+  { id: "lobo-cinzento", category: "animal", name: "Lobo Cinzento treinado", resources: 3, specification: "Caçador silencioso para reconhecimento, emboscada e rastreamento.", eras: ["medieval"], priceLabel: "10 moedas de ouro", animalProfile: { species: "Canino", strength: 3, dexterity: 3, stamina: 3, health: 5, speed: "Corrida e trilha", attack: "Mordida +1 agravado", traits: ["Matilha", "Rastreamento"], priceLabel: "10 moedas de ouro" } },
+  { id: "aguia-guerra", category: "animal", name: "Águia de guerra", resources: 3, specification: "Ave de rapina para reconhecimento e distrações rápidas.", eras: ["medieval"], priceLabel: "15 moedas de ouro", animalProfile: { species: "Ave de rapina", strength: 1, dexterity: 4, stamina: 2, health: 3, speed: "Voo de reconhecimento", attack: "Garras +1 superficial", traits: ["Visão aguçada", "Mensageira"], priceLabel: "15 moedas de ouro" } },
+  { id: "cavalo-tracao", category: "animal", name: "Cavalo de tração", resources: 3, specification: "Animal de carga para carroças, campos e logística urbana vitoriana.", eras: ["revolucao-industrial"], animalProfile: { species: "Equino", strength: 5, dexterity: 1, stamina: 4, health: 7, speed: "15 km/h em trote", attack: "Coice +2 superficial", traits: ["Forte", "Resistente ao trabalho"] } },
+  { id: "cavalo-patrulha", category: "animal", name: "Cavalo de patrulha", resources: 3, specification: "Montaria treinada para ruído, multidões e rondas noturnas.", eras: ["revolucao-industrial"], animalProfile: { species: "Equino", strength: 3, dexterity: 2, stamina: 4, health: 6, speed: "25 km/h em trote", attack: "Coice +1 superficial", traits: ["Treinado", "Leal"] } },
+  { id: "carruagem-passageiros", category: "veiculo", name: "Carruagem de passageiros", resources: 4, specification: "Veículo urbano para deslocamento de grupo em uma cidade industrial; requer animal de tração ou contratado.", eras: ["revolucao-industrial"] },
+  { id: "bicicleta-utilitaria", category: "veiculo", name: "Bicicleta utilitária", resources: 1, specification: "Transporte discreto, silencioso e prático para ruas modernas ou industriais tardias.", eras: ["revolucao-industrial", "moderna"] },
+  { id: "van-operacional", category: "veiculo", name: "Van operacional", resources: 4, specification: "Transporte de equipe, equipamento e animais em operações contemporâneas.", eras: ["moderna"] },
+  { id: "cao-rastreio", category: "animal", name: "Cão de rastreio", resources: 2, specification: "Companheiro treinado para seguir cheiros, vigiar perímetros e acompanhar uma investigação moderna.", eras: ["moderna"], animalProfile: { species: "Canino", strength: 2, dexterity: 3, stamina: 3, health: 5, speed: "Corrida curta", attack: "Mordida +1 superficial", traits: ["Faro", "Leal"] } },
 ] as const;
 
 export type V5InventoryEntry = {
@@ -214,9 +231,14 @@ export type V5InventoryEntry = {
   damage?: number;
   armor?: number;
   specification: string;
+  eras?: V5Era[];
+  priceLabel?: string;
+  animalProfile?: V5AnimalProfile;
 };
 
-const inventoryCategories: V5StoreCategory[] = ["arma", "armadura", "equipamento", "roupa", "moradia", "veiculo", "montaria"];
+const inventoryCategories: V5StoreCategory[] = ["arma", "armadura", "equipamento", "roupa", "moradia", "veiculo", "montaria", "animal"];
+const validV5Eras: V5Era[] = ["antiga", "medieval", "revolucao-industrial", "moderna"];
+const isV5AnimalProfile = (profile: unknown): profile is V5AnimalProfile => Boolean(profile) && typeof profile === "object" && typeof (profile as Partial<V5AnimalProfile>).species === "string" && typeof (profile as Partial<V5AnimalProfile>).strength === "number" && typeof (profile as Partial<V5AnimalProfile>).dexterity === "number" && typeof (profile as Partial<V5AnimalProfile>).stamina === "number" && typeof (profile as Partial<V5AnimalProfile>).health === "number" && typeof (profile as Partial<V5AnimalProfile>).speed === "string" && typeof (profile as Partial<V5AnimalProfile>).attack === "string" && Array.isArray((profile as Partial<V5AnimalProfile>).traits);
 
 export function createV5CatalogInventoryItem(catalogId: string): V5InventoryEntry | undefined {
   const item = V5_STORE.find((entry) => entry.id === catalogId);
@@ -252,6 +274,9 @@ export function normalizeV5Inventory(value: unknown): V5InventoryEntry[] {
       damage: number(candidate.damage, fallback?.damage),
       armor: number(candidate.armor, fallback?.armor),
       specification: typeof candidate.specification === "string" ? candidate.specification : fallback?.specification || "Item registrado na ficha.",
+      eras: Array.isArray(candidate.eras) ? candidate.eras.filter((era): era is V5Era => validV5Eras.includes(era as V5Era)) : fallback?.eras,
+      priceLabel: typeof candidate.priceLabel === "string" ? candidate.priceLabel : fallback?.priceLabel,
+      animalProfile: isV5AnimalProfile(candidate.animalProfile) ? candidate.animalProfile : fallback?.animalProfile,
     });
     ids.add(id);
   });
@@ -300,6 +325,10 @@ export function calculateV5ExperienceCost(kind: V5AdvancementKind, currentDots: 
 
 export function getV5InventoryItems(sheet: Pick<V5SheetData, "inventory">) {
   return normalizeV5Inventory(sheet.inventory);
+}
+
+export function getV5AnimalCompanions(sheet: Pick<V5SheetData, "inventory">) {
+  return getV5InventoryItems(sheet).filter((item) => item.category === "animal" && item.animalProfile);
 }
 
 export function getV5EquippedWeapon(sheet: Pick<V5SheetData, "inventory" | "equippedWeaponId">) {
