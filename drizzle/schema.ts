@@ -182,6 +182,25 @@ export const campaignEvents = mysqlTable("campaignEvents", {
   index("campaign_events_occurred_idx").on(table.occurredAt),
 ]);
 
+/** Referências musicais e briefs de ambientação associados ao arquivo de uma campanha. */
+export const campaignMusicCues = mysqlTable("campaignMusicCues", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
+  sessionId: int("sessionId").references(() => campaignSessions.id, { onDelete: "set null" }),
+  createdBy: int("createdBy").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 160 }).notNull(),
+  sceneType: mysqlEnum("sceneType", ["arrival", "exploration", "intrigue", "tension", "combat", "aftermath", "rest"]).default("exploration").notNull(),
+  durationSeconds: int("durationSeconds").default(120).notNull(),
+  musicPrompt: text("musicPrompt").notNull(),
+  notes: text("notes"),
+  audioUrl: text("audioUrl"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  index("campaign_music_cues_campaign_idx").on(table.campaignId),
+  index("campaign_music_cues_session_idx").on(table.sessionId),
+]);
+
 /** Mapas táticos de uma campanha; o binário da imagem permanece no armazenamento de arquivos. */
 export const campaignMaps = mysqlTable("campaignMaps", {
   id: int("id").autoincrement().primaryKey(),

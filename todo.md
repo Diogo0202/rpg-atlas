@@ -114,11 +114,19 @@
 - [x] Reexecutar testes, tipos e build no estado conciliado antes de concluir a mesa virtual.
 - [x] Salvar um checkpoint limpo da mesa virtual após a validação pós-mesclagem.
 - [x] Atualizar as verificações de saúde do servidor e confirmar a ausência de erros de TypeScript antes da publicação.
-- [ ] Integrar o Campaign Workbench às sessões após mapas e mesa virtual.
+- [x] Integrar o Campaign Workbench às sessões após mapas e mesa virtual.
 - [x] Conectar o Workbench às sessões e eventos persistentes da campanha selecionada.
 - [x] Usar a sessão registrada em foco no dossiê Markdown do Workbench.
 - [x] Exibir carregamento, erro e nova tentativa para eventos persistentes no Workbench.
 - [x] Distinguir no dossiê Markdown a ausência de eventos de uma falha de consulta.
 - [x] Cobrir em teste DOM a falha e a recuperação de eventos persistentes no Workbench.
-- [ ] Validar e publicar o ciclo de Workbench conectado ao Santuário.
+- [x] Validar e publicar o ciclo de Workbench conectado ao Santuário.
 - [ ] Implementar Música e assistência de IA após o Campaign Workbench.
+- [x] Modelar e migrar referências de trilha vinculadas a campanhas e sessões.
+- [x] Criar assistência de IA protegida para gerar briefs musicais estruturados para narradores.
+- [x] Integrar ao Santuário uma biblioteca de trilhas com edição de referência, reprodução e permissões.
+- [x] Validar por schema a resposta estruturada da IA para briefs musicais.
+- [x] Cobrir sucesso e falha da geração estruturada de briefs musicais em testes.
+- [x] Exibir e testar uma falha recuperável de `music.createBrief` no painel de trilhas.
+- [x] Confirmar em teste a rejeição de resposta inválida da IA para o brief estruturado.
+- [ ] Testar, validar e publicar o ciclo de Música e IA.
