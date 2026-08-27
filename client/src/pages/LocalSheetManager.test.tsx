@@ -120,3 +120,21 @@ it("compartilha diretamente uma ficha do cofre por link JSON e QR code", async (
   expect(await screen.findByAltText("QR code da ficha JSON compartilhada no cofre")).not.toBeNull();
   expect(screen.getByRole("status").textContent).toMatch(/Link JSON de “Lívia” copiado/);
 });
+
+it("salva, aplica e exclui uma visualização combinada do cofre", async () => {
+  saveLocalSheet("rpg-atlas-local-vampiro-v5-v1", { id: "view-record", name: "Lívia", level: 5, tags: ["jogador"], updatedAt: new Date().toISOString(), sheet: { name: "Lívia", concept: "Investigadora", sheet: { hunger: 2 } } });
+  render(<LocalSheetManagerContent />);
+  fireEvent.change(screen.getByLabelText("Pesquisar fichas locais"), { target: { value: "Lívia" } });
+  fireEvent.change(screen.getByLabelText("Filtrar fichas por nível"), { target: { value: "5" } });
+  fireEvent.change(screen.getByLabelText("Filtrar fichas por tag"), { target: { value: "jogador" } });
+  fireEvent.change(screen.getByLabelText("Ordenar fichas locais"), { target: { value: "name-asc" } });
+  fireEvent.change(screen.getByLabelText("Nome da nova visualização"), { target: { value: "Jogadores V5" } });
+  fireEvent.click(screen.getByRole("button", { name: /salvar visão/i }));
+  expect((await screen.findByRole("status")).textContent).toContain("Visualização “Jogadores V5” salva.");
+  const viewSelect = screen.getByLabelText("Visualizações salvas do cofre") as HTMLSelectElement;
+  expect(viewSelect.options[1]?.textContent).toBe("Jogadores V5");
+  fireEvent.change(viewSelect, { target: { value: viewSelect.options[1]?.value } });
+  expect((screen.getByLabelText("Pesquisar fichas locais") as HTMLInputElement).value).toBe("Lívia");
+  fireEvent.click(screen.getByRole("button", { name: /excluir visão/i }));
+  expect(screen.getByRole("status").textContent).toContain("Visualização “Jogadores V5” excluída.");
+});

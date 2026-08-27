@@ -95,4 +95,15 @@
 - [x] Adicionar leitura/preview da ficha compartilhada e testes do contrato, geração, cópia e abertura do link JSON.
 - [x] Adicionar geração e cópia de link JSON também na página `/cofre-local` para compartilhar registros sem abrir a ficha.
 - [x] Cobrir o compartilhamento JSON direto do Gerenciador com teste DOM.
-- [ ] Publicar um checkpoint final após essa integração e registrar o `version_id`.
+- [x] Publicar um checkpoint final após essa integração e registrar o `version_id`.
+
+# Nova expansão — compressão e visualizações do Cofre
+
+- [x] Definir envelope comprimido versionado para links JSON, mantendo leitura retrocompatível de links não comprimidos.
+- [x] Implementar compressão transparente de payloads grandes antes da geração da URL.
+- [x] Cobrir compressão, descompressão, Unicode e rejeição de payload inválido com testes.
+- [x] Criar modelo local persistente para visualizações personalizadas de filtros combinados.
+- [x] Permitir salvar, selecionar, atualizar e excluir visualizações no Cofre Local.
+- [x] Cobrir visualizações personalizadas com testes de persistência e interface.
+- [x] Validar responsividade, executar testes completos e publicar checkpoint.
+- [ ] Salvar um novo checkpoint publicado após a expansão de compressão de payloads e visualizações salvas do Cofre Local, registrando o `version_id` retornado.

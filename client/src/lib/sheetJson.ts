@@ -1,4 +1,5 @@
 import type { RpgSystemId } from "@shared/rpg-systems";
+import { compressSync, decompressSync } from "fflate";
 
 export const CHARACTER_JSON_FORMAT = "rpg-atlas-character-v1" as const;
 export const VAULT_BACKUP_JSON_FORMAT = "rpg-atlas-vault-v1" as const;
@@ -39,6 +40,8 @@ export type VaultBackupEnvelope = {
 
 const SYSTEM_IDS: readonly RpgSystemId[] = ["vampiro-v5", "cacador-a-vinganca", "o-um-anel"];
 const LEGACY_HUNTER_FORMAT = "rpg-atlas-hunter-character-v1";
+const COMPRESSED_SHARE_PREFIX = "z.";
+const MAX_SHARE_PAYLOAD_LENGTH = 12000;
 
 export function inferRpgSystemId(storageKey: string): RpgSystemId {
   if (storageKey.includes("hunter")) return "cacador-a-vinganca";
@@ -134,8 +137,7 @@ export function parseVaultBackup(value: unknown): Array<ParsedCharacterJson & { 
   return single ? [single] : null;
 }
 
-function encodeBase64Url(value: string) {
-  const bytes = new TextEncoder().encode(value);
+function encodeBytesBase64Url(bytes: Uint8Array) {
   let binary = "";
   bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
@@ -144,18 +146,23 @@ function encodeBase64Url(value: string) {
 function decodeBase64Url(value: string) {
   const normalized = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
   const binary = atob(normalized);
-  return new TextDecoder().decode(Uint8Array.from(binary, (character) => character.charCodeAt(0)));
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
 }
 
 export function createCharacterShareUrl(payload: CharacterJsonEnvelope, origin = typeof window === "undefined" ? "" : window.location.origin) {
-  const encoded = encodeBase64Url(JSON.stringify(payload));
-  if (encoded.length > 12000) throw new Error("A ficha é grande demais para ser compartilhada por URL. Use o arquivo JSON exportado.");
+  const compressed = encodeBytesBase64Url(compressSync(new TextEncoder().encode(JSON.stringify(payload))));
+  const encoded = `${COMPRESSED_SHARE_PREFIX}${compressed}`;
+  if (encoded.length > MAX_SHARE_PAYLOAD_LENGTH) throw new Error("A ficha é grande demais para ser compartilhada por URL. Use o arquivo JSON exportado.");
   return `${origin}/compartilhar/json?payload=${encoded}`;
 }
 
 export function parseCharacterSharePayload(encoded: string): ParsedCharacterJson | null {
-  if (!encoded || encoded.length > 12000) return null;
-  try { return parseCharacterJson(JSON.parse(decodeBase64Url(encoded))); } catch { return null; }
+  if (!encoded || encoded.length > MAX_SHARE_PAYLOAD_LENGTH) return null;
+  try {
+    const isCompressed = encoded.startsWith(COMPRESSED_SHARE_PREFIX);
+    const raw = isCompressed ? new TextDecoder().decode(decompressSync(decodeBase64Url(encoded.slice(COMPRESSED_SHARE_PREFIX.length)))) : new TextDecoder().decode(decodeBase64Url(encoded));
+    return parseCharacterJson(JSON.parse(raw));
+  } catch { return null; }
 }
 
 export function downloadJsonFile(payload: unknown, filename: string) {

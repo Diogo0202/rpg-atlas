@@ -17,3 +17,9 @@ As capturas em 1280×720 mostraram o Modo de Cena com a composição operacional
 Em 375×812, os controles principais do Modo de Cena empilham-se sem sair da viewport inicial. O Cofre Local mantém título, descrição, contador e cartões dos sistemas em coluna; os controles da biblioteca seguem em fluxo vertical. A tela de link inválido mantém a mensagem legível dentro do cartão.
 
 As capturas foram feitas com o cofre vazio e sem `payload` na rota compartilhada, portanto não exercitam visualmente o cartão de QR code nem a listagem filtrada com registros. Esses fluxos possuem cobertura DOM dedicada nos testes.
+
+## Compressão e visualizações — 2026-08-27
+
+Em 1280×720, a barra de visualizações salvas aparece integrada ao bloco da Biblioteca do navegador, com seletor, campo de nome e ações de salvar/excluir alinhados acima dos filtros existentes. A hierarquia visual permanece consistente com o design Obsidiano.
+
+Em 375×812, a mesma área é estruturada em coluna pelo grid responsivo, evitando overflow horizontal. Como o cofre está vazio na captura, o seletor não apresenta registros; a persistência e aplicação de visualizações são cobertas pelos testes DOM e unitários.
