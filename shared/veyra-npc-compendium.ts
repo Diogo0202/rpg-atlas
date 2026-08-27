@@ -37,4 +37,15 @@ export const veyraNpcCompendium: VeyraNpcRecord[] = [
   { id: "joao-kane", name: "João Kane", epithet: "O Herdeiro do Ferro", relation: "neutral", summary: "Sobrinho de Salamon e herdeiro em treinamento da linhagem Kane, dotado de intelecto aguçado, mas ainda em formação diante do peso da missão familiar.", specialties: ["Intelecto", "Conhecimento da linhagem", "Tecnologia", "Potencial de liderança"], hook: "A promessa e a dúvida de João podem abrir uma negociação ou precipitar uma decisão que revele o futuro da linhagem.", sourcePage: 17, source: kaneNpcSource },
 ];
 
-export function filterVeyraNpcs(relation: VeyraNpcRelation | "all") { return relation === "all" ? veyraNpcCompendium : veyraNpcCompendium.filter((npc) => npc.relation === relation); }
+function normalizeNpcSearch(value: string) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR").trim();
+}
+
+export function filterVeyraNpcs(relation: VeyraNpcRelation | "all", search = "") {
+  const normalizedSearch = normalizeNpcSearch(search);
+  return veyraNpcCompendium.filter((npc) => {
+    const matchesRelation = relation === "all" || npc.relation === relation;
+    const matchesSearch = !normalizedSearch || [npc.name, npc.epithet, ...npc.specialties].some((value) => normalizeNpcSearch(value).includes(normalizedSearch));
+    return matchesRelation && matchesSearch;
+  });
+}

@@ -1,5 +1,5 @@
 import { drawPdfTheme } from "./pdfThemes";
-import { getOneRingMagicById, type OneRingMagic } from "@shared/one-ring-magic";
+import { getOneRingMagicById, getOneRingMagicReference, type OneRingMagic } from "@shared/one-ring-magic";
 
 type OneRingPrintSheet = {
   culture: string;
@@ -62,7 +62,7 @@ export async function createOneRingPdfFile(payload: OneRingPdfPayload): Promise<
   section("Atributos", Object.entries(sheet.attributes).map(([name, value]) => `${name}: ${value}`));
   section("Perícias", Object.entries(sheet.skills).filter(([, value]) => value > 0).map(([name, value]) => `${name}: ${value}`).concat(Object.values(sheet.skills).some((value) => value > 0) ? [] : ["Nenhuma perícia registrada"]));
   const selectedMagics = (sheet.magicIds ?? []).map(getOneRingMagicById).filter((magic): magic is OneRingMagic => Boolean(magic));
-  section("Magias e ritos de Veyr", selectedMagics.length ? selectedMagics.map((magic) => `${magic.name} · ${magic.discipline} · p. ${magic.sourcePage}`) : ["Nenhum rito de Veyr selecionado."]);
+  section("Magias e ritos de Veyr", selectedMagics.length ? selectedMagics.map((magic) => `${magic.name} · ${magic.discipline} · ${getOneRingMagicReference(magic)}`) : ["Nenhum rito de Veyr selecionado."]);
   section("Registro da companhia", [sheet.notes || "Nenhuma nota registrada."]);
   footer();
   return new File([pdf.output("blob")], getOneRingPdfFilename(payload.name), { type: "application/pdf" });

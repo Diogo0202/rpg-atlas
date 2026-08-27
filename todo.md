@@ -148,3 +148,8 @@
 - [x] Executar novamente a suíte de testes, a checagem de tipos e o build sem criar checkpoint.
 - [x] Reconciliar o remodelamento remoto das fichas com as alterações locais de NPCs Kane e Magias de O Um Anel.
 - [x] Validar e publicar o checkpoint de integração com o GitHub.
+- [x] Adicionar busca no compêndio de NPCs por nome e especialidade, mantendo os filtros de relação.
+- [x] Criar ritos originais adicionais de Terras de Veyr com inspiração estética em Elden Ring, sem apresentá-los como regras oficiais.
+- [x] Incluir tooltips acessíveis com descrições dos ritos na aba de Magias.
+- [x] Testar, revisar visualmente e publicar as melhorias de busca e magias.
+- [ ] Salvar e publicar o checkpoint das melhorias de busca no compêndio e da aba de Magias.

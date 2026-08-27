@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addOneRingMagic, getOneRingMagicById, normalizeOneRingMagicIds, removeOneRingMagic } from "./one-ring-magic";
+import { addOneRingMagic, getOneRingMagicById, getOneRingMagicReference, normalizeOneRingMagicIds, oneRingMagics, removeOneRingMagic } from "./one-ring-magic";
 
 describe("magias e ritos de O Um Anel", () => {
   it("aceita apenas ritos catalogados, sem duplicar a ficha", () => {
@@ -11,5 +11,11 @@ describe("magias e ritos de O Um Anel", () => {
   it("resolve apenas ritos existentes para usos de exibição e impressão", () => {
     expect(getOneRingMagicById("selo-de-bronze")?.name).toBe("Selo de Bronze");
     expect(getOneRingMagicById("rito-inexistente")).toBeUndefined();
+  });
+  it("distingue os ritos originais de Veyr inspirados em Elden Ring das fontes do Drive", () => {
+    const original = getOneRingMagicById("brasa-do-ultimo-rei");
+    expect(oneRingMagics.filter((magic) => magic.origin === "veyra-original")).toHaveLength(5);
+    expect(original?.sourcePage).toBeUndefined();
+    expect(original && getOneRingMagicReference(original)).toContain("Rito original de Veyr");
   });
 });

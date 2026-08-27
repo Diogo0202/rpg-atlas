@@ -1,4 +1,4 @@
-import { getOneRingMagicById } from "@shared/one-ring-magic";
+import { getOneRingMagicById, getOneRingMagicReference } from "@shared/one-ring-magic";
 import { ScrollText, Sparkles } from "lucide-react";
 import React from "react";
 import { OneRingMagicPanel } from "./OneRingMagicPanel";
@@ -20,7 +20,7 @@ export function OneRingMagicTabs({ selectedIds, onChange }: OneRingMagicTabsProp
     <TabsContent value="ficha" className="mt-4 border border-white/10 bg-[#101211]/70 p-4">
       <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#a9c7bb]">Ritos vinculados à ficha</p>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-[#c7c1b5]">Os ritos selecionados são preservados junto ao companheiro e aparecem na impressão A4. Abra a aba <strong className="font-semibold text-[#eadcff]">Magias</strong> para consultar o catálogo e arrastar novos efeitos para a ficha.</p>
-      {selectedMagics.length ? <ul className="mt-4 grid gap-2 sm:grid-cols-2" aria-label="Ritos atualmente vinculados">{selectedMagics.map((magic) => <li key={magic!.id} className="border border-[#7d65a3]/40 bg-[#171a18] px-3 py-2"><p className="font-serif text-lg leading-none text-[#f4eee4]">{magic!.name}</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#c7b6e7]">{magic!.discipline} · p. {magic!.sourcePage}</p></li>)}</ul> : <p className="mt-4 border border-dashed border-[#7d65a3]/50 px-3 py-3 text-sm text-[#b8b3a8]">Nenhum rito de Veyr foi vinculado a este companheiro.</p>}
+      {selectedMagics.length ? <ul className="mt-4 grid gap-2 sm:grid-cols-2" aria-label="Ritos atualmente vinculados">{selectedMagics.map((magic) => <li key={magic!.id} className="border border-[#7d65a3]/40 bg-[#171a18] px-3 py-2"><p className="font-serif text-lg leading-none text-[#f4eee4]">{magic!.name}</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#c7b6e7]">{magic!.discipline} · {getOneRingMagicReference(magic!)}</p></li>)}</ul> : <p className="mt-4 border border-dashed border-[#7d65a3]/50 px-3 py-3 text-sm text-[#b8b3a8]">Nenhum rito de Veyr foi vinculado a este companheiro.</p>}
     </TabsContent>
     <TabsContent value="magias" className="mt-4">
       <OneRingMagicPanel selectedIds={selectedIds} onChange={onChange} />

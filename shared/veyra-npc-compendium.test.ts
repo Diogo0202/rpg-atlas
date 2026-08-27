@@ -15,4 +15,10 @@ describe("compêndio de NPCs de Véspera do Vau", () => {
     expect(kaneNpcs.map((npc) => npc.sourcePage)).toEqual([4, 8, 11, 14, 17, 17]);
     expect(kaneNpcs.every((npc) => npc.source?.url === kaneNpcSource.url)).toBe(true);
   });
+
+  it("busca NPCs por nome ou especialidade, sem diferenciar maiúsculas ou acentos", () => {
+    expect(filterVeyraNpcs("all", "salamon").map((npc) => npc.id)).toEqual(["salamon-kane"]);
+    expect(filterVeyraNpcs("all", "contrainteligencia").map((npc) => npc.id)).toEqual(["salamon-kane"]);
+    expect(filterVeyraNpcs("neutral", "infiltração").map((npc) => npc.id)).toEqual(["alistair-kane", "dorian-kane"]);
+  });
 });
