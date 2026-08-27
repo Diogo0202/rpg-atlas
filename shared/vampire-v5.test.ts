@@ -7,6 +7,7 @@ describe("fundação da ficha V5", () => {
     expect(sheet.generation).toBe(13);
     expect(sheet.humanity).toBe(7);
     expect(sheet.hunger).toBe(1);
+    expect(sheet.damage).toEqual({ superficial: 0, aggravated: 0 });
   });
 
   it("calcula Vitalidade e Força de Vontade a partir dos atributos", () => {

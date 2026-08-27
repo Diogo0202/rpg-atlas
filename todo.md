@@ -96,3 +96,10 @@
 - [x] Implementar gestão protegida de membros e papéis por campanha, com convites por e-mail.
 - [x] Integrar membros e permissões ao hub de campanha sem expor dados de usuários não autorizados.
 - [x] Testar, revisar e publicar o primeiro ciclo priorizado do roteiro do documento.
+- [x] Definir o próximo módulo prioritário do roteiro amplo antes de iniciar outra frente de implementação.
+- [x] Evoluir Ficha e Rules Engine com cálculos derivados, dano e rolagens específicas.
+- [x] Centralizar os estados derivados de O Um Anel e aplicá-los às rolagens específicas da ficha.
+- [ ] Evoluir Biblioteca e busca global após concluir o ciclo de fichas.
+- [ ] Implementar Mapas e a base de mesa virtual após biblioteca e busca.
+- [ ] Integrar o Campaign Workbench às sessões após mapas e mesa virtual.
+- [ ] Implementar Música e assistência de IA após o Campaign Workbench.
