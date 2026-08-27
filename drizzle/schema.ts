@@ -164,6 +164,24 @@ export const campaignFactions = mysqlTable("campaignFactions", {
   index("campaign_factions_creator_idx").on(table.createdBy),
 ]);
 
+/** Eventos da campanha para a linha do tempo, ligados opcionalmente a uma sessão. */
+export const campaignEvents = mysqlTable("campaignEvents", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
+  sessionId: int("sessionId").references(() => campaignSessions.id, { onDelete: "set null" }),
+  createdBy: int("createdBy").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 160 }).notNull(),
+  description: text("description"),
+  status: mysqlEnum("status", ["planned", "active", "resolved", "failed", "consequence"]).default("active").notNull(),
+  occurredAt: timestamp("occurredAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  index("campaign_events_campaign_idx").on(table.campaignId),
+  index("campaign_events_session_idx").on(table.sessionId),
+  index("campaign_events_occurred_idx").on(table.occurredAt),
+]);
+
 /** Dossiê de antagonista público ou pertencente ao arquivo particular de um cronista. */
 export const antagonists = mysqlTable("antagonists", {
   id: int("id").autoincrement().primaryKey(),

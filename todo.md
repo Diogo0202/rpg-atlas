@@ -84,6 +84,9 @@
 - [x] Testar, revisar e publicar a preferência de animação e os metadados dos links.
 - [x] Analisar as instruções de Documento.docx e traduzir as melhorias viáveis em tarefas de implementação.
 - [ ] Implementar e validar as melhorias priorizadas a partir do documento fornecido.
+- [x] Implementar eventos persistentes por campanha, vinculáveis às sessões e restritos a narradores.
+- [x] Integrar uma linha do tempo de eventos ao Santuário para membros autorizados.
+- [x] Testar, revisar e publicar o ciclo de eventos e linha do tempo.
 - [x] Implementar facções persistentes por campanha, com tensão, objetivo e consequência de ruptura.
 - [x] Integrar relógios de consequência persistentes ao Santuário e às permissões de narrador.
 - [x] Testar, revisar e publicar o ciclo de facções e consequências do roteiro.

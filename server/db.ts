@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, gt, inArray, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomBytes } from "node:crypto";
-import { antagonistCharacters, antagonists, antagonistSessions, campaignFactions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
+import { antagonistCharacters, antagonists, antagonistSessions, campaignEvents, campaignFactions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { rankLibraryEntries } from "../shared/library-search";
 
@@ -395,6 +395,41 @@ export async function updateCampaignFactionTensionForUser(input: { campaignId: n
   const tension = Math.max(0, Math.min(faction[0].maxTension, Math.round(input.tension)));
   await db.update(campaignFactions).set({ tension }).where(eq(campaignFactions.id, input.factionId));
   return { tension };
+}
+
+export async function listCampaignEventsForUser(input: { campaignId: number; userId: number }) {
+  if (!await campaignBelongsToUser(input.campaignId, input.userId)) return [];
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(campaignEvents).where(eq(campaignEvents.campaignId, input.campaignId)).orderBy(desc(campaignEvents.occurredAt));
+}
+
+async function assertSessionInCampaign(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, campaignId: number, sessionId?: number | null) {
+  if (!sessionId) return;
+  const session = await db.select({ id: campaignSessions.id }).from(campaignSessions).where(and(eq(campaignSessions.id, sessionId), eq(campaignSessions.campaignId, campaignId))).limit(1);
+  if (!session[0]) throw new Error("A sessão informada não pertence a esta campanha.");
+}
+
+export async function createCampaignEventForUser(input: { campaignId: number; userId: number; sessionId?: number | null; title: string; description?: string; status: "planned" | "active" | "resolved" | "failed" | "consequence"; occurredAt?: Date }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem registrar eventos nesta campanha.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  await assertSessionInCampaign(db, input.campaignId, input.sessionId);
+  const inserted = await db.insert(campaignEvents).values({ campaignId: input.campaignId, createdBy: input.userId, sessionId: input.sessionId ?? null, title: input.title, description: input.description ?? null, status: input.status, occurredAt: input.occurredAt ?? new Date() }).$returningId();
+  const id = inserted[0]?.id;
+  if (!id) throw new Error("Não foi possível registrar o evento.");
+  return (await db.select().from(campaignEvents).where(eq(campaignEvents.id, id)).limit(1))[0];
+}
+
+export async function updateCampaignEventForUser(input: { campaignId: number; eventId: number; userId: number; sessionId?: number | null; title: string; description?: string; status: "planned" | "active" | "resolved" | "failed" | "consequence"; occurredAt: Date }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem atualizar eventos nesta campanha.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  await assertSessionInCampaign(db, input.campaignId, input.sessionId);
+  const event = await db.select({ id: campaignEvents.id }).from(campaignEvents).where(and(eq(campaignEvents.id, input.eventId), eq(campaignEvents.campaignId, input.campaignId))).limit(1);
+  if (!event[0]) throw new Error("Evento não encontrado nesta campanha.");
+  await db.update(campaignEvents).set({ sessionId: input.sessionId ?? null, title: input.title, description: input.description ?? null, status: input.status, occurredAt: input.occurredAt }).where(eq(campaignEvents.id, input.eventId));
+  return (await db.select().from(campaignEvents).where(eq(campaignEvents.id, input.eventId)).limit(1))[0];
 }
 
 export async function listAntagonistsForUser(userId: number, filters?: { campaignId?: number; systemId?: string }) {
