@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, gt, inArray, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomBytes } from "node:crypto";
-import { antagonistCharacters, antagonists, antagonistSessions, campaignEventFactions, campaignEvents, campaignFactions, campaignMapMarkers, campaignMaps, campaignMembers, campaignMusicCues, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
+import { antagonistCharacters, antagonists, antagonistSessions, campaignEventFactions, campaignEvents, campaignFactions, campaignMapMarkers, campaignMaps, campaignMembers, campaignMusicCues, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, storeFavorites, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { rankLibraryEntries } from "../shared/library-search";
 import { storagePut } from "./storage";
@@ -98,6 +98,24 @@ export async function listRpgSystems() {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(rpgSystems).orderBy(rpgSystems.name);
+}
+
+export async function listStoreFavoritesForUser(ownerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({ itemId: storeFavorites.itemId, createdAt: storeFavorites.createdAt }).from(storeFavorites).where(eq(storeFavorites.ownerId, ownerId)).orderBy(desc(storeFavorites.createdAt));
+}
+
+export async function setStoreFavoriteForUser(input: { ownerId: number; itemId: string; favorite: boolean }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  if (input.favorite) {
+    const existing = await db.select({ id: storeFavorites.id }).from(storeFavorites).where(and(eq(storeFavorites.ownerId, input.ownerId), eq(storeFavorites.itemId, input.itemId))).limit(1);
+    if (!existing[0]) await db.insert(storeFavorites).values({ ownerId: input.ownerId, itemId: input.itemId });
+  } else {
+    await db.delete(storeFavorites).where(and(eq(storeFavorites.ownerId, input.ownerId), eq(storeFavorites.itemId, input.itemId)));
+  }
+  return { itemId: input.itemId, favorite: input.favorite };
 }
 
 export async function listCampaignsForUser(userId: number) {

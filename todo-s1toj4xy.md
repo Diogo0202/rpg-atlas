@@ -110,3 +110,13 @@
 - [x] Cobrir busca, vínculos, exportação, filtros temporais e integração de animais com testes automatizados.
 - [x] Salvar checkpoint e publicar os filtros do diário, os vínculos de facções e o catálogo temporal de animais.
 - [x] Adicionar ao diário de sessões um filtro explícito por registro e cobri-lo em teste automatizado.
+- [x] Modelar e persistir favoritos pessoais de itens, veículos e animais da loja.
+- [x] Exibir e filtrar favoritos no catálogo de compras V5.
+- [x] Criar uma visualização rápida dos animais vinculados à ficha V5.
+- [x] Exibir notificações de sucesso ou erro na exportação JSON e PDF do diário de sessões.
+- [x] Cobrir favoritos, painel rápido e notificações de exportação com testes automatizados.
+- [x] Validar os novos controles em desktop e mobile, com checagem de tipos e build aprovados.
+- [ ] Salvar checkpoint e publicar os favoritos, o painel rápido de animais e os avisos de exportação do diário.
+- [x] Revisar em desktop e mobile a área do diário após adicionar os controles de exportação PDF e JSON.
+- [x] Confirmar e testar a exportação PDF do diário de sessões com avisos de sucesso e falha.
+- [x] Revalidar testes, tipagem e build após a exportação PDF do diário.

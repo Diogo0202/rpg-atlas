@@ -114,6 +114,17 @@ export const characterArchetypes = mysqlTable("characterArchetypes", {
   index("character_archetypes_owner_system_idx").on(table.ownerId, table.systemId),
 ]);
 
+/** Itens do catálogo V5 marcados por uma pessoa para aquisição futura. */
+export const storeFavorites = mysqlTable("storeFavorites", {
+  id: int("id").autoincrement().primaryKey(),
+  ownerId: int("ownerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  itemId: varchar("itemId", { length: 120 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("store_favorites_owner_item_unique").on(table.ownerId, table.itemId),
+  index("store_favorites_owner_idx").on(table.ownerId),
+]);
+
 /** Registro auditável de rolagens para personagens e sessões futuras. */
 export const diceRolls = mysqlTable("diceRolls", {
   id: int("id").autoincrement().primaryKey(),
