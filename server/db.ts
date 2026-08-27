@@ -122,7 +122,7 @@ export async function listCampaignShoppingListsForUser(ownerId: number) {
   const db = await getDb();
   if (!db) return [];
   const lists = await db.select({ id: campaignShoppingLists.id, campaignId: campaignShoppingLists.campaignId, title: campaignShoppingLists.title, createdAt: campaignShoppingLists.createdAt, updatedAt: campaignShoppingLists.updatedAt, campaignTitle: campaigns.title }).from(campaignShoppingLists).innerJoin(campaigns, eq(campaignShoppingLists.campaignId, campaigns.id)).where(eq(campaignShoppingLists.ownerId, ownerId)).orderBy(desc(campaignShoppingLists.updatedAt));
-  return Promise.all(lists.map(async (list) => ({ ...list, itemIds: (await db.select({ itemId: campaignShoppingListItems.itemId }).from(campaignShoppingListItems).where(eq(campaignShoppingListItems.listId, list.id))).map((item) => item.itemId) })));
+  return Promise.all(lists.map(async (list) => ({ ...list, items: await db.select({ itemId: campaignShoppingListItems.itemId, isAcquired: campaignShoppingListItems.isAcquired, acquiredAt: campaignShoppingListItems.acquiredAt }).from(campaignShoppingListItems).where(eq(campaignShoppingListItems.listId, list.id)) })));
 }
 
 export async function createCampaignShoppingListForUser(input: { ownerId: number; campaignId: number; title: string }) {
@@ -155,6 +155,36 @@ export async function setCampaignShoppingListItemForUser(input: { ownerId: numbe
     await db.delete(campaignShoppingListItems).where(and(eq(campaignShoppingListItems.listId, input.listId), eq(campaignShoppingListItems.itemId, input.itemId)));
   }
   return { listId: input.listId, itemId: input.itemId, included: input.included };
+}
+
+export async function setCampaignShoppingListItemAcquiredForUser(input: { ownerId: number; listId: number; itemId: string; acquired: boolean }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const owned = await db.select({ id: campaignShoppingLists.id }).from(campaignShoppingLists).where(and(eq(campaignShoppingLists.id, input.listId), eq(campaignShoppingLists.ownerId, input.ownerId))).limit(1);
+  if (!owned[0]) throw new Error("Lista não encontrada ou sem permissão.");
+  const item = await db.select({ id: campaignShoppingListItems.id }).from(campaignShoppingListItems).where(and(eq(campaignShoppingListItems.listId, input.listId), eq(campaignShoppingListItems.itemId, input.itemId))).limit(1);
+  if (!item[0]) throw new Error("Item não encontrado nesta lista.");
+  await db.update(campaignShoppingListItems).set({ isAcquired: input.acquired ? 1 : 0, acquiredAt: input.acquired ? new Date() : null }).where(eq(campaignShoppingListItems.id, item[0].id));
+  return { listId: input.listId, itemId: input.itemId, acquired: input.acquired };
+}
+
+export async function createCampaignShoppingListShareLinkForUser(input: { ownerId: number; listId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const owned = await db.select({ id: campaignShoppingLists.id, shareToken: campaignShoppingLists.shareToken }).from(campaignShoppingLists).where(and(eq(campaignShoppingLists.id, input.listId), eq(campaignShoppingLists.ownerId, input.ownerId))).limit(1);
+  if (!owned[0]) throw new Error("Lista não encontrada ou sem permissão.");
+  const token = owned[0].shareToken || randomBytes(24).toString("base64url");
+  if (!owned[0].shareToken) await db.update(campaignShoppingLists).set({ shareToken: token }).where(eq(campaignShoppingLists.id, input.listId));
+  return { token };
+}
+
+export async function getSharedCampaignShoppingListByToken(token: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const list = await db.select({ id: campaignShoppingLists.id, title: campaignShoppingLists.title, campaignTitle: campaigns.title }).from(campaignShoppingLists).innerJoin(campaigns, eq(campaignShoppingLists.campaignId, campaigns.id)).where(eq(campaignShoppingLists.shareToken, token)).limit(1);
+  if (!list[0]) return undefined;
+  const items = await db.select({ itemId: campaignShoppingListItems.itemId, isAcquired: campaignShoppingListItems.isAcquired }).from(campaignShoppingListItems).where(eq(campaignShoppingListItems.listId, list[0].id));
+  return { ...list[0], items };
 }
 
 export async function listCampaignsForUser(userId: number) {

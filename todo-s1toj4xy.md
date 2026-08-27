@@ -127,3 +127,9 @@
 - [x] Exportar em PDF a ficha resumida de cada animal na visualização rápida.
 - [x] Cobrir listas, alertas, comparação e PDF de animais com testes automatizados.
 - [x] Validar em desktop e mobile, salvar checkpoint e publicar a atualização.
+- [ ] Modelar a marcação de itens adquiridos e os totais de Recursos nas listas de favoritos.
+- [ ] Exibir o estado de aquisição e o totalizador financeiro em cada lista de campanha.
+- [ ] Compartilhar uma lista de favoritos com o narrador de forma segura e prática.
+- [ ] Examinar a conversa referenciada e preparar uma configuração de integração automática compatível com seu escopo.
+- [ ] Cobrir aquisição, totais e compartilhamento com testes automatizados.
+- [ ] Validar os novos controles em desktop e mobile, salvar checkpoint e publicar a atualização.

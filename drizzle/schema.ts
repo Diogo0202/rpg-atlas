@@ -131,9 +131,11 @@ export const campaignShoppingLists = mysqlTable("campaignShoppingLists", {
   ownerId: int("ownerId").notNull().references(() => users.id, { onDelete: "cascade" }),
   campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 120 }).notNull(),
+  shareToken: varchar("shareToken", { length: 72 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => [
+  uniqueIndex("shopping_lists_share_token_unique").on(table.shareToken),
   index("shopping_lists_owner_idx").on(table.ownerId),
   index("shopping_lists_campaign_idx").on(table.campaignId),
 ]);
@@ -143,6 +145,8 @@ export const campaignShoppingListItems = mysqlTable("campaignShoppingListItems",
   id: int("id").autoincrement().primaryKey(),
   listId: int("listId").notNull().references(() => campaignShoppingLists.id, { onDelete: "cascade" }),
   itemId: varchar("itemId", { length: 120 }).notNull(),
+  isAcquired: int("isAcquired").default(0).notNull(),
+  acquiredAt: timestamp("acquiredAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, (table) => [
   uniqueIndex("shopping_list_items_unique").on(table.listId, table.itemId),

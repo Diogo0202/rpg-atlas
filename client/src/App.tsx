@@ -18,6 +18,7 @@ import HunterSheet from "./pages/HunterSheet";
 import SceneMode from "./pages/SceneMode";
 import LocalSheetManager from "./pages/LocalSheetManager";
 import ReferenceDetail from "./pages/ReferenceDetail";
+import SharedShoppingList from "./pages/SharedShoppingList";
 
 export const APP_ROUTES = {
   sceneMode: "/modo-cena",
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/acervo/:category/:id" component={ReferenceDetail} />
       <Route path="/acervo" component={ReferenceArchive} />
       <Route path="/compartilhar/ficha/:token" component={SharedCharacterSheet} />
+      <Route path="/compartilhar/lista/:token" component={SharedShoppingList} />
       <Route path="/compartilhar/:token" component={SharedCharacterSheet} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
