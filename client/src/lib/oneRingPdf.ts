@@ -1,3 +1,5 @@
+import { drawPdfTheme } from "./pdfThemes";
+
 type OneRingPrintSheet = {
   culture: string;
   calling: string;
@@ -34,11 +36,13 @@ export async function createOneRingPdfFile(payload: OneRingPdfPayload): Promise<
   const pdf = new jsPDF({ unit: "mm", format: "a4" });
   const width = pdf.internal.pageSize.getWidth();
   const height = pdf.internal.pageSize.getHeight();
+  const drawTheme = () => drawPdfTheme(pdf, "o-um-anel", width, height);
+  drawTheme();
   pdf.setProperties({ title: `Ficha de O Um Anel · ${payload.name}`, subject: "Ficha preenchida para impressão" });
   let y = 18;
   let page = 1;
   const footer = () => { pdf.setDrawColor(181, 91, 50); pdf.line(15, height - 13, width - 15, height - 13); pdf.setFont("helvetica", "normal"); pdf.setFontSize(7); pdf.setTextColor(92, 89, 82); pdf.text(`RPG Atlas · O Um Anel · impressão A4 · página ${page}`, 15, height - 8); };
-  const nextPage = () => { footer(); pdf.addPage(); page += 1; y = 18; };
+  const nextPage = () => { footer(); pdf.addPage(); page += 1; drawTheme(); y = 18; };
   const section = (title: string, lines: string[]) => {
     const wrapped = lines.flatMap((line) => pdf.splitTextToSize(line, width - 34) as string[]);
     if (y + 12 + wrapped.length * 4.4 > height - 20) nextPage();

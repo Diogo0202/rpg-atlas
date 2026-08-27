@@ -1,4 +1,5 @@
 import { buildV5SheetExportSections, type V5SheetData } from "@shared/vampire-v5";
+import { drawPdfTheme } from "./pdfThemes";
 
 export type V5PdfPayload = {
   name: string;
@@ -38,6 +39,8 @@ export async function createV5PdfFile(payload: V5PdfPayload): Promise<File> {
   pdf.setProperties({ title: `Ficha V5 · ${payload.name}`, subject: "Ficha preenchida para impressão" });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
+  const drawTheme = () => drawPdfTheme(pdf, "vampire-v5", pageWidth, pageHeight);
+  drawTheme();
   const sections = buildV5SheetExportSections(payload);
   let y = 18;
   let page = 1;
@@ -53,6 +56,7 @@ export async function createV5PdfFile(payload: V5PdfPayload): Promise<File> {
     footer(page);
     pdf.addPage();
     page += 1;
+    drawTheme();
     return 18;
   };
 

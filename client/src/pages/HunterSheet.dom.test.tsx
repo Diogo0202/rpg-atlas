@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -34,6 +34,7 @@ describe("módulo de Caçador", () => {
     vi.clearAllMocks();
     vi.unstubAllGlobals();
     hunterRecords.splice(0);
+    window.localStorage.clear();
   });
 
   it("importa uma ficha JSON e a preserva usando o contrato de personagens", async () => {
@@ -51,6 +52,21 @@ describe("módulo de Caçador", () => {
     expect((screen.getByLabelText("Conceito") as HTMLInputElement).value).toBe("Paramédica");
     await user.click(screen.getByRole("button", { name: /preservar caçador/i }));
     expect(createMutate).toHaveBeenCalledWith(expect.objectContaining({ systemId: "cacador-a-vinganca", name: "Mara Duarte", concept: "Paramédica", sheetData: expect.objectContaining({ creed: "marcial", desperation: 1, attributes: expect.objectContaining({ forca: 4 }) }) }));
+  });
+
+  it("carrega uma cópia local como nova ficha para não sobrescrever o registro remoto", async () => {
+    hunterRecords.push({ id: 21, systemId: "cacador-a-vinganca", name: "Mara", concept: "Paramédica", campaignId: null, sheetData: { attributes: { forca: 3 }, skills: { atletismo: 2 }, desperation: 1 } });
+    const user = userEvent.setup();
+    render(<HunterSheet />);
+    await user.click(screen.getByRole("button", { name: /mara/i }));
+    await user.click(screen.getByRole("button", { name: /salvar localmente/i }));
+    const vault = screen.getByRole("region", { name: "Cofre local de fichas de Caçador" });
+    const localRecord = within(vault).getByText("Mara").closest("button");
+    if (!localRecord) throw new Error("Ficha local não encontrada");
+    await user.click(localRecord);
+    await user.click(screen.getByRole("button", { name: /preservar caçador/i }));
+    expect(createMutate).toHaveBeenCalledWith(expect.objectContaining({ systemId: "cacador-a-vinganca", name: "Mara" }));
+    expect(updateMutate).not.toHaveBeenCalled();
   });
 
   it("exporta a ficha no formato compartilhável e registra uma rolagem de Desespero", async () => {
