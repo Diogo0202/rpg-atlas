@@ -1,6 +1,7 @@
 export type LocalSheetRecord<T> = {
   id: string;
   name: string;
+  createdAt?: string;
   updatedAt: string;
   sheet: T;
 };
@@ -10,7 +11,7 @@ function readRecords<T>(storageKey: string): LocalSheetRecord<T>[] {
   try {
     const raw = window.localStorage.getItem(storageKey);
     const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.map((record) => ({ ...record, createdAt: typeof record?.createdAt === "string" ? record.createdAt : record?.updatedAt })) : [];
   } catch {
     return [];
   }
@@ -50,7 +51,8 @@ export function duplicateLocalSheet<T>(storageKey: string, id: string, name?: st
   const records = readRecords<T>(storageKey);
   const target = records.find((record) => record.id === id);
   if (!target) return records;
-  const copy: LocalSheetRecord<T> = { ...target, id: createLocalSheetId(storageKey), name: name?.trim() || `${target.name} (cópia)`, updatedAt: new Date().toISOString(), sheet: structuredClone(target.sheet) };
+  const now = new Date().toISOString();
+  const copy: LocalSheetRecord<T> = { ...target, id: createLocalSheetId(storageKey), name: name?.trim() || `${target.name} (cópia)`, createdAt: now, updatedAt: now, sheet: structuredClone(target.sheet) };
   const next = [copy, ...records];
   window.localStorage.setItem(storageKey, JSON.stringify(next));
   return next;
