@@ -83,7 +83,7 @@
 - [x] Permitir nome e descrição personalizados nos links compartilhados.
 - [x] Testar, revisar e publicar a preferência de animação e os metadados dos links.
 - [x] Analisar as instruções de Documento.docx e traduzir as melhorias viáveis em tarefas de implementação.
-- [ ] Implementar e validar as melhorias priorizadas a partir do documento fornecido.
+- [x] Implementar e validar as melhorias priorizadas a partir do documento fornecido.
 - [x] Implementar eventos persistentes por campanha, vinculáveis às sessões e restritos a narradores.
 - [x] Integrar uma linha do tempo de eventos ao Santuário para membros autorizados.
 - [x] Testar, revisar e publicar o ciclo de eventos e linha do tempo.
@@ -121,7 +121,7 @@
 - [x] Distinguir no dossiê Markdown a ausência de eventos de uma falha de consulta.
 - [x] Cobrir em teste DOM a falha e a recuperação de eventos persistentes no Workbench.
 - [x] Validar e publicar o ciclo de Workbench conectado ao Santuário.
-- [ ] Implementar Música e assistência de IA após o Campaign Workbench.
+- [x] Implementar Música e assistência de IA após o Campaign Workbench.
 - [x] Modelar e migrar referências de trilha vinculadas a campanhas e sessões.
 - [x] Criar assistência de IA protegida para gerar briefs musicais estruturados para narradores.
 - [x] Integrar ao Santuário uma biblioteca de trilhas com edição de referência, reprodução e permissões.
@@ -129,4 +129,11 @@
 - [x] Cobrir sucesso e falha da geração estruturada de briefs musicais em testes.
 - [x] Exibir e testar uma falha recuperável de `music.createBrief` no painel de trilhas.
 - [x] Confirmar em teste a rejeição de resposta inválida da IA para o brief estruturado.
-- [ ] Testar, validar e publicar o ciclo de Música e IA.
+- [x] Testar, validar e publicar o ciclo de Música e IA.
+- [ ] Integrar API de geração de imagem procedural aos mapas de campanha sem remover o upload manual.
+- [ ] Migrar a integração de imagens procedurais de Gemini para a API OpenAI recém-conectada.
+- [ ] Sincronizar OpenAI e Gemini com rota principal, contingência e proveniência verificável da imagem gerada.
+- [ ] Configurar credencial de geração de imagens exclusivamente no servidor.
+- [ ] Gerar, validar e armazenar em S3 imagens automáticas vinculadas ao mapa e à campanha correta.
+- [ ] Adicionar controles de prompt, proporção e geração à mesa virtual apenas para narradores.
+- [ ] Cobrir os fluxos de geração, falha e recuperação em testes e validar o refinamento em desktop e mobile.

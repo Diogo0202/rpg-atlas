@@ -7,6 +7,7 @@ import { rankLibraryEntries } from "../shared/library-search";
 import { storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
 import { parseMusicBriefResponse } from "../shared/music-brief";
+import { generateProceduralMapImage, type ProceduralMapAspectRatio } from "./procedural-map-image";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -579,7 +580,24 @@ export async function uploadCampaignMapImageForUser(input: { campaignId: number;
   await assertMapInCampaign(db, input.campaignId, input.mapId);
   const extension = input.mimeType === "image/png" ? "png" : input.mimeType === "image/webp" ? "webp" : "jpg";
   const stored = await storagePut(`campaign-maps/${input.campaignId}/${input.mapId}/base.${extension}`, input.bytes, input.mimeType);
-  await db.update(campaignMaps).set({ imageKey: stored.key, imageUrl: stored.url }).where(eq(campaignMaps.id, input.mapId));
+  await db.update(campaignMaps).set({ imageKey: stored.key, imageUrl: stored.url, imageProvider: null, imageGenerationPrompt: null }).where(eq(campaignMaps.id, input.mapId));
+  return (await db.select().from(campaignMaps).where(eq(campaignMaps.id, input.mapId)).limit(1))[0];
+}
+
+export async function generateCampaignMapImageForUser(input: { campaignId: number; mapId: number; userId: number; creativeDirection: string; aspectRatio: ProceduralMapAspectRatio }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem gerar imagens para a mesa virtual.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  await assertMapInCampaign(db, input.campaignId, input.mapId);
+  const [campaign, map] = await Promise.all([
+    db.select({ title: campaigns.title }).from(campaigns).where(eq(campaigns.id, input.campaignId)).limit(1),
+    db.select({ title: campaignMaps.title }).from(campaignMaps).where(eq(campaignMaps.id, input.mapId)).limit(1),
+  ]);
+  if (!campaign[0] || !map[0]) throw new Error("Mapa ou campanha não encontrados.");
+  const generated = await generateProceduralMapImage({ campaignTitle: campaign[0].title, mapTitle: map[0].title, creativeDirection: input.creativeDirection, aspectRatio: input.aspectRatio });
+  const extension = generated.mimeType === "image/png" ? "png" : generated.mimeType === "image/webp" ? "webp" : "jpg";
+  const stored = await storagePut(`campaign-maps/${input.campaignId}/${input.mapId}/generated-map.${extension}`, generated.bytes, generated.mimeType);
+  await db.update(campaignMaps).set({ imageKey: stored.key, imageUrl: stored.url, imageProvider: generated.provider, imageGenerationPrompt: generated.generationPrompt }).where(eq(campaignMaps.id, input.mapId));
   return (await db.select().from(campaignMaps).where(eq(campaignMaps.id, input.mapId)).limit(1))[0];
 }
 

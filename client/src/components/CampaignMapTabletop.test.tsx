@@ -12,6 +12,7 @@ vi.stubGlobal("ResizeObserver", class {
 
 const createMapMutate = vi.fn();
 const updateMarkerMutate = vi.fn();
+const generateImageMutate = vi.fn();
 const mapsState = vi.hoisted(() => ({ data: [] as Array<any> }));
 
 vi.mock("@/lib/trpc", () => ({
@@ -22,6 +23,7 @@ vi.mock("@/lib/trpc", () => ({
       create: { useMutation: () => ({ mutate: createMapMutate, isPending: false }) },
       update: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
       uploadImage: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
+      generateImage: { useMutation: () => ({ mutate: generateImageMutate, isPending: false }) },
       createMarker: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
       updateMarker: { useMutation: () => ({ mutate: updateMarkerMutate, isPending: false }) },
       moveMarker: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
@@ -37,6 +39,7 @@ afterEach(() => {
   cleanup();
   createMapMutate.mockReset();
   updateMarkerMutate.mockReset();
+  generateImageMutate.mockReset();
   mapsState.data = [];
 });
 
@@ -73,4 +76,20 @@ it("permite ao narrador editar os metadados de um marcador persistente", async (
   await user.type(screen.getByLabelText("Identificação"), "Vigia ferido");
   await user.click(screen.getByRole("button", { name: /salvar marcador/i }));
   expect(updateMarkerMutate).toHaveBeenCalledWith({ campaignId: 12, mapId: 17, markerId: 28, label: "Vigia ferido", description: "Ameaça visível.", markerType: "threat", color: "#b55b32" });
+});
+
+it("permite ao narrador gerar uma imagem procedural para o mapa selecionado", async () => {
+  const user = userEvent.setup();
+  mapsState.data = [{ id: 17, title: "Ruínas sob a chuva", imageUrl: null, gridEnabled: 1, gridSize: 50, markers: [] }];
+  render(<CampaignMapTabletop campaigns={[{ id: 12, title: "A Coroa Partida", memberRole: "narrator" }]} initialCampaignId={12} />);
+  await user.type(screen.getByLabelText("Direção do terreno"), "Ruínas costeiras alagadas com névoa baixa e passarelas de madeira.");
+  await user.selectOptions(screen.getByLabelText("Proporção"), "4:3");
+  await user.click(screen.getByRole("button", { name: /gerar imagem do mapa/i }));
+  expect(generateImageMutate).toHaveBeenCalledWith({ campaignId: 12, mapId: 17, creativeDirection: "Ruínas costeiras alagadas com névoa baixa e passarelas de madeira.", aspectRatio: "4:3" });
+});
+
+it("informa que a imagem atual foi criada pela rota sincronizada", () => {
+  mapsState.data = [{ id: 17, title: "Ruínas sob a chuva", imageUrl: "/manus-storage/mapa.png", imageProvider: "gemini", gridEnabled: 1, gridSize: 50, markers: [] }];
+  render(<CampaignMapTabletop campaigns={[{ id: 12, title: "A Coroa Partida", memberRole: "narrator" }]} initialCampaignId={12} />);
+  expect(screen.getByText(/imagem atual gerada via gemini/i)).toBeTruthy();
 });

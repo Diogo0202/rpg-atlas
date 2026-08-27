@@ -209,6 +209,8 @@ export const campaignMaps = mysqlTable("campaignMaps", {
   title: varchar("title", { length: 160 }).notNull(),
   imageKey: varchar("imageKey", { length: 512 }),
   imageUrl: text("imageUrl"),
+  imageProvider: mysqlEnum("imageProvider", ["openai", "gemini"]),
+  imageGenerationPrompt: text("imageGenerationPrompt"),
   gridEnabled: int("gridEnabled").default(1).notNull(),
   gridSize: int("gridSize").default(50).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
