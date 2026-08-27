@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isCrisisInCampaign, matchesCrisisCategory, matchesItemCategory, matchesSearchText, normalizeMasterOrder, toWorkbenchCampaign, type SectionKey } from "./CampaignWorkbench";
+import { isCrisisInCampaign, matchesCrisisCategory, matchesItemCategory, matchesSearchText, normalizeMasterOrder, toWorkbenchCampaign, type SectionKey, workbenchRemoteCampaignId } from "./CampaignWorkbench";
 
 describe("normalizeMasterOrder", () => {
   it("mantém a ordem personalizada e completa as seções ausentes", () => {
@@ -12,6 +12,11 @@ describe("normalizeMasterOrder", () => {
 
   it("adapta campanhas persistentes sem colidir com os identificadores locais", () => {
     expect(toWorkbenchCampaign({ id: 7, title: "A Estrada Cinzenta", description: null, systemId: "o-um-anel" })).toMatchObject({ id: "cloud-7", name: "A Estrada Cinzenta", register: "ARQ-007", setting: "Campanha persistente no arquivo" });
+  });
+
+  it("identifica apenas campanhas persistentes no formato interno do Workbench", () => {
+    expect(workbenchRemoteCampaignId("cloud-42")).toBe(42);
+    expect(workbenchRemoteCampaignId("coroa-partida")).toBeNull();
   });
 
   it("localiza texto de crises e itens sem diferenciar maiúsculas", () => {

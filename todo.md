@@ -103,16 +103,22 @@
 - [x] Implementar busca global protegida para campanhas, fichas, sessões, eventos e antagonistas.
 - [x] Integrar a pesquisa global e filtros de sistema ao Acervo sem expor registros privados.
 - [x] Adicionar estado de erro e nova tentativa à busca global protegida no Acervo.
-- [ ] Implementar Mapas e a base de mesa virtual após biblioteca e busca.
+- [x] Implementar Mapas e a base de mesa virtual após biblioteca e busca.
 - [x] Modelar e migrar mapas de campanha e marcadores com coordenadas normalizadas.
 - [x] Criar procedimentos protegidos para criar mapas, enviar imagens e gerenciar marcadores de campanha.
 - [x] Integrar uma mesa virtual com imagem, pan, zoom, grade e marcadores ao Santuário.
 - [x] Permitir editar os metadados de marcadores persistentes na mesa virtual.
 - [x] Expor a criação de mapas adicionais quando uma campanha já possui uma mesa.
-- [ ] Testar, validar em desktop/mobile e publicar o ciclo de mapas e mesa virtual.
+- [x] Testar, validar em desktop/mobile e publicar o ciclo de mapas e mesa virtual.
 - [x] Confirmar a integração pós-mesclagem entre eventos, facções e o esquema do banco.
 - [x] Reexecutar testes, tipos e build no estado conciliado antes de concluir a mesa virtual.
-- [ ] Salvar um checkpoint limpo da mesa virtual após a validação pós-mesclagem.
+- [x] Salvar um checkpoint limpo da mesa virtual após a validação pós-mesclagem.
 - [x] Atualizar as verificações de saúde do servidor e confirmar a ausência de erros de TypeScript antes da publicação.
 - [ ] Integrar o Campaign Workbench às sessões após mapas e mesa virtual.
+- [x] Conectar o Workbench às sessões e eventos persistentes da campanha selecionada.
+- [x] Usar a sessão registrada em foco no dossiê Markdown do Workbench.
+- [x] Exibir carregamento, erro e nova tentativa para eventos persistentes no Workbench.
+- [x] Distinguir no dossiê Markdown a ausência de eventos de uma falha de consulta.
+- [x] Cobrir em teste DOM a falha e a recuperação de eventos persistentes no Workbench.
+- [ ] Validar e publicar o ciclo de Workbench conectado ao Santuário.
 - [ ] Implementar Música e assistência de IA após o Campaign Workbench.
