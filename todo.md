@@ -113,5 +113,6 @@
 - [x] Confirmar a integração pós-mesclagem entre eventos, facções e o esquema do banco.
 - [x] Reexecutar testes, tipos e build no estado conciliado antes de concluir a mesa virtual.
 - [ ] Salvar um checkpoint limpo da mesa virtual após a validação pós-mesclagem.
+- [x] Atualizar as verificações de saúde do servidor e confirmar a ausência de erros de TypeScript antes da publicação.
 - [ ] Integrar o Campaign Workbench às sessões após mapas e mesa virtual.
 - [ ] Implementar Música e assistência de IA após o Campaign Workbench.
