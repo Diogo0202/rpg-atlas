@@ -125,6 +125,30 @@ export const storeFavorites = mysqlTable("storeFavorites", {
   index("store_favorites_owner_idx").on(table.ownerId),
 ]);
 
+/** Listas de compras privadas de um participante, organizadas por campanha. */
+export const campaignShoppingLists = mysqlTable("campaignShoppingLists", {
+  id: int("id").autoincrement().primaryKey(),
+  ownerId: int("ownerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 120 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  index("shopping_lists_owner_idx").on(table.ownerId),
+  index("shopping_lists_campaign_idx").on(table.campaignId),
+]);
+
+/** Itens do catálogo reservados em uma lista de compras específica. */
+export const campaignShoppingListItems = mysqlTable("campaignShoppingListItems", {
+  id: int("id").autoincrement().primaryKey(),
+  listId: int("listId").notNull().references(() => campaignShoppingLists.id, { onDelete: "cascade" }),
+  itemId: varchar("itemId", { length: 120 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("shopping_list_items_unique").on(table.listId, table.itemId),
+  index("shopping_list_items_list_idx").on(table.listId),
+]);
+
 /** Registro auditável de rolagens para personagens e sessões futuras. */
 export const diceRolls = mysqlTable("diceRolls", {
   id: int("id").autoincrement().primaryKey(),

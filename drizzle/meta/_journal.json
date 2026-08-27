@@ -92,6 +92,13 @@
       "when": 1787857430737,
       "tag": "0012_third_enchantress",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1787858706947,
+      "tag": "0013_heavy_johnny_storm",
+      "breakpoints": true
     }
   ]
 }
