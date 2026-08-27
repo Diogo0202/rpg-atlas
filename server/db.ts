@@ -323,6 +323,17 @@ export async function createCampaignSessionForUser(input: { campaignId: number; 
   return (await db.select().from(campaignSessions).where(eq(campaignSessions.id, sessionId)).limit(1))[0];
 }
 
+export async function updateCampaignSessionForUser(input: { campaignId: number; sessionId: number; userId: number; title: string; summary?: string; status: "planned" | "played" | "archived" }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem alterar sessões nesta campanha.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const existing = await db.select({ id: campaignSessions.id, playedAt: campaignSessions.playedAt }).from(campaignSessions).where(and(eq(campaignSessions.id, input.sessionId), eq(campaignSessions.campaignId, input.campaignId))).limit(1);
+  if (!existing[0]) throw new Error("Sessão não encontrada nesta campanha.");
+  const playedAt = input.status === "played" ? existing[0].playedAt || new Date() : null;
+  await db.update(campaignSessions).set({ title: input.title, summary: input.summary ?? null, status: input.status, playedAt }).where(eq(campaignSessions.id, input.sessionId));
+  return (await db.select().from(campaignSessions).where(eq(campaignSessions.id, input.sessionId)).limit(1))[0];
+}
+
 export async function listCampaignMembersForOwner(input: { campaignId: number; ownerId: number }) {
   if (!await campaignIsNarratedByUser(input.campaignId, input.ownerId)) throw new Error("Campanha não encontrada ou sem permissão de narrador.");
   const db = await getDb();

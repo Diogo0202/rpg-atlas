@@ -84,6 +84,9 @@
 - [x] Testar, revisar e publicar a preferência de animação e os metadados dos links.
 - [x] Analisar as instruções de Documento.docx e traduzir as melhorias viáveis em tarefas de implementação.
 - [ ] Implementar e validar as melhorias priorizadas a partir do documento fornecido.
+- [x] Implementar edição persistente de sessões com status e resumo, restrita a narradores.
+- [x] Integrar a linha de sessões e o diário ao Santuário de campanhas.
+- [x] Testar, revisar e publicar a continuidade do roteiro com sessões.
 - [x] Implementar gestão protegida de membros e papéis por campanha, com convites por e-mail.
 - [x] Integrar membros e permissões ao hub de campanha sem expor dados de usuários não autorizados.
 - [x] Testar, revisar e publicar o primeiro ciclo priorizado do roteiro do documento.
