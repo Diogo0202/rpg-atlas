@@ -23,3 +23,15 @@ As capturas foram feitas com o cofre vazio e sem `payload` na rota compartilhada
 Em 1280×720, a barra de visualizações salvas aparece integrada ao bloco da Biblioteca do navegador, com seletor, campo de nome e ações de salvar/excluir alinhados acima dos filtros existentes. A hierarquia visual permanece consistente com o design Obsidiano.
 
 Em 375×812, a mesma área é estruturada em coluna pelo grid responsivo, evitando overflow horizontal. Como o cofre está vazio na captura, o seletor não apresenta registros; a persistência e aplicação de visualizações são cobertas pelos testes DOM e unitários.
+
+## Preview compartilhado e remodelação das fichas — 2026-08-27
+
+O modal de pré-visualização foi validado com dados básicos de nome, sistema, conceito e nível, além de confirmação de importação sem sobrescrita. Em desktop, a ficha V5 apresenta uma nova folha de sangue com Fome, Humanidade, Potência de Sangue e Geração antes do fluxo de criação; O Um Anel apresenta Resistência, Esperança, Sombra e Carga em uma folha de jornada dedicada.
+
+Em mobile, os controles de criação e os painéis centrais permanecem empilhados sem overflow horizontal. A navegação de etapas mantém a leitura dos quatro momentos de criação; os testes DOM cobrem o modal, os recursos centrais e o campo explícito de comunidade da companhia.
+
+## Remodelação estrutural — captura desktop
+
+As rotas `/ficha-v5` e `/ficha-um-anel` exibem a nova folha temática principal imediatamente após o Cofre Local. Em Vampiro, o bloco de sangue mostra Fome, Humanidade, geração, potência e disciplinas; em O Um Anel, a folha mostra Resistência, Esperança, Sombra e Carga. A hierarquia é legível em 1280×720, com o conteúdo avançado recolhido abaixo para evitar duplicação visual. Os controles de cabeçalho permanecem acessíveis, embora a densidade de ações de Vampiro exija verificação adicional em viewport estreita.
+
+Em 375×812, ambas as fichas empilham cabeçalho, seletor de sistema, ações e Cofre Local sem overflow horizontal. Vampiro mantém os botões de PDF em sequência vertical e O Um Anel preserva a ação de impressão com boa legibilidade. A folha principal continua abaixo da área inicial, acessível por rolagem; os controles de ação permanecem dentro da largura do dispositivo.

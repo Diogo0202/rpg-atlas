@@ -106,4 +106,29 @@
 - [x] Permitir salvar, selecionar, atualizar e excluir visualizações no Cofre Local.
 - [x] Cobrir visualizações personalizadas com testes de persistência e interface.
 - [x] Validar responsividade, executar testes completos e publicar checkpoint.
-- [ ] Salvar um novo checkpoint publicado após a expansão de compressão de payloads e visualizações salvas do Cofre Local, registrando o `version_id` retornado.
+- [x] Salvar um novo checkpoint publicado após a expansão de compressão de payloads e visualizações salvas do Cofre Local, registrando o `version_id` retornado.
+
+# Nova expansão — preview compartilhado e fichas fiéis aos universos
+
+- [x] Criar modal de pré-visualização ao abrir link compartilhado, com dados básicos antes da importação.
+- [x] Permitir confirmar ou cancelar a importação a partir do modal sem sobrescrever fichas locais.
+- [x] Remodelar a ficha de Vampiro V5 com composição fiel ao fluxo de atributos, habilidades, disciplinas, vantagens, saúde e fome do universo.
+- [x] Remodelar a ficha de O Um Anel com composição fiel ao fluxo de atributos, perícias, esperança, sombra, resistência, comunidade e jornada.
+- [x] Preservar exportação JSON/PDF, cofre local, compartilhamento e compatibilidade dos dados durante a remodelação.
+- [x] Cobrir modal, modelos e interações das fichas com testes unitários e de interface.
+- [x] Validar responsividade, executar testes completos e publicar checkpoint.
+
+# Correções de fidelidade e validação integrada
+
+- [x] Remodelar de fato a ficha de Vampiro V5 reorganizando os blocos principais de criação, em vez de apenas adicionar painel complementar.
+- [x] Remodelar de fato a ficha de O Um Anel com blocos explícitos de comunidade e jornada, além da hierarquia visual do sistema.
+- [x] Executar testes integrados das fichas remodeladas cobrindo exportação PDF/JSON, Cofre Local, compartilhamento e carregamento de dados em Vampiro e O Um Anel.
+- [x] Adicionar ou atualizar testes DOM específicos de O Um Anel e ampliar a cobertura integrada das interações das duas fichas.
+- [x] Corrigir o warning `NaN` na folha principal V5 e validar valores derivados exibidos.
+- [x] Adicionar testes integrados de página para exportação, Cofre Local, compartilhamento e carregamento em Vampiro e O Um Anel.
+- [x] Interagir nos testes DOM com os novos painéis principais das duas fichas.
+- [x] Adicionar asserções de Vitalidade e Força de Vontade na folha principal V5 para evitar regressão de NaN.
+- [x] Exercitar exportação, ações do Cofre, compartilhamento e carregamento nas páginas remodeladas de Vampiro e O Um Anel.
+- [x] Criar teste integrado de Vampiro V5 que acione exportação, salvamento, carregamento no Cofre e compartilhamento após a remodelação.
+- [x] Criar teste integrado de O Um Anel que acione exportação, salvamento, carregamento no Cofre e compartilhamento após a remodelação.
+- [ ] Salvar checkpoint publicado com a nova folha principal fiel de Vampiro V5 e O Um Anel e o modal de preview compartilhado, registrando o `version_id` retornado.
