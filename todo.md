@@ -82,3 +82,8 @@
 - [x] Adicionar alternância para resultados instantâneos sem animação de dados.
 - [x] Permitir nome e descrição personalizados nos links compartilhados.
 - [x] Testar, revisar e publicar a preferência de animação e os metadados dos links.
+- [x] Analisar as instruções de Documento.docx e traduzir as melhorias viáveis em tarefas de implementação.
+- [ ] Implementar e validar as melhorias priorizadas a partir do documento fornecido.
+- [x] Implementar gestão protegida de membros e papéis por campanha, com convites por e-mail.
+- [x] Integrar membros e permissões ao hub de campanha sem expor dados de usuários não autorizados.
+- [x] Testar, revisar e publicar o primeiro ciclo priorizado do roteiro do documento.

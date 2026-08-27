@@ -100,7 +100,7 @@ export async function listRpgSystems() {
 export async function listCampaignsForUser(userId: number) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(campaigns).where(eq(campaigns.ownerId, userId)).orderBy(desc(campaigns.updatedAt));
+  return db.select({ id: campaigns.id, ownerId: campaigns.ownerId, systemId: campaigns.systemId, title: campaigns.title, description: campaigns.description, coverUrl: campaigns.coverUrl, visibility: campaigns.visibility, status: campaigns.status, createdAt: campaigns.createdAt, updatedAt: campaigns.updatedAt, memberRole: campaignMembers.role }).from(campaigns).leftJoin(campaignMembers, and(eq(campaignMembers.campaignId, campaigns.id), eq(campaignMembers.userId, userId))).where(or(eq(campaigns.ownerId, userId), eq(campaignMembers.userId, userId))).orderBy(desc(campaigns.updatedAt));
 }
 
 export async function createCampaignForUser(input: {
@@ -288,11 +288,20 @@ export async function listSourceDocuments() {
   return db.select().from(sourceDocuments).orderBy(asc(sourceDocuments.category), asc(sourceDocuments.title));
 }
 
-async function campaignBelongsToUser(campaignId: number, userId: number) {
+async function campaignAccessRole(campaignId: number, userId: number) {
   const db = await getDb();
-  if (!db) return false;
-  const result = await db.select({ id: campaigns.id }).from(campaigns).where(and(eq(campaigns.id, campaignId), eq(campaigns.ownerId, userId))).limit(1);
-  return Boolean(result[0]);
+  if (!db) return null;
+  const result = await db.select({ ownerId: campaigns.ownerId, memberRole: campaignMembers.role }).from(campaigns).leftJoin(campaignMembers, and(eq(campaignMembers.campaignId, campaigns.id), eq(campaignMembers.userId, userId))).where(eq(campaigns.id, campaignId)).limit(1);
+  if (!result[0]) return null;
+  return result[0].ownerId === userId ? "narrator" as const : result[0].memberRole;
+}
+
+async function campaignBelongsToUser(campaignId: number, userId: number) {
+  return Boolean(await campaignAccessRole(campaignId, userId));
+}
+
+async function campaignIsNarratedByUser(campaignId: number, userId: number) {
+  return (await campaignAccessRole(campaignId, userId)) === "narrator";
 }
 
 export async function listCampaignSessionsForUser(campaignId: number, userId: number) {
@@ -303,7 +312,7 @@ export async function listCampaignSessionsForUser(campaignId: number, userId: nu
 }
 
 export async function createCampaignSessionForUser(input: { campaignId: number; userId: number; title: string; summary?: string }) {
-  if (!await campaignBelongsToUser(input.campaignId, input.userId)) throw new Error("Campanha não encontrada ou sem permissão.");
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem registrar sessões nesta campanha.");
   const db = await getDb();
   if (!db) throw new Error("Banco de dados indisponível.");
   const existing = await db.select({ sequence: campaignSessions.sequence }).from(campaignSessions).where(eq(campaignSessions.campaignId, input.campaignId)).orderBy(desc(campaignSessions.sequence)).limit(1);
@@ -312,6 +321,41 @@ export async function createCampaignSessionForUser(input: { campaignId: number; 
   const sessionId = inserted[0]?.id;
   if (!sessionId) throw new Error("Não foi possível registrar a sessão.");
   return (await db.select().from(campaignSessions).where(eq(campaignSessions.id, sessionId)).limit(1))[0];
+}
+
+export async function listCampaignMembersForOwner(input: { campaignId: number; ownerId: number }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.ownerId)) throw new Error("Campanha não encontrada ou sem permissão de narrador.");
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({ userId: users.id, name: users.name, email: users.email, role: campaignMembers.role, joinedAt: campaignMembers.createdAt, ownerId: campaigns.ownerId }).from(campaignMembers).innerJoin(users, eq(campaignMembers.userId, users.id)).innerJoin(campaigns, eq(campaignMembers.campaignId, campaigns.id)).where(eq(campaignMembers.campaignId, input.campaignId)).orderBy(asc(campaignMembers.createdAt));
+}
+
+export async function addCampaignMemberForOwner(input: { campaignId: number; ownerId: number; email: string; role: "narrator" | "player" | "observer" }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  if (!await campaignIsNarratedByUser(input.campaignId, input.ownerId)) throw new Error("Campanha não encontrada ou sem permissão de narrador.");
+  const member = await db.select({ id: users.id, email: users.email, name: users.name }).from(users).where(eq(users.email, input.email.trim())).limit(1);
+  if (!member[0]) throw new Error("Nenhum usuário encontrado com esse e-mail. A pessoa precisa entrar no RPG Atlas ao menos uma vez.");
+  await db.insert(campaignMembers).values({ campaignId: input.campaignId, userId: member[0].id, role: input.role }).onDuplicateKeyUpdate({ set: { role: input.role } });
+  return member[0];
+}
+
+export async function updateCampaignMemberRoleForOwner(input: { campaignId: number; ownerId: number; userId: number; role: "narrator" | "player" | "observer" }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  if (!await campaignIsNarratedByUser(input.campaignId, input.ownerId)) throw new Error("Campanha não encontrada ou sem permissão de narrador.");
+  const campaign = await db.select({ ownerId: campaigns.ownerId }).from(campaigns).where(eq(campaigns.id, input.campaignId)).limit(1);
+  if (campaign[0]?.ownerId === input.userId && input.role !== "narrator") throw new Error("A pessoa proprietária da campanha deve permanecer como narradora.");
+  await db.update(campaignMembers).set({ role: input.role }).where(and(eq(campaignMembers.campaignId, input.campaignId), eq(campaignMembers.userId, input.userId)));
+}
+
+export async function removeCampaignMemberForOwner(input: { campaignId: number; ownerId: number; userId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  if (!await campaignIsNarratedByUser(input.campaignId, input.ownerId)) throw new Error("Campanha não encontrada ou sem permissão de narrador.");
+  const campaign = await db.select({ ownerId: campaigns.ownerId }).from(campaigns).where(eq(campaigns.id, input.campaignId)).limit(1);
+  if (campaign[0]?.ownerId === input.userId) throw new Error("A pessoa proprietária não pode ser removida da própria campanha.");
+  await db.delete(campaignMembers).where(and(eq(campaignMembers.campaignId, input.campaignId), eq(campaignMembers.userId, input.userId)));
 }
 
 export async function listAntagonistsForUser(userId: number, filters?: { campaignId?: number; systemId?: string }) {
