@@ -108,5 +108,5 @@
 - [x] Organizar a loja por eras histórica e incluir veículos e animais adequados ao catálogo.
 - [x] Integrar animais selecionados ao inventário das fichas de personagem.
 - [x] Cobrir busca, vínculos, exportação, filtros temporais e integração de animais com testes automatizados.
-- [ ] Salvar checkpoint e publicar os filtros do diário, os vínculos de facções e o catálogo temporal de animais.
+- [x] Salvar checkpoint e publicar os filtros do diário, os vínculos de facções e o catálogo temporal de animais.
 - [x] Adicionar ao diário de sessões um filtro explícito por registro e cobri-lo em teste automatizado.
