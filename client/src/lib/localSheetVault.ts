@@ -1,6 +1,7 @@
 export type LocalSheetRecord<T> = {
   id: string;
   name: string;
+  createdAt?: string;
   updatedAt: string;
   sheet: T;
 };
@@ -10,7 +11,7 @@ function readRecords<T>(storageKey: string): LocalSheetRecord<T>[] {
   try {
     const raw = window.localStorage.getItem(storageKey);
     const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.map((record) => ({ ...record, createdAt: typeof record?.createdAt === "string" ? record.createdAt : record?.updatedAt })) : [];
   } catch {
     return [];
   }
@@ -33,6 +34,28 @@ export function saveLocalSheet<T>(storageKey: string, record: LocalSheetRecord<T
 
 export function loadLocalSheet<T>(storageKey: string, id: string): LocalSheetRecord<T> | undefined {
   return readRecords<T>(storageKey).find((record) => record.id === id);
+}
+
+export function renameLocalSheet(storageKey: string, id: string, name: string) {
+  const normalizedName = name.trim();
+  if (normalizedName.length < 2) throw new Error("O nome precisa ter pelo menos 2 caracteres.");
+  const records = readRecords<unknown>(storageKey);
+  const target = records.find((record) => record.id === id);
+  if (!target) return records;
+  const next = records.map((record) => record.id === id ? { ...record, name: normalizedName, updatedAt: new Date().toISOString(), sheet: record.sheet && typeof record.sheet === "object" && "name" in record.sheet ? { ...record.sheet, name: normalizedName } : record.sheet } : record);
+  window.localStorage.setItem(storageKey, JSON.stringify(next));
+  return next;
+}
+
+export function duplicateLocalSheet<T>(storageKey: string, id: string, name?: string) {
+  const records = readRecords<T>(storageKey);
+  const target = records.find((record) => record.id === id);
+  if (!target) return records;
+  const now = new Date().toISOString();
+  const copy: LocalSheetRecord<T> = { ...target, id: createLocalSheetId(storageKey), name: name?.trim() || `${target.name} (cópia)`, createdAt: now, updatedAt: now, sheet: structuredClone(target.sheet) };
+  const next = [copy, ...records];
+  window.localStorage.setItem(storageKey, JSON.stringify(next));
+  return next;
 }
 
 export function removeLocalSheet(storageKey: string, id: string) {

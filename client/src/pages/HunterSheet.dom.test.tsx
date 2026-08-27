@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -47,7 +47,11 @@ describe("módulo de Caçador", () => {
     }
     vi.stubGlobal("FileReader", MockFileReader);
     render(<HunterSheet />);
-    await user.upload(screen.getByLabelText("Importar ficha de Caçador JSON"), new File(["{}"], "mara.json", { type: "application/json" }));
+    await user.upload(screen.getByLabelText("Importar ficha ou backup JSON de Caçador"), new File(["{}"], "mara.json", { type: "application/json" }));
+    await waitFor(() => expect(screen.queryByText("Mara Duarte")).not.toBeNull());
+    const importedRecord = screen.getByText("Mara Duarte").closest("button");
+    if (!importedRecord) throw new Error("Ficha importada não encontrada");
+    await user.click(importedRecord);
     expect((screen.getByLabelText("Nome") as HTMLInputElement).value).toBe("Mara Duarte");
     expect((screen.getByLabelText("Conceito") as HTMLInputElement).value).toBe("Paramédica");
     await user.click(screen.getByRole("button", { name: /preservar caçador/i }));
@@ -78,9 +82,9 @@ describe("módulo de Caçador", () => {
     const anchorClick = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
     render(<HunterSheet />);
     await user.click(screen.getByRole("button", { name: /mara/i }));
-    await user.click(screen.getByRole("button", { name: /exportar json/i }));
+    await user.click(screen.getByRole("button", { name: "Exportar ficha atual sem salvar" }));
     expect(createObjectURL).toHaveBeenCalledOnce();
-    expect(toastSuccess).toHaveBeenCalledWith("Ficha de Caçador exportada em JSON.");
+    expect(toastSuccess).toHaveBeenCalledWith("Ficha Mara exportada em JSON.");
     await user.click(screen.getByRole("button", { name: /^rolar$/i }));
     await new Promise((resolve) => window.setTimeout(resolve, 450));
     expect(recordRollMutate).toHaveBeenCalledWith(expect.objectContaining({ systemId: "cacador-a-vinganca", characterId: 21, resultData: expect.objectContaining({ desperationDice: 1 }) }));

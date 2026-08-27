@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "af6777ee-24a9-4d6a-bfe3-73136557acc5",
-  "prevId": "91668d3a-28f7-4f49-ba9a-3c9905fd01fc",
+  "id": "f2c08013-8802-453b-9d49-19b44dfb3f63",
+  "prevId": "af6777ee-24a9-4d6a-bfe3-73136557acc5",
   "tables": {
     "antagonistCharacters": {
       "name": "antagonistCharacters",
@@ -956,6 +956,20 @@
         },
         "imageUrl": {
           "name": "imageUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "imageProvider": {
+          "name": "imageProvider",
+          "type": "enum('openai','gemini')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "imageGenerationPrompt": {
+          "name": "imageGenerationPrompt",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

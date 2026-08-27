@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, gt, inArray, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomBytes } from "node:crypto";
-import { antagonistCharacters, antagonists, antagonistSessions, campaignEventFactions, campaignEvents, campaignFactions, campaignMapMarkers, campaignMaps, campaignMembers, campaignMusicCues, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, storeFavorites, users } from "../drizzle/schema";
+import { antagonistCharacters, antagonists, antagonistSessions, campaignEventFactions, campaignEvents, campaignFactions, campaignMapMarkers, campaignMaps, campaignMembers, campaignMusicCues, campaignSessions, campaigns, campaignShoppingListItems, campaignShoppingLists, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, storeFavorites, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { rankLibraryEntries } from "../shared/library-search";
 import { storagePut } from "./storage";
@@ -117,6 +117,45 @@ export async function setStoreFavoriteForUser(input: { ownerId: number; itemId: 
     await db.delete(storeFavorites).where(and(eq(storeFavorites.ownerId, input.ownerId), eq(storeFavorites.itemId, input.itemId)));
   }
   return { itemId: input.itemId, favorite: input.favorite };
+}
+
+export async function listCampaignShoppingListsForUser(ownerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const lists = await db.select({ id: campaignShoppingLists.id, campaignId: campaignShoppingLists.campaignId, title: campaignShoppingLists.title, createdAt: campaignShoppingLists.createdAt, updatedAt: campaignShoppingLists.updatedAt, campaignTitle: campaigns.title }).from(campaignShoppingLists).innerJoin(campaigns, eq(campaignShoppingLists.campaignId, campaigns.id)).where(eq(campaignShoppingLists.ownerId, ownerId)).orderBy(desc(campaignShoppingLists.updatedAt));
+  return Promise.all(lists.map(async (list) => ({ ...list, itemIds: (await db.select({ itemId: campaignShoppingListItems.itemId }).from(campaignShoppingListItems).where(eq(campaignShoppingListItems.listId, list.id))).map((item) => item.itemId) })));
+}
+
+export async function createCampaignShoppingListForUser(input: { ownerId: number; campaignId: number; title: string }) {
+  if (!await campaignBelongsToUser(input.campaignId, input.ownerId)) throw new Error("Campanha não encontrada ou sem permissão.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const inserted = await db.insert(campaignShoppingLists).values({ ...input, title: input.title.trim() }).$returningId();
+  const listId = inserted[0]?.id;
+  if (!listId) throw new Error("Não foi possível criar a lista de compras.");
+  return (await db.select().from(campaignShoppingLists).where(eq(campaignShoppingLists.id, listId)).limit(1))[0];
+}
+
+export async function removeCampaignShoppingListForUser(input: { ownerId: number; listId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const owned = await db.select({ id: campaignShoppingLists.id }).from(campaignShoppingLists).where(and(eq(campaignShoppingLists.id, input.listId), eq(campaignShoppingLists.ownerId, input.ownerId))).limit(1);
+  if (!owned[0]) throw new Error("Lista não encontrada ou sem permissão.");
+  await db.delete(campaignShoppingLists).where(eq(campaignShoppingLists.id, input.listId));
+}
+
+export async function setCampaignShoppingListItemForUser(input: { ownerId: number; listId: number; itemId: string; included: boolean }) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const owned = await db.select({ id: campaignShoppingLists.id }).from(campaignShoppingLists).where(and(eq(campaignShoppingLists.id, input.listId), eq(campaignShoppingLists.ownerId, input.ownerId))).limit(1);
+  if (!owned[0]) throw new Error("Lista não encontrada ou sem permissão.");
+  if (input.included) {
+    const existing = await db.select({ id: campaignShoppingListItems.id }).from(campaignShoppingListItems).where(and(eq(campaignShoppingListItems.listId, input.listId), eq(campaignShoppingListItems.itemId, input.itemId))).limit(1);
+    if (!existing[0]) await db.insert(campaignShoppingListItems).values({ listId: input.listId, itemId: input.itemId });
+  } else {
+    await db.delete(campaignShoppingListItems).where(and(eq(campaignShoppingListItems.listId, input.listId), eq(campaignShoppingListItems.itemId, input.itemId)));
+  }
+  return { listId: input.listId, itemId: input.itemId, included: input.included };
 }
 
 export async function listCampaignsForUser(userId: number) {

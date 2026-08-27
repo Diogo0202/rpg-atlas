@@ -13,6 +13,7 @@ vi.stubGlobal("ResizeObserver", class {
 const createMapMutate = vi.fn();
 const updateMarkerMutate = vi.fn();
 const generateImageMutate = vi.fn();
+let generationShouldFail = false;
 const mapsState = vi.hoisted(() => ({ data: [] as Array<any> }));
 
 vi.mock("@/lib/trpc", () => ({
@@ -23,7 +24,7 @@ vi.mock("@/lib/trpc", () => ({
       create: { useMutation: () => ({ mutate: createMapMutate, isPending: false }) },
       update: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
       uploadImage: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
-      generateImage: { useMutation: () => ({ mutate: generateImageMutate, isPending: false }) },
+      generateImage: { useMutation: (options: any) => ({ mutate: (input: any) => { generateImageMutate(input); if (generationShouldFail) options.onError({ message: "Serviço indisponível." }); }, isPending: false }) },
       createMarker: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
       updateMarker: { useMutation: () => ({ mutate: updateMarkerMutate, isPending: false }) },
       moveMarker: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
@@ -40,6 +41,7 @@ afterEach(() => {
   createMapMutate.mockReset();
   updateMarkerMutate.mockReset();
   generateImageMutate.mockReset();
+  generationShouldFail = false;
   mapsState.data = [];
 });
 
@@ -92,4 +94,16 @@ it("informa que a imagem atual foi criada pela rota sincronizada", () => {
   mapsState.data = [{ id: 17, title: "Ruínas sob a chuva", imageUrl: "/manus-storage/mapa.png", imageProvider: "gemini", gridEnabled: 1, gridSize: 50, markers: [] }];
   render(<CampaignMapTabletop campaigns={[{ id: 12, title: "A Coroa Partida", memberRole: "narrator" }]} initialCampaignId={12} />);
   expect(screen.getByText(/imagem atual gerada via gemini/i)).toBeTruthy();
+});
+
+it("informa falha da geração e permite tentar novamente", async () => {
+  const user = userEvent.setup();
+  generationShouldFail = true;
+  mapsState.data = [{ id: 17, title: "Ruínas sob a chuva", imageUrl: null, gridEnabled: 1, gridSize: 50, markers: [] }];
+  render(<CampaignMapTabletop campaigns={[{ id: 12, title: "A Coroa Partida", memberRole: "narrator" }]} initialCampaignId={12} />);
+  await user.type(screen.getByLabelText("Direção do terreno"), "Ruínas costeiras alagadas com névoa baixa e passarelas de madeira.");
+  await user.click(screen.getByRole("button", { name: /gerar imagem do mapa/i }));
+  expect(screen.getByRole("alert").textContent).toContain("A geração não foi concluída.");
+  await user.click(screen.getByRole("button", { name: /tentar novamente/i }));
+  expect(generateImageMutate).toHaveBeenCalledTimes(2);
 });

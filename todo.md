@@ -130,10 +130,16 @@
 - [x] Exibir e testar uma falha recuperável de `music.createBrief` no painel de trilhas.
 - [x] Confirmar em teste a rejeição de resposta inválida da IA para o brief estruturado.
 - [x] Testar, validar e publicar o ciclo de Música e IA.
-- [ ] Integrar API de geração de imagem procedural aos mapas de campanha sem remover o upload manual.
-- [ ] Migrar a integração de imagens procedurais de Gemini para a API OpenAI recém-conectada.
-- [ ] Sincronizar OpenAI e Gemini com rota principal, contingência e proveniência verificável da imagem gerada.
-- [ ] Configurar credencial de geração de imagens exclusivamente no servidor.
-- [ ] Gerar, validar e armazenar em S3 imagens automáticas vinculadas ao mapa e à campanha correta.
-- [ ] Adicionar controles de prompt, proporção e geração à mesa virtual apenas para narradores.
-- [ ] Cobrir os fluxos de geração, falha e recuperação em testes e validar o refinamento em desktop e mobile.
+- [x] Integrar API de geração de imagem procedural aos mapas de campanha sem remover o upload manual.
+- [x] Migrar a integração de imagens procedurais de Gemini para a API OpenAI recém-conectada.
+- [x] Sincronizar OpenAI e Gemini com rota principal, contingência e proveniência verificável da imagem gerada.
+- [x] Configurar credencial de geração de imagens exclusivamente no servidor.
+- [x] Gerar, validar e armazenar em S3 imagens automáticas vinculadas ao mapa e à campanha correta.
+- [x] Adicionar controles de prompt, proporção e geração à mesa virtual apenas para narradores.
+- [x] Cobrir os fluxos de geração, falha e recuperação em testes e validar o refinamento em desktop e mobile.
+- [ ] Inventariar os NPCs e magias relevantes nas duas pastas do Drive fornecidas.
+- [ ] Reconciliar as alterações locais de mapas procedurais com a versão compartilhada mais recente antes de continuar.
+- [ ] Criar um compêndio de NPCs dividido em aliados, inimigos e neutros, com a fonte registrada.
+- [ ] Modelar a biblioteca e as magias selecionadas de O Um Anel na ficha persistente.
+- [ ] Adicionar uma aba de magias com seleção e arrastar/soltar para a ficha de O Um Anel.
+- [ ] Testar os fluxos de NPCs e magias sem criar um novo checkpoint até autorização do usuário.

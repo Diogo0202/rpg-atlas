@@ -8,6 +8,7 @@ import { mapsRouter } from "./routers/maps";
 import { musicRouter } from "./routers/music";
 import { systemsRouter } from "./routers/systems";
 import { storeRouter } from "./routers/store";
+import { shoppingListsRouter } from "./routers/shoppingLists";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
@@ -34,6 +35,7 @@ export const appRouter = router({
   maps: mapsRouter,
   music: musicRouter,
   store: storeRouter,
+  shoppingLists: shoppingListsRouter,
 });
 
 export type AppRouter = typeof appRouter;

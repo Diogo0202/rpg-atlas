@@ -116,7 +116,14 @@
 - [x] Exibir notificações de sucesso ou erro na exportação JSON e PDF do diário de sessões.
 - [x] Cobrir favoritos, painel rápido e notificações de exportação com testes automatizados.
 - [x] Validar os novos controles em desktop e mobile, com checagem de tipos e build aprovados.
-- [ ] Salvar checkpoint e publicar os favoritos, o painel rápido de animais e os avisos de exportação do diário.
+- [x] Salvar checkpoint e publicar os favoritos, o painel rápido de animais e os avisos de exportação do diário.
 - [x] Revisar em desktop e mobile a área do diário após adicionar os controles de exportação PDF e JSON.
 - [x] Confirmar e testar a exportação PDF do diário de sessões com avisos de sucesso e falha.
 - [x] Revalidar testes, tipagem e build após a exportação PDF do diário.
+- [x] Modelar e persistir listas de compras vinculadas a campanhas e aos favoritos pessoais.
+- [x] Exibir listas de compras por campanha no catálogo V5.
+- [x] Mostrar alertas visuais de Recursos insuficientes nos itens favoritos para a ficha escolhida.
+- [x] Comparar lado a lado dois favoritos do catálogo antes do registro na ficha.
+- [x] Exportar em PDF a ficha resumida de cada animal na visualização rápida.
+- [x] Cobrir listas, alertas, comparação e PDF de animais com testes automatizados.
+- [x] Validar em desktop e mobile, salvar checkpoint e publicar a atualização.

@@ -1,4 +1,5 @@
 /** Design philosophy: Arquivo Obsidiano — keep the application in a single dark editorial shell. */
+import React from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
@@ -14,7 +15,14 @@ import VampireStore from "./pages/VampireStore";
 import SharedCharacterSheet from "./pages/SharedCharacterSheet";
 import ReferenceArchive from "./pages/ReferenceArchive";
 import HunterSheet from "./pages/HunterSheet";
+import SceneMode from "./pages/SceneMode";
+import LocalSheetManager from "./pages/LocalSheetManager";
 import ReferenceDetail from "./pages/ReferenceDetail";
+
+export const APP_ROUTES = {
+  sceneMode: "/modo-cena",
+  localVault: "/cofre-local",
+} as const;
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -26,6 +34,8 @@ function Router() {
       <Route path="/ficha-v5" component={VampireSheet} />
       <Route path="/ficha-um-anel" component={OneRingSheet} />
       <Route path="/ficha-cacador" component={HunterSheet} />
+      <Route path={APP_ROUTES.sceneMode} component={SceneMode} />
+      <Route path={APP_ROUTES.localVault} component={LocalSheetManager} />
       <Route path="/arsenal-v5" component={VampireStore} />
       <Route path="/acervo/:category/:id" component={ReferenceDetail} />
       <Route path="/acervo" component={ReferenceArchive} />

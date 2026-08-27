@@ -237,6 +237,9 @@ export default function Home() {
                 <Button onClick={() => navigate("metodo")} variant="outline" className="h-12 rounded-none border-[#eae3d5]/30 bg-[#111312]/35 px-6 text-[12px] font-bold uppercase tracking-[0.13em] text-[#eae3d5] hover:bg-[#eae3d5]/10 hover:text-[#f4eee4]">
                   Consultar método
                 </Button>
+                <Button onClick={() => setLocation("/modo-cena")} variant="outline" className="h-12 rounded-none border-[#b55b32]/60 bg-[#b55b32]/10 px-6 text-[12px] font-bold uppercase tracking-[0.13em] text-[#eae3d5] hover:bg-[#b55b32]/20">
+                  Abrir modo de cena
+                </Button>
               </div>
             </div>
               <div className="mt-14 justify-self-end border-l border-dashed border-[#eae3d5]/30 pl-6 lg:mt-0">
