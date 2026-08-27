@@ -44,6 +44,9 @@ describe("SceneModePanel", () => {
     fireEvent.click(screen.getAllByRole("button", { name: /Avançar turno/i })[0]);
     expect(screen.queryByText("Cobertura")).toBeNull();
     expect(screen.queryByText(/efeito\(s\) expirado\(s\): Cobertura/)).not.toBeNull();
+    const expiryNotice = screen.getByRole("status");
+    expect(expiryNotice.textContent).toContain("Efeito temporário expirado");
+    expect(expiryNotice.className).toContain("scene-expiry-alert");
   });
 
   it("exporta o histórico com o estado da sessão", () => {

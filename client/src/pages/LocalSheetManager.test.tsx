@@ -5,6 +5,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { loadLocalSheet, saveLocalSheet } from "@/lib/localSheetVault";
 import { LocalSheetManagerContent } from "./LocalSheetManager";
 
+vi.mock("qrcode", () => ({ default: { toDataURL: vi.fn(async () => "data:image/png;base64,manager-qr") } }));
+
 beforeEach(() => {
   cleanup();
   window.localStorage.clear();
@@ -89,4 +91,32 @@ describe("LocalSheetManagerContent — busca e backup", () => {
     fireEvent.change(screen.getByLabelText("Importar ficha ou backup JSON para o cofre"), { target: { files: [file] } });
     await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/não foi reconhecido/));
   });
+});
+
+it("filtra por nível e tag personalizada e edita a organização da ficha", () => {
+  saveLocalSheet("rpg-atlas-local-vampiro-v5-v1", { id: "v5-1", name: "Lívia", level: 5, tags: ["investigação", "jogador"], updatedAt: "2026-08-27T10:00:00.000Z", sheet: { name: "Lívia", concept: "Investigadora" } });
+  saveLocalSheet("rpg-atlas-local-hunter-v1", { id: "hunter-1", name: "Mara", level: 7, tags: ["ameaça"], updatedAt: "2026-08-27T11:00:00.000Z", sheet: { name: "Mara", concept: "Vigilante" } });
+  render(<LocalSheetManagerContent />);
+
+  fireEvent.change(screen.getByRole("combobox", { name: "Filtrar fichas por nível" }), { target: { value: "5" } });
+  expect(screen.queryByText("Lívia")).not.toBeNull();
+  expect(screen.queryByText("Mara")).toBeNull();
+  fireEvent.change(screen.getByRole("combobox", { name: "Filtrar fichas por tag" }), { target: { value: "investigação" } });
+  expect(screen.getByText("1 de 2")).not.toBeNull();
+
+  fireEvent.click(screen.getByRole("button", { name: "Editar nível e tags de Lívia" }));
+  fireEvent.change(screen.getByRole("spinbutton", { name: "Nível de Lívia" }), { target: { value: "6" } });
+  fireEvent.change(screen.getByRole("textbox", { name: "Tags de Lívia" }), { target: { value: "investigação, protagonista" } });
+  fireEvent.click(screen.getAllByRole("button", { name: "Salvar" }).at(-1)!);
+  expect(screen.getByText("Nível 6")).not.toBeNull();
+  expect(screen.getByText(/protagonista/)).not.toBeNull();
+});
+
+it("compartilha diretamente uma ficha do cofre por link JSON e QR code", async () => {
+  saveLocalSheet("rpg-atlas-local-vampiro-v5-v1", { id: "v5-share", name: "Lívia", level: 5, tags: ["jogador"], updatedAt: new Date().toISOString(), sheet: { name: "Lívia", concept: "Investigadora", sheet: { hunger: 2 } } });
+  Object.assign(navigator, { clipboard: { writeText: vi.fn(async () => undefined) } });
+  render(<LocalSheetManagerContent />);
+  fireEvent.click(screen.getByRole("button", { name: "Compartilhar Lívia por link JSON" }));
+  expect(await screen.findByAltText("QR code da ficha JSON compartilhada no cofre")).not.toBeNull();
+  expect(screen.getByRole("status").textContent).toMatch(/Link JSON de “Lívia” copiado/);
 });

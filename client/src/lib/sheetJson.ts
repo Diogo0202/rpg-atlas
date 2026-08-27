@@ -13,6 +13,8 @@ export type CharacterJsonEnvelope = {
     concept: string;
     campaignId?: string;
     createdAt?: string;
+    level?: number;
+    tags?: string[];
     sheet: unknown;
   };
 };
@@ -23,6 +25,8 @@ export type ParsedCharacterJson = {
   concept: string;
   campaignId?: string;
   createdAt?: string;
+  level?: number;
+  tags?: string[];
   sheet: unknown;
 };
 
@@ -62,6 +66,8 @@ export function createCharacterJsonEnvelope(input: {
   concept?: string;
   campaignId?: string | null;
   createdAt?: string;
+  level?: number;
+  tags?: string[];
   sheet: unknown;
 }): CharacterJsonEnvelope {
   return {
@@ -74,6 +80,8 @@ export function createCharacterJsonEnvelope(input: {
       concept: input.concept?.trim() || "",
       ...(input.campaignId ? { campaignId: input.campaignId } : {}),
       ...(input.createdAt ? { createdAt: input.createdAt } : {}),
+      ...(input.level !== undefined ? { level: Math.max(1, Math.min(100, Math.round(input.level))) } : {}),
+      ...(input.tags?.length ? { tags: Array.from(new Set(input.tags.map((tag) => tag.trim()).filter(Boolean))).slice(0, 12) } : {}),
       sheet: input.sheet,
     },
   };
@@ -89,12 +97,16 @@ export function parseCharacterJson(value: unknown): ParsedCharacterJson | null {
   if (name.length < 2 || !isRecord(sheet)) return null;
   const campaignId = candidate.campaignId == null ? undefined : String(candidate.campaignId);
   const createdAt = typeof candidate.createdAt === "string" ? candidate.createdAt : undefined;
+  const level = typeof candidate.level === "number" && Number.isFinite(candidate.level) ? Math.max(1, Math.min(100, Math.round(candidate.level))) : undefined;
+  const tags = Array.isArray(candidate.tags) ? Array.from(new Set(candidate.tags.filter((tag): tag is string => typeof tag === "string").map((tag) => tag.trim()).filter(Boolean))).slice(0, 12) : undefined;
   return {
     systemId,
     name,
     concept: normalizeText(candidate.concept),
     ...(campaignId ? { campaignId } : {}),
     ...(createdAt ? { createdAt } : {}),
+    ...(level !== undefined ? { level } : {}),
+    ...(tags?.length ? { tags } : {}),
     sheet,
   };
 }
@@ -120,6 +132,30 @@ export function parseVaultBackup(value: unknown): Array<ParsedCharacterJson & { 
   }
   const single = parseCharacterJson(value);
   return single ? [single] : null;
+}
+
+function encodeBase64Url(value: string) {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+  bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function decodeBase64Url(value: string) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
+  const binary = atob(normalized);
+  return new TextDecoder().decode(Uint8Array.from(binary, (character) => character.charCodeAt(0)));
+}
+
+export function createCharacterShareUrl(payload: CharacterJsonEnvelope, origin = typeof window === "undefined" ? "" : window.location.origin) {
+  const encoded = encodeBase64Url(JSON.stringify(payload));
+  if (encoded.length > 12000) throw new Error("A ficha é grande demais para ser compartilhada por URL. Use o arquivo JSON exportado.");
+  return `${origin}/compartilhar/json?payload=${encoded}`;
+}
+
+export function parseCharacterSharePayload(encoded: string): ParsedCharacterJson | null {
+  if (!encoded || encoded.length > 12000) return null;
+  try { return parseCharacterJson(JSON.parse(decodeBase64Url(encoded))); } catch { return null; }
 }
 
 export function downloadJsonFile(payload: unknown, filename: string) {

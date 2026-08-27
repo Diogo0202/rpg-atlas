@@ -3,6 +3,8 @@ export type LocalSheetRecord<T> = {
   name: string;
   createdAt?: string;
   updatedAt: string;
+  level?: number;
+  tags?: string[];
   sheet: T;
 };
 
@@ -43,6 +45,13 @@ export function renameLocalSheet(storageKey: string, id: string, name: string) {
   const target = records.find((record) => record.id === id);
   if (!target) return records;
   const next = records.map((record) => record.id === id ? { ...record, name: normalizedName, updatedAt: new Date().toISOString(), sheet: record.sheet && typeof record.sheet === "object" && "name" in record.sheet ? { ...record.sheet, name: normalizedName } : record.sheet } : record);
+  window.localStorage.setItem(storageKey, JSON.stringify(next));
+  return next;
+}
+
+export function updateLocalSheetMetadata(storageKey: string, id: string, metadata: { level?: number; tags?: string[] }) {
+  const records = readRecords<unknown>(storageKey);
+  const next = records.map((record) => record.id === id ? { ...record, level: metadata.level, tags: metadata.tags, updatedAt: new Date().toISOString() } : record);
   window.localStorage.setItem(storageKey, JSON.stringify(next));
   return next;
 }

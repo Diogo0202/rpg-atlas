@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { createLocalSheetId, loadLocalSheet, listLocalSheets, removeLocalSheet, saveLocalSheet, type LocalSheetRecord } from "@/lib/localSheetVault";
-import { createCharacterJsonEnvelope, createVaultBackup, downloadJsonFile, inferRpgSystemId, parseVaultBackup, slugifyFilename } from "@/lib/sheetJson";
-import { Download, FolderOpen, Save, Trash2, Upload } from "lucide-react";
+import { createCharacterJsonEnvelope, createCharacterShareUrl, createVaultBackup, downloadJsonFile, inferRpgSystemId, parseVaultBackup, slugifyFilename } from "@/lib/sheetJson";
+import QRCode from "qrcode";
+import { ClipboardCopy, Download, FolderOpen, QrCode, Save, Trash2, Upload } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -25,6 +26,8 @@ function recordToJson(record: LocalSheetRecord<SheetPayload>, systemId: ReturnTy
       concept: record.sheet.concept,
       campaignId: record.sheet.campaignId,
       createdAt: record.createdAt,
+      level: record.level,
+      tags: record.tags,
       sheet: record.sheet.sheet,
     }),
     exportedAt: record.updatedAt,
@@ -33,6 +36,8 @@ function recordToJson(record: LocalSheetRecord<SheetPayload>, systemId: ReturnTy
 
 export function LocalSheetVaultPanel({ storageKey, systemLabel, name, concept, campaignId, sheet, onLoad }: LocalSheetVaultPanelProps) {
   const [records, setRecords] = useState<LocalSheetRecord<SheetPayload>[]>(() => listLocalSheets<SheetPayload>(storageKey));
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [shareQr, setShareQr] = useState<string | null>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
   const systemId = inferRpgSystemId(storageKey);
 
@@ -58,6 +63,16 @@ export function LocalSheetVaultPanel({ storageKey, systemLabel, name, concept, c
   const exportRecord = (record: LocalSheetRecord<SheetPayload>) => {
     downloadJsonFile(recordToJson(record, systemId), `${slugifyFilename(record.name)}-${slugifyFilename(systemLabel)}.json`);
     toast.success(`Ficha ${record.name} exportada em JSON.`);
+  };
+
+  const shareRecord = async (record: LocalSheetRecord<SheetPayload>) => {
+    try {
+      const url = createCharacterShareUrl(recordToJson(record, systemId));
+      const qr = await QRCode.toDataURL(url, { width: 220, margin: 2, color: { dark: "#161715", light: "#f4eee4" } });
+      setShareQr(qr);
+      setShareUrl(url);
+      try { await navigator.clipboard.writeText(url); toast.success(`Link JSON de ${record.name} copiado.`); } catch { window.prompt("Copie o link JSON da ficha:", url); }
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Não foi possível criar o link JSON."); }
   };
 
   const exportCurrent = () => {
@@ -92,7 +107,7 @@ export function LocalSheetVaultPanel({ storageKey, systemLabel, name, concept, c
         let next = listLocalSheets<SheetPayload>(storageKey);
         compatible.forEach((entry, index) => {
           const importedAt = entry.updatedAt || new Date(Date.now() + index).toISOString();
-          next = saveLocalSheet(storageKey, { id: createLocalSheetId(storageKey), name: entry.name, createdAt: entry.createdAt || importedAt, updatedAt: importedAt, sheet: { name: entry.name, concept: entry.concept, campaignId: entry.campaignId, sheet: entry.sheet } });
+          next = saveLocalSheet(storageKey, { id: createLocalSheetId(storageKey), name: entry.name, createdAt: entry.createdAt || importedAt, updatedAt: importedAt, level: entry.level, tags: entry.tags, sheet: { name: entry.name, concept: entry.concept, campaignId: entry.campaignId, sheet: entry.sheet } });
         });
         setRecords(next);
         toast.success(`${compatible.length} ficha(s) importada(s) para o Cofre Local.`);
@@ -104,5 +119,5 @@ export function LocalSheetVaultPanel({ storageKey, systemLabel, name, concept, c
     reader.readAsText(file);
   };
 
-  return <section className="border border-[#83a89a]/35 bg-[#171a18] p-4" aria-label={`Cofre local de fichas de ${systemLabel}`}><div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><div><p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-[#a9c7bb]"><FolderOpen className="h-4 w-4 text-[#d27648]" /> Cofre local · {systemLabel}</p><p className="mt-1 text-xs text-[#8f958c]">Salva uma cópia neste navegador, sem substituir o arquivo da campanha.</p></div><div className="flex flex-wrap gap-2"><Button type="button" variant="outline" onClick={() => importInputRef.current?.click()} className="h-10 rounded-none border-[#83a89a]/45 bg-transparent text-[10px] font-bold uppercase tracking-[.1em] text-[#eae3d5]"><Upload className="mr-2 h-4 w-4" /> Importar JSON</Button><input ref={importInputRef} className="sr-only" aria-label={`Importar ficha ou backup JSON de ${systemLabel}`} type="file" accept="application/json,.json" onChange={importJson} /><Button type="button" variant="outline" onClick={exportBackup} disabled={!records.length} className="h-10 rounded-none border-[#83a89a]/45 bg-transparent text-[10px] font-bold uppercase tracking-[.1em] text-[#eae3d5]"><Download className="mr-2 h-4 w-4" /> Backup do cofre</Button><Button type="button" onClick={save} className="h-10 rounded-none bg-[#b55b32] text-[10px] font-bold uppercase tracking-[.13em] text-[#161715] hover:bg-[#d27648]"><Save className="mr-2 h-4 w-4" /> Salvar localmente</Button></div></div>{name.trim().length >= 2 ? <div className="mt-3 flex justify-end"><button type="button" onClick={exportCurrent} className="text-[9px] font-bold uppercase tracking-[.12em] text-[#a9c7bb] underline decoration-[#b55b32]/60 underline-offset-4 hover:text-[#ffb08e]">Exportar ficha atual sem salvar</button></div> : null}{records.length ? <div className="mt-4 grid gap-2 sm:grid-cols-2">{records.map((record) => <div key={record.id} className="flex items-center justify-between gap-3 border border-white/10 bg-black/10 p-3"><button type="button" onClick={() => load(record.id)} className="min-w-0 text-left text-[#f4eee4] hover:text-[#ffb08e]"><span className="block truncate font-serif text-lg">{record.name}</span><span className="block text-[9px] uppercase tracking-[.1em] text-[#8f958c]">Atualizada em {new Date(record.updatedAt).toLocaleDateString("pt-BR")}</span></button><div className="flex shrink-0 items-center gap-2"><button type="button" aria-label={`Exportar ${record.name} em JSON`} onClick={() => exportRecord(record)} className="text-[#a9c7bb] hover:text-[#ffb08e]"><Download className="h-4 w-4" /></button><button type="button" aria-label={`Excluir ${record.name} do cofre local`} onClick={() => remove(record.id)} className="text-[#a9c7bb] hover:text-[#ffb08e]"><Trash2 className="h-4 w-4" /></button></div></div>)}</div> : <p className="mt-4 text-xs text-[#8f958c]">Nenhuma ficha local salva ainda. Você ainda pode exportar a ficha atual sem salvá-la.</p>}</section>;
+  return <section className="border border-[#83a89a]/35 bg-[#171a18] p-4" aria-label={`Cofre local de fichas de ${systemLabel}`}><div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><div><p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-[#a9c7bb]"><FolderOpen className="h-4 w-4 text-[#d27648]" /> Cofre local · {systemLabel}</p><p className="mt-1 text-xs text-[#8f958c]">Salva uma cópia neste navegador, sem substituir o arquivo da campanha.</p></div><div className="flex flex-wrap gap-2"><Button type="button" variant="outline" onClick={() => importInputRef.current?.click()} className="h-10 rounded-none border-[#83a89a]/45 bg-transparent text-[10px] font-bold uppercase tracking-[.1em] text-[#eae3d5]"><Upload className="mr-2 h-4 w-4" /> Importar JSON</Button><input ref={importInputRef} className="sr-only" aria-label={`Importar ficha ou backup JSON de ${systemLabel}`} type="file" accept="application/json,.json" onChange={importJson} /><Button type="button" variant="outline" onClick={exportBackup} disabled={!records.length} className="h-10 rounded-none border-[#83a89a]/45 bg-transparent text-[10px] font-bold uppercase tracking-[.1em] text-[#eae3d5]"><Download className="mr-2 h-4 w-4" /> Backup do cofre</Button><Button type="button" onClick={save} className="h-10 rounded-none bg-[#b55b32] text-[10px] font-bold uppercase tracking-[.13em] text-[#161715] hover:bg-[#d27648]"><Save className="mr-2 h-4 w-4" /> Salvar localmente</Button></div></div>{name.trim().length >= 2 ? <div className="mt-3 flex flex-wrap justify-end gap-3"><button type="button" onClick={exportCurrent} className="text-[9px] font-bold uppercase tracking-[.12em] text-[#a9c7bb] underline decoration-[#b55b32]/60 underline-offset-4 hover:text-[#ffb08e]">Exportar ficha atual sem salvar</button><button type="button" onClick={() => shareRecord({ id: "current", name: name.trim(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), sheet: { name: name.trim(), concept, campaignId, sheet } })} className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-[.12em] text-[#a9c7bb] underline decoration-[#b55b32]/60 underline-offset-4 hover:text-[#ffb08e]"><ClipboardCopy className="h-3.5 w-3.5" /> Copiar link JSON</button></div> : null}{shareUrl ? <div className="mt-4 flex flex-wrap items-center justify-end gap-3 border border-[#83a89a]/35 bg-[#f4eee4] p-3"><img src={shareQr || ""} alt="QR code da ficha JSON compartilhada" className="h-36 w-36" /><div className="max-w-xs text-right text-[9px] leading-4 text-[#161715]"><strong className="block uppercase tracking-[.1em]">Link JSON pronto</strong><span>O link foi copiado. Escaneie o código ou envie a URL para o jogador abrir a ficha.</span><button type="button" onClick={() => setShareUrl(null)} className="mt-2 block w-full text-right font-bold uppercase tracking-[.1em] underline">Fechar</button></div></div> : null}{records.length ? <div className="mt-4 grid gap-2 sm:grid-cols-2">{records.map((record) => <div key={record.id} className="flex items-center justify-between gap-3 border border-white/10 bg-black/10 p-3"><button type="button" onClick={() => load(record.id)} className="min-w-0 text-left text-[#f4eee4] hover:text-[#ffb08e]"><span className="block truncate font-serif text-lg">{record.name}</span><span className="block text-[9px] uppercase tracking-[.1em] text-[#8f958c]">Atualizada em {new Date(record.updatedAt).toLocaleDateString("pt-BR")}</span></button><div className="flex shrink-0 items-center gap-2"><button type="button" aria-label={`Exportar ${record.name} em JSON`} onClick={() => exportRecord(record)} className="text-[#a9c7bb] hover:text-[#ffb08e]"><Download className="h-4 w-4" /></button><button type="button" aria-label={`Compartilhar ${record.name} por link JSON`} onClick={() => shareRecord(record)} className="text-[#a9c7bb] hover:text-[#ffb08e]"><QrCode className="h-4 w-4" /></button><button type="button" aria-label={`Excluir ${record.name} do cofre local`} onClick={() => remove(record.id)} className="text-[#a9c7bb] hover:text-[#ffb08e]"><Trash2 className="h-4 w-4" /></button></div></div>)}</div> : <p className="mt-4 text-xs text-[#8f958c]">Nenhuma ficha local salva ainda. Você ainda pode exportar a ficha atual sem salvá-la.</p>}</section>;
 }
