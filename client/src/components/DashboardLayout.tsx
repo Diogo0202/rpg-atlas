@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import React from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -22,7 +23,7 @@ import {
 import { startLogin } from "@/const";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useMobile";
-import { BookMarked, BookOpen, LayoutDashboard, LogOut, Moon, PanelLeft, ScrollText, Shield, Skull, Sun, UserRound } from "lucide-react";
+import { BookMarked, BookOpen, Clock3, FolderOpen, LayoutDashboard, LogOut, Moon, PanelLeft, ScrollText, Shield, Skull, Sun, UserRound } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -37,6 +38,8 @@ const menuItems = [
   { number: "06", icon: Shield, label: "Arsenal V5", path: "/arsenal-v5" },
   { number: "07", icon: UserRound, label: "Ficha O Um Anel", path: "/ficha-um-anel" },
   { number: "08", icon: UserRound, label: "Ficha Caçador", path: "/ficha-cacador" },
+  { number: "09", icon: Clock3, label: "Modo de Cena", path: "/modo-cena" },
+  { number: "10", icon: FolderOpen, label: "Cofre Local", path: "/cofre-local" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

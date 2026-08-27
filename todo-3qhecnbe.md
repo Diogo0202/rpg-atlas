@@ -41,3 +41,21 @@
 - [x] Adicionar teste de interface cobrindo o carregamento local na ficha de Caçador após abrir uma ficha persistida, validando que o próximo salvamento cria nova ficha ou exige re-seleção explícita.
 - [x] Salvar um checkpoint publicado após as alterações finais de persistência local e PDFs temáticos.
 - [x] Confirmar o `version_id` retornado pelo checkpoint final antes de concluir a entrega.
+- [x] Mapear a interface principal, o protótipo de Modo de Cena e o cofre local atual.
+- [x] Integrar a barra de ações rápidas e o painel de rolagens na interface principal.
+- [x] Criar uma área de gerenciamento das fichas salvas localmente.
+- [x] Permitir renomear fichas locais sem alterar o personagem remoto.
+- [x] Permitir duplicar fichas locais com novo identificador.
+- [x] Permitir excluir fichas locais com confirmação e estado vazio.
+- [x] Criar testes e validar navegação, estados e responsividade.
+- [x] Criar um checkpoint publicado com a integração concluída.
+- [x] Sincronizar a renomeação do cofre local com `record.sheet.name` e cobrir o recarregamento do nome atualizado.
+- [x] Adicionar testes de navegação para os acessos a `/modo-cena` e `/cofre-local`.
+- [x] Validar visualmente o Modo de Cena e o Cofre Local em desktop e mobile.
+- [x] Adicionar teste de roteamento cobrindo a renderização de `/modo-cena` via App.
+- [x] Adicionar teste de roteamento cobrindo a renderização de `/cofre-local` via App ou menu persistente.
+- [x] Renderizar `App` em `/modo-cena` em teste e confirmar o conteúdo de `SceneMode`.
+- [x] Renderizar `App` em `/cofre-local` em teste e confirmar o conteúdo de `LocalSheetManager`.
+- [x] Corrigir o erro de tipos da integração concorrente de Favoritos V5 sem sobrescrever sua implementação.
+- [x] Salvar um checkpoint publicado após a integração do Modo de Cena e do Cofre Local.
+- [x] Confirmar que o checkpoint inclui as correções de roteamento via App, imports JSX e as validações finais.

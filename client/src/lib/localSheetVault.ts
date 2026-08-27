@@ -35,6 +35,27 @@ export function loadLocalSheet<T>(storageKey: string, id: string): LocalSheetRec
   return readRecords<T>(storageKey).find((record) => record.id === id);
 }
 
+export function renameLocalSheet(storageKey: string, id: string, name: string) {
+  const normalizedName = name.trim();
+  if (normalizedName.length < 2) throw new Error("O nome precisa ter pelo menos 2 caracteres.");
+  const records = readRecords<unknown>(storageKey);
+  const target = records.find((record) => record.id === id);
+  if (!target) return records;
+  const next = records.map((record) => record.id === id ? { ...record, name: normalizedName, updatedAt: new Date().toISOString(), sheet: record.sheet && typeof record.sheet === "object" && "name" in record.sheet ? { ...record.sheet, name: normalizedName } : record.sheet } : record);
+  window.localStorage.setItem(storageKey, JSON.stringify(next));
+  return next;
+}
+
+export function duplicateLocalSheet<T>(storageKey: string, id: string, name?: string) {
+  const records = readRecords<T>(storageKey);
+  const target = records.find((record) => record.id === id);
+  if (!target) return records;
+  const copy: LocalSheetRecord<T> = { ...target, id: createLocalSheetId(storageKey), name: name?.trim() || `${target.name} (cópia)`, updatedAt: new Date().toISOString(), sheet: structuredClone(target.sheet) };
+  const next = [copy, ...records];
+  window.localStorage.setItem(storageKey, JSON.stringify(next));
+  return next;
+}
+
 export function removeLocalSheet(storageKey: string, id: string) {
   const next = readRecords<unknown>(storageKey).filter((record) => record.id !== id);
   try {
