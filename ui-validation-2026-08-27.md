@@ -9,3 +9,29 @@ Em 375×812, o cabeçalho das duas rotas se adapta para empilhamento vertical. A
 As capturas finais em 1280×720 continuam mostrando a pesquisa, o contador, o seletor de ordenação e os botões de importação/exportação no mesmo bloco visual do Cofre. A ordenação por sistema não introduz alteração de layout. No Modo de Cena, o cabeçalho mantém exportação do histórico e o painel de foco mantém o bloco de condições visível.
 
 Em 375×812, o empilhamento permanece legível e sem overflow horizontal. Os controles do Cofre continuam abaixo da dobra depois dos cartões de sistemas, enquanto a navegação do Modo de Cena mantém ações rápidas e próximo turno acessíveis na primeira área operacional. O build visual não apresentou console error nas capturas.
+
+## Expansão de compartilhamento e filtros
+
+As capturas em 1280×720 mostraram o Modo de Cena com a composição operacional preservada e o Cofre Local com pesquisa, nível, tags, ordenação e ações de backup alinhados no bloco da biblioteca. A rota `/compartilhar/json` apresenta o estado inválido de forma clara, com contraste e instrução de recuperação.
+
+Em 375×812, os controles principais do Modo de Cena empilham-se sem sair da viewport inicial. O Cofre Local mantém título, descrição, contador e cartões dos sistemas em coluna; os controles da biblioteca seguem em fluxo vertical. A tela de link inválido mantém a mensagem legível dentro do cartão.
+
+As capturas foram feitas com o cofre vazio e sem `payload` na rota compartilhada, portanto não exercitam visualmente o cartão de QR code nem a listagem filtrada com registros. Esses fluxos possuem cobertura DOM dedicada nos testes.
+
+## Compressão e visualizações — 2026-08-27
+
+Em 1280×720, a barra de visualizações salvas aparece integrada ao bloco da Biblioteca do navegador, com seletor, campo de nome e ações de salvar/excluir alinhados acima dos filtros existentes. A hierarquia visual permanece consistente com o design Obsidiano.
+
+Em 375×812, a mesma área é estruturada em coluna pelo grid responsivo, evitando overflow horizontal. Como o cofre está vazio na captura, o seletor não apresenta registros; a persistência e aplicação de visualizações são cobertas pelos testes DOM e unitários.
+
+## Preview compartilhado e remodelação das fichas — 2026-08-27
+
+O modal de pré-visualização foi validado com dados básicos de nome, sistema, conceito e nível, além de confirmação de importação sem sobrescrita. Em desktop, a ficha V5 apresenta uma nova folha de sangue com Fome, Humanidade, Potência de Sangue e Geração antes do fluxo de criação; O Um Anel apresenta Resistência, Esperança, Sombra e Carga em uma folha de jornada dedicada.
+
+Em mobile, os controles de criação e os painéis centrais permanecem empilhados sem overflow horizontal. A navegação de etapas mantém a leitura dos quatro momentos de criação; os testes DOM cobrem o modal, os recursos centrais e o campo explícito de comunidade da companhia.
+
+## Remodelação estrutural — captura desktop
+
+As rotas `/ficha-v5` e `/ficha-um-anel` exibem a nova folha temática principal imediatamente após o Cofre Local. Em Vampiro, o bloco de sangue mostra Fome, Humanidade, geração, potência e disciplinas; em O Um Anel, a folha mostra Resistência, Esperança, Sombra e Carga. A hierarquia é legível em 1280×720, com o conteúdo avançado recolhido abaixo para evitar duplicação visual. Os controles de cabeçalho permanecem acessíveis, embora a densidade de ações de Vampiro exija verificação adicional em viewport estreita.
+
+Em 375×812, ambas as fichas empilham cabeçalho, seletor de sistema, ações e Cofre Local sem overflow horizontal. Vampiro mantém os botões de PDF em sequência vertical e O Um Anel preserva a ação de impressão com boa legibilidade. A folha principal continua abaixo da área inicial, acessível por rolagem; os controles de ação permanecem dentro da largura do dispositivo.

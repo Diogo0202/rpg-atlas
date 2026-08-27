@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createLocalSheetId, listLocalSheets, loadLocalSheet, removeLocalSheet, saveLocalSheet } from "./localSheetVault";
+import { createLocalSheetId, listLocalSheetViews, listLocalSheets, loadLocalSheet, removeLocalSheet, removeLocalSheetView, saveLocalSheet, saveLocalSheetView } from "./localSheetVault";
 
 function createStorage() {
   const data = new Map<string, string>();
@@ -28,5 +28,14 @@ describe("localSheetVault", () => {
 
   it("gera identificadores locais com o prefixo do sistema", () => {
     expect(createLocalSheetId("vampiro")).toMatch(/^vampiro-/);
+  });
+
+  it("persiste visualizações combinadas e permite atualizá-las e removê-las", () => {
+    saveLocalSheetView({ id: "view-1", name: "Caçadores ativos", search: "Mara", levelFilter: "5", tagFilter: "jogador", sortBy: "name-asc" });
+    expect(listLocalSheetViews()).toMatchObject([{ id: "view-1", name: "Caçadores ativos", levelFilter: "5", tagFilter: "jogador" }]);
+    saveLocalSheetView({ id: "view-1", name: "Caçadores ativos", search: "Rafael", levelFilter: "", tagFilter: "", sortBy: "updated-desc" });
+    expect(listLocalSheetViews()[0].search).toBe("Rafael");
+    removeLocalSheetView("view-1");
+    expect(listLocalSheetViews()).toEqual([]);
   });
 });

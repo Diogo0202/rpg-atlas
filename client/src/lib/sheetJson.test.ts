@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createCharacterJsonEnvelope, createVaultBackup, parseCharacterJson, parseVaultBackup, slugifyFilename } from "./sheetJson";
+import { createCharacterJsonEnvelope, createCharacterShareUrl, createVaultBackup, parseCharacterJson, parseCharacterSharePayload, parseVaultBackup, slugifyFilename } from "./sheetJson";
 
 describe("sheetJson", () => {
   it("cria e interpreta um envelope de ficha versionado", () => {
@@ -19,3 +19,23 @@ describe("sheetJson", () => {
     expect(slugifyFilename("Lívia Vesper / noite")).toBe("livia-vesper-noite");
   });
 });
+
+  it("gera e decodifica um link JSON compartilhável", () => {
+    const payload = createCharacterJsonEnvelope({ systemId: "cacador-a-vinganca", name: "João da Luz", concept: "Investigação", level: 4, tags: ["mesa", "caçada"], sheet: { desperation: 2 } });
+    const url = createCharacterShareUrl(payload, "https://rpgatlas.example");
+    expect(url.startsWith("https://rpgatlas.example/compartilhar/json?payload=")).toBe(true);
+    const encoded = new URL(url).searchParams.get("payload");
+    expect(encoded).toBeTruthy();
+    expect(encoded?.startsWith("z.")).toBe(true);
+    expect(parseCharacterSharePayload(encoded || "")).toEqual({ systemId: "cacador-a-vinganca", name: "João da Luz", concept: "Investigação", level: 4, tags: ["mesa", "caçada"], sheet: { desperation: 2 } });
+    expect(parseCharacterSharePayload("payload-corrompido")).toBeNull();
+  });
+
+  it("comprime fichas grandes antes de gerar a URL e mantém a leitura do payload", () => {
+    const payload = createCharacterJsonEnvelope({ systemId: "vampiro-v5", name: "Personagem Grande", sheet: { notes: "A névoa retorna. ".repeat(1200) } });
+    const url = createCharacterShareUrl(payload, "https://rpgatlas.example");
+    const encoded = new URL(url).searchParams.get("payload") || "";
+    expect(encoded.startsWith("z.")).toBe(true);
+    expect(encoded.length).toBeLessThan(JSON.stringify(payload).length);
+    expect(parseCharacterSharePayload(encoded)?.name).toBe("Personagem Grande");
+  });

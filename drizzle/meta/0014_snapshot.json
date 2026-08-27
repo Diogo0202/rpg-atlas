@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "f2c08013-8802-453b-9d49-19b44dfb3f63",
+  "id": "809803e7-a5fc-49cd-aaee-8b40bdc19380",
   "prevId": "af6777ee-24a9-4d6a-bfe3-73136557acc5",
   "tables": {
     "antagonistCharacters": {
@@ -961,20 +961,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "imageProvider": {
-          "name": "imageProvider",
-          "type": "enum('openai','gemini')",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "imageGenerationPrompt": {
-          "name": "imageGenerationPrompt",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "gridEnabled": {
           "name": "gridEnabled",
           "type": "int",
@@ -1460,6 +1446,21 @@
           "notNull": true,
           "autoincrement": false
         },
+        "isAcquired": {
+          "name": "isAcquired",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "acquiredAt": {
+          "name": "acquiredAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "createdAt": {
           "name": "createdAt",
           "type": "timestamp",
@@ -1543,6 +1544,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "shareToken": {
+          "name": "shareToken",
+          "type": "varchar(72)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "createdAt": {
           "name": "createdAt",
           "type": "timestamp",
@@ -1562,6 +1570,13 @@
         }
       },
       "indexes": {
+        "shopping_lists_share_token_unique": {
+          "name": "shopping_lists_share_token_unique",
+          "columns": [
+            "shareToken"
+          ],
+          "isUnique": true
+        },
         "shopping_lists_owner_idx": {
           "name": "shopping_lists_owner_idx",
           "columns": [

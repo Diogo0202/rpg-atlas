@@ -77,4 +77,58 @@
 - [x] Adicionar `createdAt` ao envelope JSON de ficha e aos backups, preservando esse campo na importação e exportação.
 - [x] Implementar ordenação do Cofre Local por sistema e cobrir a nova opção com teste.
 - [x] Adicionar teste de interface para importação JSON no Cofre Local, validando importação sem sobrescrita e feedback de erro.
-- [ ] Salvar um novo checkpoint publicado após a expansão de backup JSON, Modo de Cena e Cofre Local, confirmando o `version_id` retornado.
+- [x] Salvar um novo checkpoint publicado após a expansão de backup JSON, Modo de Cena e Cofre Local, confirmando o `version_id` retornado.
+
+# Nova expansão — expiração, compartilhamento e organização
+
+- [x] Adicionar animação visual quando um efeito temporário expirar no Modo de Cena.
+- [x] Exibir notificação acessível quando um efeito temporário expirar durante a rodada.
+- [x] Criar contrato de compartilhamento para fichas exportadas por link.
+- [x] Implementar geração e cópia de link compartilhável para uma ficha JSON.
+- [x] Implementar QR code para abrir ou transferir uma ficha compartilhada.
+- [x] Adicionar metadados de nível e tags personalizadas às fichas do Cofre Local.
+- [x] Adicionar filtros por nível e tags na interface de pesquisa do Cofre Local.
+- [x] Cobrir as novas funções com testes unitários e de interface.
+- [x] Validar responsividade, executar testes completos e publicar checkpoint.
+- [x] Implementar um fluxo real de compartilhamento para fichas JSON exportadas com payload seguro e rota dedicada de leitura.
+- [x] Integrar a geração e a cópia do link JSON no Cofre Local e nos painéis de exportação das fichas.
+- [x] Adicionar leitura/preview da ficha compartilhada e testes do contrato, geração, cópia e abertura do link JSON.
+- [x] Adicionar geração e cópia de link JSON também na página `/cofre-local` para compartilhar registros sem abrir a ficha.
+- [x] Cobrir o compartilhamento JSON direto do Gerenciador com teste DOM.
+- [x] Publicar um checkpoint final após essa integração e registrar o `version_id`.
+
+# Nova expansão — compressão e visualizações do Cofre
+
+- [x] Definir envelope comprimido versionado para links JSON, mantendo leitura retrocompatível de links não comprimidos.
+- [x] Implementar compressão transparente de payloads grandes antes da geração da URL.
+- [x] Cobrir compressão, descompressão, Unicode e rejeição de payload inválido com testes.
+- [x] Criar modelo local persistente para visualizações personalizadas de filtros combinados.
+- [x] Permitir salvar, selecionar, atualizar e excluir visualizações no Cofre Local.
+- [x] Cobrir visualizações personalizadas com testes de persistência e interface.
+- [x] Validar responsividade, executar testes completos e publicar checkpoint.
+- [x] Salvar um novo checkpoint publicado após a expansão de compressão de payloads e visualizações salvas do Cofre Local, registrando o `version_id` retornado.
+
+# Nova expansão — preview compartilhado e fichas fiéis aos universos
+
+- [x] Criar modal de pré-visualização ao abrir link compartilhado, com dados básicos antes da importação.
+- [x] Permitir confirmar ou cancelar a importação a partir do modal sem sobrescrever fichas locais.
+- [x] Remodelar a ficha de Vampiro V5 com composição fiel ao fluxo de atributos, habilidades, disciplinas, vantagens, saúde e fome do universo.
+- [x] Remodelar a ficha de O Um Anel com composição fiel ao fluxo de atributos, perícias, esperança, sombra, resistência, comunidade e jornada.
+- [x] Preservar exportação JSON/PDF, cofre local, compartilhamento e compatibilidade dos dados durante a remodelação.
+- [x] Cobrir modal, modelos e interações das fichas com testes unitários e de interface.
+- [x] Validar responsividade, executar testes completos e publicar checkpoint.
+
+# Correções de fidelidade e validação integrada
+
+- [x] Remodelar de fato a ficha de Vampiro V5 reorganizando os blocos principais de criação, em vez de apenas adicionar painel complementar.
+- [x] Remodelar de fato a ficha de O Um Anel com blocos explícitos de comunidade e jornada, além da hierarquia visual do sistema.
+- [x] Executar testes integrados das fichas remodeladas cobrindo exportação PDF/JSON, Cofre Local, compartilhamento e carregamento de dados em Vampiro e O Um Anel.
+- [x] Adicionar ou atualizar testes DOM específicos de O Um Anel e ampliar a cobertura integrada das interações das duas fichas.
+- [x] Corrigir o warning `NaN` na folha principal V5 e validar valores derivados exibidos.
+- [x] Adicionar testes integrados de página para exportação, Cofre Local, compartilhamento e carregamento em Vampiro e O Um Anel.
+- [x] Interagir nos testes DOM com os novos painéis principais das duas fichas.
+- [x] Adicionar asserções de Vitalidade e Força de Vontade na folha principal V5 para evitar regressão de NaN.
+- [x] Exercitar exportação, ações do Cofre, compartilhamento e carregamento nas páginas remodeladas de Vampiro e O Um Anel.
+- [x] Criar teste integrado de Vampiro V5 que acione exportação, salvamento, carregamento no Cofre e compartilhamento após a remodelação.
+- [x] Criar teste integrado de O Um Anel que acione exportação, salvamento, carregamento no Cofre e compartilhamento após a remodelação.
+- [ ] Salvar checkpoint publicado com a nova folha principal fiel de Vampiro V5 e O Um Anel e o modal de preview compartilhado, registrando o `version_id` retornado.

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { V5_STORE } from "../../shared/vampire-v5";
-import { createCampaignShoppingListForUser, listCampaignShoppingListsForUser, removeCampaignShoppingListForUser, setCampaignShoppingListItemForUser } from "../db";
-import { protectedProcedure, router } from "../_core/trpc";
+import { createCampaignShoppingListForUser, createCampaignShoppingListShareLinkForUser, getSharedCampaignShoppingListByToken, listCampaignShoppingListsForUser, removeCampaignShoppingListForUser, setCampaignShoppingListItemAcquiredForUser, setCampaignShoppingListItemForUser } from "../db";
+import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 
 const listId = z.object({ listId: z.number().int().positive() });
 const itemId = z.string().trim().min(1).max(120);
@@ -14,4 +14,7 @@ export const shoppingListsRouter = router({
     if (!V5_STORE.some((item) => item.id === input.itemId)) throw new Error("O item informado não pertence ao catálogo atual.");
     return setCampaignShoppingListItemForUser({ ownerId: ctx.user.id, ...input });
   }),
+  setItemAcquired: protectedProcedure.input(listId.extend({ itemId, acquired: z.boolean() })).mutation(({ ctx, input }) => setCampaignShoppingListItemAcquiredForUser({ ownerId: ctx.user.id, ...input })),
+  createShareLink: protectedProcedure.input(listId).mutation(({ ctx, input }) => createCampaignShoppingListShareLinkForUser({ ownerId: ctx.user.id, ...input })),
+  sharedByToken: publicProcedure.input(z.object({ token: z.string().min(20).max(72) })).query(({ input }) => getSharedCampaignShoppingListByToken(input.token)),
 });

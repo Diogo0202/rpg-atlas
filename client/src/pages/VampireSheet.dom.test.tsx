@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -37,6 +37,7 @@ vi.mock("@/lib/trpc", () => ({
 }));
 vi.mock("wouter", () => ({ Link: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
+vi.mock("@/lib/v5Pdf", () => ({ createV5PdfFile: vi.fn(() => new File(["pdf"], "v5.pdf", { type: "application/pdf" })), downloadV5Pdf: vi.fn(), shareV5Pdf: vi.fn(), createV5MailtoUrl: vi.fn(() => "mailto:test@example.com") }));
 
 import VampireSheet from "./VampireSheet";
 
@@ -76,4 +77,43 @@ describe("inventário expansível autenticado", () => {
     expect(screen.queryByText("Novo item")).toBeNull();
     expect(screen.queryByDisplayValue("Rascunho de Mara")).toBeNull();
   }, 15_000);
+});
+
+
+describe("VampireSheet — folha principal V5", () => {
+  it("edita origem, fome e capacidades na composição principal", async () => {
+    const user = userEvent.setup();
+    render(<VampireSheet />);
+    expect(screen.getByRole("region", { name: "Folha principal de criação Vampiro V5" })).not.toBeNull();
+    await user.selectOptions(screen.getByLabelText("Clã na folha principal"), "brujah");
+    await user.clear(screen.getByLabelText("Fome na folha principal"));
+    await user.type(screen.getByLabelText("Fome na folha principal"), "3");
+    expect(screen.getAllByText("Brujah").length).toBeGreaterThan(0);
+    expect((screen.getByLabelText("Fome na folha principal") as HTMLInputElement).value).toBe("3");
+    expect(screen.getAllByText("Disciplinas").length).toBeGreaterThan(0);
+    const primarySheet = screen.getByRole("region", { name: "Folha principal de criação Vampiro V5" });
+    expect(primarySheet.textContent).toContain("Vitalidade");
+    expect(primarySheet.textContent).toContain("Força de Vontade");
+    expect(primarySheet.textContent).not.toContain("NaN");
+    expect(screen.getByText(/Cofre local/i)).not.toBeNull();
+  });
+
+  it("mantém exportação e compartilhamento disponíveis junto do cofre local", async () => {
+    const user = userEvent.setup();
+    render(<VampireSheet />);
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn(() => "blob:sheet") });
+    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, value: vi.fn() });
+    expect(screen.getByRole("button", { name: /exportar para impressão/i })).not.toBeNull();
+    expect(screen.getByRole("button", { name: /compartilhar pdf/i })).not.toBeNull();
+    expect(screen.getByRole("button", { name: /salvar localmente/i })).not.toBeNull();
+    await user.type(screen.getByLabelText("Nome do personagem"), "Mara");
+    await user.click(screen.getAllByRole("button").find((button) => button.textContent?.includes("Exportar ficha atual sem salvar"))!);
+    await user.click(screen.getAllByRole("button").find((button) => button.textContent?.includes("Copiar link JSON"))!);
+    await waitFor(() => expect(screen.getByText("Link JSON pronto")).not.toBeNull());
+    await user.click(screen.getByRole("button", { name: /salvar localmente/i }));
+    expect(localStorage.length).toBeGreaterThan(0);
+    const savedCharacterButtons = screen.getAllByRole("button").filter((button) => button.textContent?.trim() === "Mara");
+    await user.click(savedCharacterButtons[savedCharacterButtons.length - 1]);
+    expect((screen.getByLabelText("Nome do personagem") as HTMLInputElement).value).toBe("Mara");
+  });
 });

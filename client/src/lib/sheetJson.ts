@@ -1,4 +1,5 @@
 import type { RpgSystemId } from "@shared/rpg-systems";
+import { compressSync, decompressSync } from "fflate";
 
 export const CHARACTER_JSON_FORMAT = "rpg-atlas-character-v1" as const;
 export const VAULT_BACKUP_JSON_FORMAT = "rpg-atlas-vault-v1" as const;
@@ -13,6 +14,8 @@ export type CharacterJsonEnvelope = {
     concept: string;
     campaignId?: string;
     createdAt?: string;
+    level?: number;
+    tags?: string[];
     sheet: unknown;
   };
 };
@@ -23,6 +26,8 @@ export type ParsedCharacterJson = {
   concept: string;
   campaignId?: string;
   createdAt?: string;
+  level?: number;
+  tags?: string[];
   sheet: unknown;
 };
 
@@ -35,6 +40,8 @@ export type VaultBackupEnvelope = {
 
 const SYSTEM_IDS: readonly RpgSystemId[] = ["vampiro-v5", "cacador-a-vinganca", "o-um-anel"];
 const LEGACY_HUNTER_FORMAT = "rpg-atlas-hunter-character-v1";
+const COMPRESSED_SHARE_PREFIX = "z.";
+const MAX_SHARE_PAYLOAD_LENGTH = 12000;
 
 export function inferRpgSystemId(storageKey: string): RpgSystemId {
   if (storageKey.includes("hunter")) return "cacador-a-vinganca";
@@ -62,6 +69,8 @@ export function createCharacterJsonEnvelope(input: {
   concept?: string;
   campaignId?: string | null;
   createdAt?: string;
+  level?: number;
+  tags?: string[];
   sheet: unknown;
 }): CharacterJsonEnvelope {
   return {
@@ -74,6 +83,8 @@ export function createCharacterJsonEnvelope(input: {
       concept: input.concept?.trim() || "",
       ...(input.campaignId ? { campaignId: input.campaignId } : {}),
       ...(input.createdAt ? { createdAt: input.createdAt } : {}),
+      ...(input.level !== undefined ? { level: Math.max(1, Math.min(100, Math.round(input.level))) } : {}),
+      ...(input.tags?.length ? { tags: Array.from(new Set(input.tags.map((tag) => tag.trim()).filter(Boolean))).slice(0, 12) } : {}),
       sheet: input.sheet,
     },
   };
@@ -89,12 +100,16 @@ export function parseCharacterJson(value: unknown): ParsedCharacterJson | null {
   if (name.length < 2 || !isRecord(sheet)) return null;
   const campaignId = candidate.campaignId == null ? undefined : String(candidate.campaignId);
   const createdAt = typeof candidate.createdAt === "string" ? candidate.createdAt : undefined;
+  const level = typeof candidate.level === "number" && Number.isFinite(candidate.level) ? Math.max(1, Math.min(100, Math.round(candidate.level))) : undefined;
+  const tags = Array.isArray(candidate.tags) ? Array.from(new Set(candidate.tags.filter((tag): tag is string => typeof tag === "string").map((tag) => tag.trim()).filter(Boolean))).slice(0, 12) : undefined;
   return {
     systemId,
     name,
     concept: normalizeText(candidate.concept),
     ...(campaignId ? { campaignId } : {}),
     ...(createdAt ? { createdAt } : {}),
+    ...(level !== undefined ? { level } : {}),
+    ...(tags?.length ? { tags } : {}),
     sheet,
   };
 }
@@ -120,6 +135,34 @@ export function parseVaultBackup(value: unknown): Array<ParsedCharacterJson & { 
   }
   const single = parseCharacterJson(value);
   return single ? [single] : null;
+}
+
+function encodeBytesBase64Url(bytes: Uint8Array) {
+  let binary = "";
+  bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function decodeBase64Url(value: string) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
+  const binary = atob(normalized);
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
+}
+
+export function createCharacterShareUrl(payload: CharacterJsonEnvelope, origin = typeof window === "undefined" ? "" : window.location.origin) {
+  const compressed = encodeBytesBase64Url(compressSync(new TextEncoder().encode(JSON.stringify(payload))));
+  const encoded = `${COMPRESSED_SHARE_PREFIX}${compressed}`;
+  if (encoded.length > MAX_SHARE_PAYLOAD_LENGTH) throw new Error("A ficha é grande demais para ser compartilhada por URL. Use o arquivo JSON exportado.");
+  return `${origin}/compartilhar/json?payload=${encoded}`;
+}
+
+export function parseCharacterSharePayload(encoded: string): ParsedCharacterJson | null {
+  if (!encoded || encoded.length > MAX_SHARE_PAYLOAD_LENGTH) return null;
+  try {
+    const isCompressed = encoded.startsWith(COMPRESSED_SHARE_PREFIX);
+    const raw = isCompressed ? new TextDecoder().decode(decompressSync(decodeBase64Url(encoded.slice(COMPRESSED_SHARE_PREFIX.length)))) : new TextDecoder().decode(decodeBase64Url(encoded));
+    return parseCharacterJson(JSON.parse(raw));
+  } catch { return null; }
 }
 
 export function downloadJsonFile(payload: unknown, filename: string) {

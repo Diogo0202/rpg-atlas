@@ -3,6 +3,8 @@ export type LocalSheetRecord<T> = {
   name: string;
   createdAt?: string;
   updatedAt: string;
+  level?: number;
+  tags?: string[];
   sheet: T;
 };
 
@@ -47,6 +49,13 @@ export function renameLocalSheet(storageKey: string, id: string, name: string) {
   return next;
 }
 
+export function updateLocalSheetMetadata(storageKey: string, id: string, metadata: { level?: number; tags?: string[] }) {
+  const records = readRecords<unknown>(storageKey);
+  const next = records.map((record) => record.id === id ? { ...record, level: metadata.level, tags: metadata.tags, updatedAt: new Date().toISOString() } : record);
+  window.localStorage.setItem(storageKey, JSON.stringify(next));
+  return next;
+}
+
 export function duplicateLocalSheet<T>(storageKey: string, id: string, name?: string) {
   const records = readRecords<T>(storageKey);
   const target = records.find((record) => record.id === id);
@@ -70,4 +79,55 @@ export function removeLocalSheet(storageKey: string, id: string) {
 
 export function createLocalSheetId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+export type LocalSheetView = {
+  id: string;
+  name: string;
+  search: string;
+  levelFilter: string;
+  tagFilter: string;
+  sortBy: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+const LOCAL_SHEET_VIEWS_KEY = "rpg-atlas-local-sheet-views-v1";
+
+function readViews(): LocalSheetView[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(LOCAL_SHEET_VIEWS_KEY) || "[]");
+    return Array.isArray(parsed) ? parsed.filter((view) => view && typeof view.id === "string" && typeof view.name === "string").map((view) => ({
+      id: view.id,
+      name: view.name,
+      search: typeof view.search === "string" ? view.search : "",
+      levelFilter: typeof view.levelFilter === "string" ? view.levelFilter : "",
+      tagFilter: typeof view.tagFilter === "string" ? view.tagFilter : "",
+      sortBy: typeof view.sortBy === "string" ? view.sortBy : "updated-desc",
+      createdAt: typeof view.createdAt === "string" ? view.createdAt : new Date().toISOString(),
+      updatedAt: typeof view.updatedAt === "string" ? view.updatedAt : new Date().toISOString(),
+    })) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function listLocalSheetViews() {
+  return readViews().sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+}
+
+export function saveLocalSheetView(view: Omit<LocalSheetView, "createdAt" | "updatedAt"> & Partial<Pick<LocalSheetView, "createdAt" | "updatedAt">>) {
+  const now = new Date().toISOString();
+  const existing = readViews().find((entry) => entry.id === view.id);
+  const nextView: LocalSheetView = { ...view, createdAt: view.createdAt || existing?.createdAt || now, updatedAt: now };
+  const next = [nextView, ...readViews().filter((entry) => entry.id !== view.id)].slice(0, 30);
+  window.localStorage.setItem(LOCAL_SHEET_VIEWS_KEY, JSON.stringify(next));
+  return next;
+}
+
+export function removeLocalSheetView(id: string) {
+  const next = readViews().filter((view) => view.id !== id);
+  window.localStorage.setItem(LOCAL_SHEET_VIEWS_KEY, JSON.stringify(next));
+  return next;
 }
