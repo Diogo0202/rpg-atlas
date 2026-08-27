@@ -101,3 +101,12 @@
 - [x] Implementar rolagens V5 de Caçador com animação e dados de Desespero.
 - [x] Cobrir vínculos, exportação e rolagens de Desespero com testes automatizados.
 - [x] Salvar checkpoint e publicar os vínculos, a exportação e as rolagens de Desespero de Caçador.
+- [x] Extrair dos manuais compartilhados os dados seguros e utilizáveis de animais para o catálogo.
+- [x] Adicionar pesquisa e filtros por conteúdo, estado e sessão ao diário de sessões.
+- [x] Vincular facções aos eventos da linha do tempo persistente com controle de campanha.
+- [x] Exportar o diário de sessões e seus eventos em JSON compartilhável.
+- [x] Organizar a loja por eras histórica e incluir veículos e animais adequados ao catálogo.
+- [x] Integrar animais selecionados ao inventário das fichas de personagem.
+- [x] Cobrir busca, vínculos, exportação, filtros temporais e integração de animais com testes automatizados.
+- [ ] Salvar checkpoint e publicar os filtros do diário, os vínculos de facções e o catálogo temporal de animais.
+- [x] Adicionar ao diário de sessões um filtro explícito por registro e cobri-lo em teste automatizado.

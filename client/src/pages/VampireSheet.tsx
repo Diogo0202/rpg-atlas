@@ -7,6 +7,7 @@ import { CustomArchetypePanel } from "@/components/CustomArchetypePanel";
 import { AttributeSkillRollPicker } from "@/components/AttributeSkillRollPicker";
 import { CharacterShareLinkButton } from "@/components/CharacterShareLinkButton";
 import { V5DisciplinesPanel } from "@/components/V5DisciplinesPanel";
+import { V5AnimalCompanionsPanel } from "@/components/V5AnimalCompanionsPanel";
 import { V5CharacterPortrait } from "@/components/V5CharacterPortrait";
 import { V5IntegrityPanel } from "@/components/V5IntegrityPanel";
 import { DiceRollHistorySheet } from "@/components/DiceRollHistorySheet";
@@ -20,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { resetInventoryEditorSession } from "@/lib/inventoryEditor";
 import { createV5MailtoUrl, createV5PdfFile, downloadV5Pdf, shareV5Pdf } from "@/lib/v5Pdf";
-import { V5_ADVANTAGE_DETAILS, V5_ATTRIBUTES, V5_CLANS, V5_FLAW_DETAILS, V5_GENERATIONS, V5_PREDATORS, V5_SKILLS, V5_STARTER_ARCHETYPES, appendV5History, applyClanDisciplines, calculateV5ExperienceCost, createV5SheetData, getV5AdvancementLabel, getV5EquippedArmor, getV5EquippedWeapon, getV5InventoryItems, normalizeV5Inventory, reconcileV5EquipmentAfterInventoryEdit, type V5AdvancementKind, type V5InventoryEntry, type V5SheetData, type V5StarterArchetype, type V5StoreCategory, v5HealthTrack, v5WillpowerTrack } from "@shared/vampire-v5";
+import { V5_ADVANTAGE_DETAILS, V5_ATTRIBUTES, V5_CLANS, V5_FLAW_DETAILS, V5_GENERATIONS, V5_PREDATORS, V5_SKILLS, V5_STARTER_ARCHETYPES, appendV5History, applyClanDisciplines, calculateV5ExperienceCost, createV5SheetData, getV5AdvancementLabel, getV5AnimalCompanions, getV5EquippedArmor, getV5EquippedWeapon, getV5InventoryItems, normalizeV5Inventory, reconcileV5EquipmentAfterInventoryEdit, type V5AdvancementKind, type V5InventoryEntry, type V5SheetData, type V5StarterArchetype, type V5StoreCategory, v5HealthTrack, v5WillpowerTrack } from "@shared/vampire-v5";
 import { calculateIntegrityTrack, calculateRuleTotal } from "@shared/rules-engine";
 import { BadgeCheck, BookOpen, CheckCircle2, ChevronDown, ChevronUp, Crown, Dice6, Download, Droplets, History, LoaderCircle, Mail, PackagePlus, Pencil, Plus, Printer, Save, Share2, Shield, ShieldCheck, Sparkles, Trash2, UserRound } from "lucide-react";
 import React, { useMemo, useState } from "react";
@@ -34,7 +35,7 @@ function hydrateSheet(value: unknown): V5SheetData {
 }
 
 const inventoryCategories: { value: V5StoreCategory; label: string }[] = [
-  { value: "arma", label: "Arma" }, { value: "armadura", label: "Armadura" }, { value: "equipamento", label: "Equipamento" }, { value: "roupa", label: "Vestuário" }, { value: "moradia", label: "Moradia" }, { value: "veiculo", label: "Veículo" }, { value: "montaria", label: "Montaria" },
+  { value: "arma", label: "Arma" }, { value: "armadura", label: "Armadura" }, { value: "equipamento", label: "Equipamento" }, { value: "roupa", label: "Vestuário" }, { value: "moradia", label: "Moradia" }, { value: "veiculo", label: "Veículo" }, { value: "montaria", label: "Montaria" }, { value: "animal", label: "Animal" },
 ];
 
 type InventoryDraft = Omit<V5InventoryEntry, "id" | "catalogId" | "source"> & { damageText: string; armorText: string };
@@ -81,6 +82,7 @@ function V5SheetContent() {
   const equippedWeapon = getV5EquippedWeapon(sheet);
   const equippedArmor = getV5EquippedArmor(sheet);
   const inventoryItems = getV5InventoryItems(sheet);
+  const animalCompanions = getV5AnimalCompanions(sheet);
   const experienceCost = calculateV5ExperienceCost(advancementKind, currentDots, targetDots);
   const selectedCampaignName = useMemo(() => campaigns.find((campaign) => campaign.id === Number(campaignId))?.title, [campaignId, campaigns]);
   const isSavingSheet = createCharacter.isPending || updateCharacter.isPending;
@@ -126,6 +128,7 @@ function V5SheetContent() {
   <V5IntegrityPanel maximum={health} damage={sheet.damage} onChange={(damage) => setSheet((current) => appendV5History({ ...current, damage }, "Trilha de integridade atualizada."))} />
   <article className="border border-white/10 bg-[#171a18] p-5"><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#a9c7bb]"><Sparkles className="h-4 w-4 text-[#d27648]" /> Habilidades</div><div className="mt-4 grid gap-4 md:grid-cols-3">{Object.entries(V5_SKILLS).map(([group, labels]) => <div key={group}><p className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#d27648]">{group}</p><div className="mt-2 space-y-1">{labels.map((label) => <div key={label} className="flex items-center justify-between border-b border-white/10 py-1 text-xs"><span>{label}</span><span className="flex items-center gap-2"><button type="button" aria-label={`Rolar ${label}`} onClick={() => rollTrait({ id: `skill:${label}`, label, detail: "Habilidade" })} className="text-[#d27648] hover:text-[#ffb08e]"><Dice6 className="h-3.5 w-3.5" /></button><button onClick={() => updateRating("skills", label, -1)} className="text-[#a9c7bb]">−</button><strong>{sheet.skills[label]}</strong><button onClick={() => updateRating("skills", label, 1)} className="text-[#d27648]">+</button></span></div>)}</div></div>)}</div></article>
   <TemporaryModifiersPanel modifiers={sheet.temporaryModifiers} onChange={(temporaryModifiers) => setSheet({ ...sheet, temporaryModifiers })} />
+  <V5AnimalCompanionsPanel animals={animalCompanions} />
   <article className="border border-[#83a89a]/35 bg-[#171a18] p-5"><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#a9c7bb]">Rolagens por traço</p><p className="mt-2 text-xs leading-5 text-[#b8b3a8]">Clique em qualquer atributo ou habilidade para rolar seu valor com as condições temporárias aplicáveis.</p><div className="mt-4 grid max-h-56 gap-2 overflow-y-auto pr-1 sm:grid-cols-2 xl:grid-cols-3">{directRollOptions.map((option) => <button key={option.id} type="button" onClick={() => rollTrait(option)} className="flex items-center justify-between border border-white/10 bg-black/10 px-3 py-2 text-left text-sm text-[#f4eee4] hover:border-[#d27648] hover:bg-[#d27648]/10"><span>{option.label}</span><Dice6 className="h-4 w-4 text-[#d27648]" /></button>)}</div>{quickRollResult ? <p className="mt-3 text-xs text-[#a9c7bb]">Última rolagem: <strong className="text-[#f4eee4]">{quickRollResult.label}</strong> · {quickRollResult.pool} dados · {quickRollResult.successes} êxito(s){quickRollResult.modifier ? ` · modificador ${quickRollResult.modifier >= 0 ? "+" : ""}${quickRollResult.modifier}` : ""}.</p> : null}</article>
 
   <V5DisciplinesPanel clan={selectedClan} disciplines={sheet.disciplines} onToggleManualDiscipline={toggleManualDiscipline} onTogglePower={togglePower} />
