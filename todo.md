@@ -152,4 +152,4 @@
 - [x] Criar ritos originais adicionais de Terras de Veyr com inspiração estética em Elden Ring, sem apresentá-los como regras oficiais.
 - [x] Incluir tooltips acessíveis com descrições dos ritos na aba de Magias.
 - [x] Testar, revisar visualmente e publicar as melhorias de busca e magias.
-- [ ] Salvar e publicar o checkpoint das melhorias de busca no compêndio e da aba de Magias.
+- [x] Salvar e publicar o checkpoint das melhorias de busca no compêndio e da aba de Magias.
