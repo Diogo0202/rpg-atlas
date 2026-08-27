@@ -173,7 +173,7 @@ export async function updateCharacterForUser(input: {
   return (await db.select().from(characters).where(eq(characters.id, input.characterId)).limit(1))[0];
 }
 
-export async function createCharacterShareLinkForUser(input: { ownerId: number; characterId: number; expiresAt?: Date | null }) {
+export async function createCharacterShareLinkForUser(input: { ownerId: number; characterId: number; expiresAt?: Date | null; label?: string | null; description?: string | null }) {
   const db = await getDb();
   if (!db) throw new Error("Banco de dados indisponível.");
   const owned = await db.select({ id: characters.id }).from(characters).where(and(eq(characters.id, input.characterId), eq(characters.ownerId, input.ownerId))).limit(1);
@@ -181,9 +181,11 @@ export async function createCharacterShareLinkForUser(input: { ownerId: number; 
   const token = randomBytes(24).toString("base64url");
   const existing = await db.select({ id: characterShareLinks.id }).from(characterShareLinks).where(eq(characterShareLinks.characterId, input.characterId)).limit(1);
   const expiresAt = input.expiresAt || null;
-  if (existing[0]) await db.update(characterShareLinks).set({ token, ownerId: input.ownerId, expiresAt }).where(eq(characterShareLinks.id, existing[0].id));
-  else await db.insert(characterShareLinks).values({ characterId: input.characterId, ownerId: input.ownerId, token, expiresAt });
-  return { token, expiresAt };
+  const label = input.label?.trim() || null;
+  const description = input.description?.trim() || null;
+  if (existing[0]) await db.update(characterShareLinks).set({ token, ownerId: input.ownerId, expiresAt, label, description }).where(eq(characterShareLinks.id, existing[0].id));
+  else await db.insert(characterShareLinks).values({ characterId: input.characterId, ownerId: input.ownerId, token, expiresAt, label, description });
+  return { token, expiresAt, label, description };
 }
 
 export async function getSharedCharacterByToken(token: string) {
@@ -198,7 +200,7 @@ export async function getCharacterShareLinkStatusForUser(input: { ownerId: numbe
   if (!db) throw new Error("Banco de dados indisponível.");
   const owned = await db.select({ id: characters.id }).from(characters).where(and(eq(characters.id, input.characterId), eq(characters.ownerId, input.ownerId))).limit(1);
   if (!owned[0]) throw new Error("Ficha não encontrada ou sem permissão.");
-  const link = await db.select({ token: characterShareLinks.token, expiresAt: characterShareLinks.expiresAt, createdAt: characterShareLinks.createdAt }).from(characterShareLinks).where(and(eq(characterShareLinks.characterId, input.characterId), eq(characterShareLinks.ownerId, input.ownerId))).limit(1);
+  const link = await db.select({ token: characterShareLinks.token, expiresAt: characterShareLinks.expiresAt, label: characterShareLinks.label, description: characterShareLinks.description, createdAt: characterShareLinks.createdAt }).from(characterShareLinks).where(and(eq(characterShareLinks.characterId, input.characterId), eq(characterShareLinks.ownerId, input.ownerId))).limit(1);
   if (!link[0]) return null;
   return { ...link[0], isActive: !link[0].expiresAt || link[0].expiresAt > new Date() };
 }

@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "90113b5f-a353-463c-ba1e-5d76e98c967b",
+  "id": "d1f0d69d-2e98-4efc-a9fa-a05083ea1381",
   "prevId": "8e8851b4-d45f-41b6-bbb3-8af010e3856c",
   "tables": {
     "antagonistCharacters": {
@@ -893,6 +893,20 @@
           "notNull": false,
           "autoincrement": false
         },
+        "label": {
+          "name": "label",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "createdAt": {
           "name": "createdAt",
           "type": "timestamp",
@@ -1274,295 +1288,6 @@
       "compositePrimaryKeys": {
         "diceRolls_id": {
           "name": "diceRolls_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "hunterCellAntagonists": {
-      "name": "hunterCellAntagonists",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "cellId": {
-          "name": "cellId",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "antagonistId": {
-          "name": "antagonistId",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        }
-      },
-      "indexes": {
-        "hunter_cell_antagonists_unique": {
-          "name": "hunter_cell_antagonists_unique",
-          "columns": [
-            "cellId",
-            "antagonistId"
-          ],
-          "isUnique": true
-        },
-        "hunter_cell_antagonists_antagonist_idx": {
-          "name": "hunter_cell_antagonists_antagonist_idx",
-          "columns": [
-            "antagonistId"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "hunterCellAntagonists_cellId_hunterCells_id_fk": {
-          "name": "hunterCellAntagonists_cellId_hunterCells_id_fk",
-          "tableFrom": "hunterCellAntagonists",
-          "tableTo": "hunterCells",
-          "columnsFrom": [
-            "cellId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "hunterCellAntagonists_antagonistId_antagonists_id_fk": {
-          "name": "hunterCellAntagonists_antagonistId_antagonists_id_fk",
-          "tableFrom": "hunterCellAntagonists",
-          "tableTo": "antagonists",
-          "columnsFrom": [
-            "antagonistId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "hunterCellAntagonists_id": {
-          "name": "hunterCellAntagonists_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "hunterCellMembers": {
-      "name": "hunterCellMembers",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "cellId": {
-          "name": "cellId",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "characterId": {
-          "name": "characterId",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        }
-      },
-      "indexes": {
-        "hunter_cell_members_unique": {
-          "name": "hunter_cell_members_unique",
-          "columns": [
-            "cellId",
-            "characterId"
-          ],
-          "isUnique": true
-        },
-        "hunter_cell_members_character_idx": {
-          "name": "hunter_cell_members_character_idx",
-          "columns": [
-            "characterId"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "hunterCellMembers_cellId_hunterCells_id_fk": {
-          "name": "hunterCellMembers_cellId_hunterCells_id_fk",
-          "tableFrom": "hunterCellMembers",
-          "tableTo": "hunterCells",
-          "columnsFrom": [
-            "cellId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "hunterCellMembers_characterId_characters_id_fk": {
-          "name": "hunterCellMembers_characterId_characters_id_fk",
-          "tableFrom": "hunterCellMembers",
-          "tableTo": "characters",
-          "columnsFrom": [
-            "characterId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "hunterCellMembers_id": {
-          "name": "hunterCellMembers_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "hunterCells": {
-      "name": "hunterCells",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "ownerId": {
-          "name": "ownerId",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "campaignId": {
-          "name": "campaignId",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(120)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true,
-          "default": "(now())"
-        }
-      },
-      "indexes": {
-        "hunter_cells_owner_idx": {
-          "name": "hunter_cells_owner_idx",
-          "columns": [
-            "ownerId"
-          ],
-          "isUnique": false
-        },
-        "hunter_cells_campaign_idx": {
-          "name": "hunter_cells_campaign_idx",
-          "columns": [
-            "campaignId"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "hunterCells_ownerId_users_id_fk": {
-          "name": "hunterCells_ownerId_users_id_fk",
-          "tableFrom": "hunterCells",
-          "tableTo": "users",
-          "columnsFrom": [
-            "ownerId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "hunterCells_campaignId_campaigns_id_fk": {
-          "name": "hunterCells_campaignId_campaigns_id_fk",
-          "tableFrom": "hunterCells",
-          "tableTo": "campaigns",
-          "columnsFrom": [
-            "campaignId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "hunterCells_id": {
-          "name": "hunterCells_id",
           "columns": [
             "id"
           ]
