@@ -4,6 +4,7 @@ import { archetypesRouter } from "./routers/archetypes";
 import { charactersRouter } from "./routers/characters";
 import { libraryRouter } from "./routers/library";
 import { hunterCellsRouter } from "./routers/hunterCells";
+import { mapsRouter } from "./routers/maps";
 import { systemsRouter } from "./routers/systems";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -28,6 +29,7 @@ export const appRouter = router({
   archetypes: archetypesRouter,
   library: libraryRouter,
   hunterCells: hunterCellsRouter,
+  maps: mapsRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -3,6 +3,7 @@ import { SystemRuleTooltip } from "@/components/SystemRuleTooltip";
 import { CampaignMembersPanel } from "@/components/CampaignMembersPanel";
 import { CampaignSessionsPanel } from "@/components/CampaignSessionsPanel";
 import { CampaignFactionsPanel } from "@/components/CampaignFactionsPanel";
+import { CampaignMapTabletop } from "@/components/CampaignMapTabletop";
 import { CampaignTimelinePanel } from "@/components/CampaignTimelinePanel";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
@@ -64,6 +65,7 @@ function SanctumContent() {
   <CampaignSessionsPanel campaigns={campaigns} initialCampaignId={recentCampaign?.id ?? null} />
   <CampaignFactionsPanel campaigns={campaigns} initialCampaignId={recentCampaign?.id ?? null} />
   <CampaignTimelinePanel campaigns={campaigns} initialCampaignId={recentCampaign?.id ?? null} />
+  <CampaignMapTabletop campaigns={campaigns} initialCampaignId={recentCampaign?.id ?? null} />
 
   <section className="mt-8 grid gap-7 xl:grid-cols-[0.88fr_1.12fr]"><article className="relative overflow-hidden border border-[#b55b32]/45 bg-[#171a18] p-6"><div className="absolute inset-0 dossier-grid opacity-20" /><div className="relative"><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#a9c7bb]">Preparar registro</p><h2 className="mt-3 font-serif text-4xl leading-none">Inicie uma<br />nova crônica.</h2><p className="mt-4 max-w-sm text-sm leading-6 text-[#b8b3a8]">Escolha o sistema. Cada campanha carrega suas próprias regras, membros e documentos.</p><label className="mt-7 flex flex-col gap-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#a9c7bb]">Sistema<select value={systemId} onChange={(event) => setSystemId(event.target.value as "vampiro-v5" | "o-um-anel")} className="h-11 border border-white/15 bg-[#101211] px-3 text-sm font-semibold normal-case tracking-normal text-[#eae3d5] outline-none focus:border-[#b55b32]">{systems.map((system) => <option key={system.id} value={system.id}>{system.name} · {system.edition}</option>)}</select></label><label className="mt-4 flex flex-col gap-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#a9c7bb]">Nome da campanha<input value={campaignTitle} onChange={(event) => setCampaignTitle(event.target.value)} placeholder="Ex.: A Coroa Partida" className="h-11 border border-white/15 bg-[#101211] px-3 text-sm font-medium normal-case tracking-normal text-[#eae3d5] outline-none placeholder:text-[#6f746c] focus:border-[#b55b32]" /></label><Button onClick={submitCampaign} disabled={createCampaign.isPending} className="mt-5 h-11 rounded-none bg-[#b55b32] px-5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#101211] hover:bg-[#d27648]"><FolderPlus className="mr-2 h-4 w-4" />{createCampaign.isPending ? "Registrando" : "Registrar campanha"}</Button></div></article>
 

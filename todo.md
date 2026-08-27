@@ -104,5 +104,11 @@
 - [x] Integrar a pesquisa global e filtros de sistema ao Acervo sem expor registros privados.
 - [x] Adicionar estado de erro e nova tentativa à busca global protegida no Acervo.
 - [ ] Implementar Mapas e a base de mesa virtual após biblioteca e busca.
+- [x] Modelar e migrar mapas de campanha e marcadores com coordenadas normalizadas.
+- [ ] Criar procedimentos protegidos para criar mapas, enviar imagens e gerenciar marcadores de campanha.
+- [ ] Integrar uma mesa virtual com imagem, pan, zoom, grade e marcadores ao Santuário.
+- [ ] Permitir editar os metadados de marcadores persistentes na mesa virtual.
+- [ ] Expor a criação de mapas adicionais quando uma campanha já possui uma mesa.
+- [ ] Testar, validar em desktop/mobile e publicar o ciclo de mapas e mesa virtual.
 - [ ] Integrar o Campaign Workbench às sessões após mapas e mesa virtual.
 - [ ] Implementar Música e assistência de IA após o Campaign Workbench.

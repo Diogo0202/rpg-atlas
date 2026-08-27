@@ -1,9 +1,10 @@
 import { and, asc, desc, eq, gt, inArray, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomBytes } from "node:crypto";
-import { antagonistCharacters, antagonists, antagonistSessions, campaignEvents, campaignFactions, campaignMembers, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
+import { antagonistCharacters, antagonists, antagonistSessions, campaignEvents, campaignFactions, campaignMapMarkers, campaignMaps, campaignMembers, campaignSessions, campaigns, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { rankLibraryEntries } from "../shared/library-search";
+import { storagePut } from "./storage";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -430,6 +431,84 @@ export async function updateCampaignEventForUser(input: { campaignId: number; ev
   if (!event[0]) throw new Error("Evento não encontrado nesta campanha.");
   await db.update(campaignEvents).set({ sessionId: input.sessionId ?? null, title: input.title, description: input.description ?? null, status: input.status, occurredAt: input.occurredAt }).where(eq(campaignEvents.id, input.eventId));
   return (await db.select().from(campaignEvents).where(eq(campaignEvents.id, input.eventId)).limit(1))[0];
+}
+
+type CampaignMapMarkerType = "location" | "character" | "threat" | "objective" | "secret";
+
+async function assertMapInCampaign(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, campaignId: number, mapId: number) {
+  const map = await db.select({ id: campaignMaps.id }).from(campaignMaps).where(and(eq(campaignMaps.id, mapId), eq(campaignMaps.campaignId, campaignId))).limit(1);
+  if (!map[0]) throw new Error("Mapa não encontrado nesta campanha.");
+}
+
+export async function listCampaignMapsForUser(input: { campaignId: number; userId: number }) {
+  if (!await campaignBelongsToUser(input.campaignId, input.userId)) return [];
+  const db = await getDb();
+  if (!db) return [];
+  const maps = await db.select().from(campaignMaps).where(eq(campaignMaps.campaignId, input.campaignId)).orderBy(desc(campaignMaps.updatedAt));
+  return Promise.all(maps.map(async (map) => ({
+    ...map,
+    markers: await db.select().from(campaignMapMarkers).where(eq(campaignMapMarkers.mapId, map.id)).orderBy(asc(campaignMapMarkers.createdAt)),
+  })));
+}
+
+export async function createCampaignMapForUser(input: { campaignId: number; userId: number; title: string }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem criar mapas nesta campanha.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const inserted = await db.insert(campaignMaps).values({ campaignId: input.campaignId, createdBy: input.userId, title: input.title }).$returningId();
+  const mapId = inserted[0]?.id;
+  if (!mapId) throw new Error("Não foi possível criar o mapa.");
+  return (await db.select().from(campaignMaps).where(eq(campaignMaps.id, mapId)).limit(1))[0];
+}
+
+export async function updateCampaignMapForUser(input: { campaignId: number; mapId: number; userId: number; title: string; gridEnabled: boolean; gridSize: number }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem configurar a mesa virtual.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  await assertMapInCampaign(db, input.campaignId, input.mapId);
+  await db.update(campaignMaps).set({ title: input.title, gridEnabled: input.gridEnabled ? 1 : 0, gridSize: input.gridSize }).where(eq(campaignMaps.id, input.mapId));
+  return (await db.select().from(campaignMaps).where(eq(campaignMaps.id, input.mapId)).limit(1))[0];
+}
+
+export async function uploadCampaignMapImageForUser(input: { campaignId: number; mapId: number; userId: number; mimeType: "image/png" | "image/jpeg" | "image/webp"; bytes: Uint8Array }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem enviar imagens de mapa.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  await assertMapInCampaign(db, input.campaignId, input.mapId);
+  const extension = input.mimeType === "image/png" ? "png" : input.mimeType === "image/webp" ? "webp" : "jpg";
+  const stored = await storagePut(`campaign-maps/${input.campaignId}/${input.mapId}/base.${extension}`, input.bytes, input.mimeType);
+  await db.update(campaignMaps).set({ imageKey: stored.key, imageUrl: stored.url }).where(eq(campaignMaps.id, input.mapId));
+  return (await db.select().from(campaignMaps).where(eq(campaignMaps.id, input.mapId)).limit(1))[0];
+}
+
+export async function createCampaignMapMarkerForUser(input: { campaignId: number; mapId: number; userId: number; label: string; description?: string; markerType: CampaignMapMarkerType; color: string; positionX: number; positionY: number }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem posicionar marcadores.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  await assertMapInCampaign(db, input.campaignId, input.mapId);
+  const inserted = await db.insert(campaignMapMarkers).values({ mapId: input.mapId, createdBy: input.userId, label: input.label, description: input.description ?? null, markerType: input.markerType, color: input.color, positionX: input.positionX, positionY: input.positionY }).$returningId();
+  const markerId = inserted[0]?.id;
+  if (!markerId) throw new Error("Não foi possível posicionar o marcador.");
+  return (await db.select().from(campaignMapMarkers).where(eq(campaignMapMarkers.id, markerId)).limit(1))[0];
+}
+
+export async function moveCampaignMapMarkerForUser(input: { campaignId: number; mapId: number; markerId: number; userId: number; positionX: number; positionY: number }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem mover marcadores.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  await assertMapInCampaign(db, input.campaignId, input.mapId);
+  const marker = await db.select({ id: campaignMapMarkers.id }).from(campaignMapMarkers).where(and(eq(campaignMapMarkers.id, input.markerId), eq(campaignMapMarkers.mapId, input.mapId))).limit(1);
+  if (!marker[0]) throw new Error("Marcador não encontrado neste mapa.");
+  await db.update(campaignMapMarkers).set({ positionX: input.positionX, positionY: input.positionY }).where(eq(campaignMapMarkers.id, input.markerId));
+  return (await db.select().from(campaignMapMarkers).where(eq(campaignMapMarkers.id, input.markerId)).limit(1))[0];
+}
+
+export async function removeCampaignMapMarkerForUser(input: { campaignId: number; mapId: number; markerId: number; userId: number }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem remover marcadores.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  await assertMapInCampaign(db, input.campaignId, input.mapId);
+  await db.delete(campaignMapMarkers).where(and(eq(campaignMapMarkers.id, input.markerId), eq(campaignMapMarkers.mapId, input.mapId)));
 }
 
 export async function listAntagonistsForUser(userId: number, filters?: { campaignId?: number; systemId?: string }) {

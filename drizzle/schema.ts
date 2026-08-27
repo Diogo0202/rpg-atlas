@@ -182,6 +182,40 @@ export const campaignEvents = mysqlTable("campaignEvents", {
   index("campaign_events_occurred_idx").on(table.occurredAt),
 ]);
 
+/** Mapas táticos de uma campanha; o binário da imagem permanece no armazenamento de arquivos. */
+export const campaignMaps = mysqlTable("campaignMaps", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
+  createdBy: int("createdBy").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 160 }).notNull(),
+  imageKey: varchar("imageKey", { length: 512 }),
+  imageUrl: text("imageUrl"),
+  gridEnabled: int("gridEnabled").default(1).notNull(),
+  gridSize: int("gridSize").default(50).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  index("campaign_maps_campaign_idx").on(table.campaignId),
+  index("campaign_maps_creator_idx").on(table.createdBy),
+]);
+
+/** Marcadores em coordenadas normalizadas (0–10.000), estáveis independentemente do zoom da mesa. */
+export const campaignMapMarkers = mysqlTable("campaignMapMarkers", {
+  id: int("id").autoincrement().primaryKey(),
+  mapId: int("mapId").notNull().references(() => campaignMaps.id, { onDelete: "cascade" }),
+  createdBy: int("createdBy").notNull().references(() => users.id, { onDelete: "cascade" }),
+  label: varchar("label", { length: 120 }).notNull(),
+  description: text("description"),
+  markerType: mysqlEnum("markerType", ["location", "character", "threat", "objective", "secret"]).default("location").notNull(),
+  color: varchar("color", { length: 16 }).default("#b55b32").notNull(),
+  positionX: int("positionX").notNull(),
+  positionY: int("positionY").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  index("campaign_map_markers_map_idx").on(table.mapId),
+]);
+
 /** Dossiê de antagonista público ou pertencente ao arquivo particular de um cronista. */
 export const antagonists = mysqlTable("antagonists", {
   id: int("id").autoincrement().primaryKey(),
