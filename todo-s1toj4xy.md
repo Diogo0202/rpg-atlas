@@ -135,3 +135,5 @@
 - [x] Validar os novos controles em desktop e mobile, salvar checkpoint e publicar a atualização.
 - [x] Adicionar filtro de itens pendentes de aquisição às listas de favoritos por campanha.
 - [x] Cobrir o filtro de pendências, validar a interface e publicar a atualização.
+- [x] Remover o criador de fichas do painel inicial e manter somente a visualização das fichas existentes.
+- [x] Cobrir a simplificação do painel inicial, validar em desktop e mobile e publicar a atualização.
