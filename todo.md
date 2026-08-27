@@ -79,3 +79,6 @@
 - [x] Adicionar botão explícito para copiar o link compartilhado ativo com toast de sucesso.
 - [x] Permitir personalizar cor ou estilo visual dos dados nas rolagens animadas.
 - [x] Testar, revisar e publicar a cópia de link e os estilos de dados.
+- [x] Adicionar alternância para resultados instantâneos sem animação de dados.
+- [x] Permitir nome e descrição personalizados nos links compartilhados.
+- [x] Testar, revisar e publicar a preferência de animação e os metadados dos links.
