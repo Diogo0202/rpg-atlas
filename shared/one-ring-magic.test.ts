@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addOneRingMagic, getOneRingMagicById, getOneRingMagicReference, normalizeOneRingMagicIds, oneRingMagics, removeOneRingMagic } from "./one-ring-magic";
+import { addOneRingMagic, getOneRingMagicById, getOneRingMagicReference, normalizeOneRingMagicIds, oneRingMagics, removeOneRingMagic, toggleOneRingMagicFavorite } from "./one-ring-magic";
 
 describe("magias e ritos de O Um Anel", () => {
   it("aceita apenas ritos catalogados, sem duplicar a ficha", () => {
@@ -17,5 +17,10 @@ describe("magias e ritos de O Um Anel", () => {
     expect(oneRingMagics.filter((magic) => magic.origin === "veyra-original")).toHaveLength(5);
     expect(original?.sourcePage).toBeUndefined();
     expect(original && getOneRingMagicReference(original)).toContain("Rito original de Veyr");
+  });
+  it("alterna favoritos somente entre ritos catalogados", () => {
+    expect(toggleOneRingMagicFavorite([], "bencao-de-abrigo")).toEqual(["bencao-de-abrigo"]);
+    expect(toggleOneRingMagicFavorite(["bencao-de-abrigo"], "bencao-de-abrigo")).toEqual([]);
+    expect(toggleOneRingMagicFavorite([], "rito-inexistente")).toEqual([]);
   });
 });

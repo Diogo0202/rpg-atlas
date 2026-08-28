@@ -153,3 +153,9 @@
 - [x] Incluir tooltips acessíveis com descrições dos ritos na aba de Magias.
 - [x] Testar, revisar visualmente e publicar as melhorias de busca e magias.
 - [x] Salvar e publicar o checkpoint das melhorias de busca no compêndio e da aba de Magias.
+- [x] Ampliar a busca do compêndio de NPCs para descrições e ganchos narrativos.
+- [x] Adicionar filtro acessível por disciplina ritual na aba de Magias.
+- [x] Persistir ritos e magias favoritas por personagem dentro da ficha de O Um Anel.
+- [x] Testar, revisar visualmente e publicar filtros, favoritos e busca ampliada.
+- [x] Confirmar a renderização visual de Biblioteca e Ficha de O Um Anel após as capturas em branco.
+- [ ] Salvar e publicar o checkpoint dos filtros por disciplina, favoritos por personagem e busca integral de NPCs.

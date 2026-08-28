@@ -7,9 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 type OneRingMagicTabsProps = {
   selectedIds: string[];
   onChange: (magicIds: string[]) => void;
+  favoriteIds?: string[];
+  onFavoritesChange?: (magicIds: string[]) => void;
 };
 
-export function OneRingMagicTabs({ selectedIds, onChange }: OneRingMagicTabsProps) {
+export function OneRingMagicTabs({ selectedIds, onChange, favoriteIds, onFavoritesChange }: OneRingMagicTabsProps) {
   const selectedMagics = selectedIds.map(getOneRingMagicById).filter(Boolean);
 
   return <Tabs defaultValue="ficha" className="border border-[#7d65a3]/45 bg-[#171a18] p-4 sm:p-5">
@@ -23,7 +25,7 @@ export function OneRingMagicTabs({ selectedIds, onChange }: OneRingMagicTabsProp
       {selectedMagics.length ? <ul className="mt-4 grid gap-2 sm:grid-cols-2" aria-label="Ritos atualmente vinculados">{selectedMagics.map((magic) => <li key={magic!.id} className="border border-[#7d65a3]/40 bg-[#171a18] px-3 py-2"><p className="font-serif text-lg leading-none text-[#f4eee4]">{magic!.name}</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#c7b6e7]">{magic!.discipline} · {getOneRingMagicReference(magic!)}</p></li>)}</ul> : <p className="mt-4 border border-dashed border-[#7d65a3]/50 px-3 py-3 text-sm text-[#b8b3a8]">Nenhum rito de Veyr foi vinculado a este companheiro.</p>}
     </TabsContent>
     <TabsContent value="magias" className="mt-4">
-      <OneRingMagicPanel selectedIds={selectedIds} onChange={onChange} />
+      <OneRingMagicPanel selectedIds={selectedIds} onChange={onChange} favoriteIds={favoriteIds} onFavoritesChange={onFavoritesChange} />
     </TabsContent>
   </Tabs>;
 }

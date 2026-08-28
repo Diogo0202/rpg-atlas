@@ -33,3 +33,4 @@ export function getOneRingMagicReference(magic: OneRingMagic) { return magic.ori
 export function normalizeOneRingMagicIds(value: unknown) { return Array.isArray(value) ? value.filter((id): id is string => typeof id === "string" && oneRingMagics.some((magic) => magic.id === id)) : []; }
 export function addOneRingMagic(selected: string[], magicId: string) { return selected.includes(magicId) || !oneRingMagics.some((magic) => magic.id === magicId) ? selected : [...selected, magicId]; }
 export function removeOneRingMagic(selected: string[], magicId: string) { return selected.filter((id) => id !== magicId); }
+export function toggleOneRingMagicFavorite(favoriteIds: string[], magicId: string) { return favoriteIds.includes(magicId) ? removeOneRingMagic(favoriteIds, magicId) : addOneRingMagic(favoriteIds, magicId); }
