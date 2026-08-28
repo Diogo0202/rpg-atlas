@@ -33,3 +33,12 @@ it("encontra NPCs por nome e especialidade, preservando o filtro de relação", 
   expect(screen.getByText("Alistair Kane")).toBeTruthy();
   expect(screen.queryByText("Maela Varn")).toBeNull();
 });
+
+it("expõe ordenação por fonte e tags narrativas em cada gancho", async () => {
+  const user = userEvent.setup();
+  render(<VeyraNpcCompendium />);
+  const sort = screen.getByRole("combobox", { name: "Ordenar NPCs por" });
+  await user.selectOptions(sort, "source");
+  expect((sort as HTMLSelectElement).value).toBe("source");
+  expect(screen.getByRole("list", { name: "Tags narrativas de Salamon Kane" }).textContent).toContain("culto");
+});

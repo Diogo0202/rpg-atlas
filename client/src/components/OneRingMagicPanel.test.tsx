@@ -52,3 +52,12 @@ it("filtra por disciplina e conserva favoritos dentro da ficha", async () => {
   await user.click(screen.getByRole("button", { name: /Favoritos · 1/ }));
   expect(screen.getByText("Brasa do Último Rei")).toBeTruthy();
 });
+
+it("sinaliza transição breve e acessível ao alterar a disciplina", async () => {
+  const user = userEvent.setup();
+  render(<Harness />);
+  const catalog = screen.getByRole("region", { name: "Catálogo de ritos" });
+  await user.selectOptions(screen.getByRole("combobox", { name: "Filtrar ritos por disciplina" }), "cinzas");
+  expect(catalog.getAttribute("aria-busy")).toBe("true");
+  expect(catalog.className).toContain("motion-reduce:transition-none");
+});

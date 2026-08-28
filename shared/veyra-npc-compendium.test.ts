@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterVeyraNpcs, kaneNpcSource, veyraNpcCompendium } from "./veyra-npc-compendium";
+import { filterVeyraNpcs, kaneNpcSource, sortVeyraNpcs, veyraNpcCompendium } from "./veyra-npc-compendium";
 
 describe("compêndio de NPCs de Véspera do Vau", () => {
   it("preserva os três grupos de relação e uma fonte para cada NPC", () => {
@@ -22,5 +22,11 @@ describe("compêndio de NPCs de Véspera do Vau", () => {
     expect(filterVeyraNpcs("neutral", "infiltração").map((npc) => npc.id)).toEqual(["alistair-kane", "dorian-kane"]);
     expect(filterVeyraNpcs("ally", "ossário").map((npc) => npc.id)).toEqual(["maela-varn"]);
     expect(filterVeyraNpcs("enemy", "cultos niilistas").map((npc) => npc.id)).toEqual(["salamon-kane"]);
+  });
+
+  it("mantém tags narrativas e permite ordenar os NPCs pela fonte documental", () => {
+    expect(veyraNpcCompendium.every((npc) => npc.narrativeTags.length >= 2)).toBe(true);
+    const unordered = [veyraNpcCompendium[10], veyraNpcCompendium[0]];
+    expect(sortVeyraNpcs(unordered, "source").map((npc) => npc.id)).toEqual(["maela-varn", "brahan-kane"]);
   });
 });

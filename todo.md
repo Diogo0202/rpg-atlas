@@ -159,3 +159,9 @@
 - [x] Testar, revisar visualmente e publicar filtros, favoritos e busca ampliada.
 - [x] Confirmar a renderização visual de Biblioteca e Ficha de O Um Anel após as capturas em branco.
 - [x] Salvar e publicar o checkpoint dos filtros por disciplina, favoritos por personagem e busca integral de NPCs.
+- [x] Adicionar ordenação acessível dos NPCs por fonte documental.
+- [x] Incluir tags narrativas rastreáveis nos ganchos dos NPCs.
+- [x] Aplicar transições suaves com suporte a movimento reduzido nos filtros e favoritos de Magias.
+- [x] Testar, revisar visualmente e publicar ordenação, tags e transições.
+- [x] Confirmar a renderização de Biblioteca e Ficha de O Um Anel após as capturas em branco.
+- [ ] Salvar e publicar o checkpoint de ordenação por fonte, tags narrativas e transições de Magias.
