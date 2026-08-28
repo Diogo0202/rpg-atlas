@@ -125,6 +125,38 @@ html:not(.dark) [class~="border-white/10"],
 html:not(.dark) [class~="border-white/15"],
 html:not(.dark) [class~="border-white/20"] { border-color: var(--archive-line) !important; }
 
+.system-vampire {
+  --system-accent: #b72d45;
+  --system-accent-soft: #ef9ba9;
+  --system-secondary: #b89672;
+  background-color: #100b0e !important;
+  background-image: radial-gradient(circle at 82% 0%, rgba(183, 45, 69, 0.19), transparent 28%), radial-gradient(circle at 12% 20%, rgba(184, 150, 114, 0.09), transparent 24%), linear-gradient(135deg, #100b0e, #171013 58%, #0b0a0b) !important;
+}
+
+.system-vampire .system-sheet-header { border-color: rgb(183 45 69 / 0.6) !important; }
+.system-vampire [class~="bg-[#171a18]"] { background-color: #1b1115 !important; }
+.system-vampire [class~="bg-[#101211]"] { background-color: #11090d !important; }
+.system-vampire [class~="text-[#d27648]"] { color: var(--system-accent-soft) !important; }
+.system-vampire [class~="bg-[#b55b32]"] { background-color: var(--system-accent) !important; }
+.system-vampire [class~="border-[#b55b32]/60"],
+.system-vampire [class~="border-[#b55b32]/45"] { border-color: rgb(183 45 69 / 0.6) !important; }
+
+.system-one-ring {
+  --system-accent: #c19a4b;
+  --system-accent-soft: #e6cf92;
+  --system-secondary: #7ea276;
+  background-color: #11170f !important;
+  background-image: radial-gradient(circle at 92% 4%, rgba(193, 154, 75, 0.15), transparent 27%), radial-gradient(circle at 8% 12%, rgba(91, 132, 81, 0.2), transparent 31%), linear-gradient(135deg, #11170f, #172017 56%, #0d120c) !important;
+}
+
+.system-one-ring .system-sheet-header { border-color: rgb(193 154 75 / 0.55) !important; }
+.system-one-ring [class~="bg-[#171a18]"] { background-color: #172117 !important; }
+.system-one-ring [class~="bg-[#101211]"] { background-color: #0d150d !important; }
+.system-one-ring [class~="text-[#d27648]"] { color: var(--system-accent-soft) !important; }
+.system-one-ring [class~="bg-[#b55b32]"] { background-color: var(--system-accent) !important; }
+.system-one-ring [class~="border-[#83a89a]/60"],
+.system-one-ring [class~="border-[#83a89a]/45"] { border-color: rgb(193 154 75 / 0.58) !important; }
+
 html[data-theme-transition="active"],
 html[data-theme-transition="active"] *,
 html[data-theme-transition="active"] *::before,

@@ -137,3 +137,8 @@
 - [x] Cobrir o filtro de pendências, validar a interface e publicar a atualização.
 - [x] Remover o criador de fichas do painel inicial e manter somente a visualização das fichas existentes.
 - [x] Cobrir a simplificação do painel inicial, validar em desktop e mobile e publicar a atualização.
+- [x] Mapear e definir os temas visuais próprios de Vampiro e O Um Anel.
+- [x] Implementar um editor de corte e redimensionamento de retrato antes do salvamento da ficha.
+- [x] Aplicar os temas específicos às fichas de Vampiro e O Um Anel.
+- [x] Cobrir temas e processamento de retrato com testes automatizados.
+- [x] Validar em desktop e mobile, salvar checkpoint e publicar os novos temas e o editor de retrato.

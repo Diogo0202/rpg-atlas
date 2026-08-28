@@ -125,6 +125,7 @@ function DashboardLayoutContent({
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
   const { theme, toggleTheme } = useTheme();
+  const systemThemeClass = location === "/ficha-v5" ? "system-vampire" : location === "/ficha-um-anel" ? "system-one-ring" : "";
 
   useEffect(() => {
     if (isCollapsed) {
@@ -263,7 +264,7 @@ function DashboardLayoutContent({
         />
       </div>
 
-      <SidebarInset className="bg-[#101211]">
+      <SidebarInset className={`bg-[#101211] ${systemThemeClass}`}>
         {isMobile && (
           <div className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-white/10 bg-[#101211]/95 px-2 text-[#eae3d5] backdrop-blur supports-[backdrop-filter]:backdrop-blur">
             <div className="flex items-center gap-2">
