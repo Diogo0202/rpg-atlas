@@ -132,3 +132,27 @@
 - [x] Criar teste integrado de Vampiro V5 que acione exportação, salvamento, carregamento no Cofre e compartilhamento após a remodelação.
 - [x] Criar teste integrado de O Um Anel que acione exportação, salvamento, carregamento no Cofre e compartilhamento após a remodelação.
 - [ ] Salvar checkpoint publicado com a nova folha principal fiel de Vampiro V5 e O Um Anel e o modal de preview compartilhado, registrando o `version_id` retornado.
+
+# Nova expansão — temas por sistema e retratos
+
+- [ ] Definir tokens visuais específicos para Vampiro e O Um Anel, preservando acessibilidade e responsividade.
+- [ ] Criar contrato de retrato com limite de tamanho, tipo MIME permitido e compatibilidade retroativa.
+- [ ] Adicionar upload de retrato nas fichas e pré-visualização com remoção/substituição.
+- [ ] Persistir o retrato junto aos dados no Cofre Local, incluindo salvar, carregar, duplicar e importar/exportar JSON.
+- [ ] Aplicar tema vermelho escuro de Vampiro à ficha e ao contexto de criação.
+- [ ] Aplicar tema pergaminho de O Um Anel à ficha e ao contexto de jornada.
+- [ ] Cobrir temas, upload, persistência e compatibilidade com testes unitários e de interface.
+- [x] Validar responsividade, executar testes completos e publicar checkpoint.
+
+# Continuação — temas por sistema e editor de retrato
+
+- [x] Aplicar tema escuro com tons de vermelho à ficha e ao contexto de Vampiro.
+- [x] Aplicar estilo pergaminho à ficha e ao contexto de O Um Anel.
+- [x] Criar editor de retrato com seleção de arquivo, recorte quadrado e redimensionamento.
+- [x] Permitir confirmar, substituir e remover o retrato antes de salvar a ficha.
+- [x] Persistir o retrato recortado no estado da ficha e no Cofre Local, mantendo compatibilidade com fichas antigas.
+- [x] Cobrir temas e editor de retrato com testes unitários e de interface.
+- [x] Validar responsividade e acessibilidade, executar testes completos e publicar checkpoint.
+- [x] Aplicar overrides CSS completos para o tema de Vampiro em painéis, textos, bordas e acentos internos.
+- [x] Adicionar testes de interface que verifiquem os temas renderizados nas fichas.
+- [x] Ampliar os testes DOM das fichas para verificar o editor de retrato integrado.

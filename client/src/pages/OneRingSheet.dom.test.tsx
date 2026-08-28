@@ -32,6 +32,9 @@ describe("OneRingSheet — folha de jornada", () => {
   it("exibe a hierarquia do sistema e edita comunidade e recursos centrais", () => {
     render(<OneRingSheet />);
     expect(screen.getByRole("heading", { name: "O companheiro na estrada" })).not.toBeNull();
+    expect(document.querySelector('[data-system-theme="one-ring"]')).not.toBeNull();
+    expect(screen.getByRole("region", { name: "Retrato do companheiro" })).not.toBeNull();
+    expect(screen.getByRole("button", { name: /escolher imagem/i })).not.toBeNull();
     expect(screen.getByRole("navigation", { name: "Fluxo de criação de O Um Anel" })).not.toBeNull();
     expect(screen.getByText("A jornada é coletiva.")).not.toBeNull();
     fireEvent.change(screen.getByLabelText("Comunidade da companhia"), { target: { value: "Companhia do Norte" } });

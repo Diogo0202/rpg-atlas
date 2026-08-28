@@ -280,3 +280,68 @@ html[data-theme-transition="active"] *::after {
     margin-left: 0;
   }
 }
+
+/* System-specific sheet themes. They intentionally scope to the creation page so the archive keeps its own editorial palette. */
+[data-system-theme="vampire"] {
+  --sheet-bg: #0d090a;
+  --sheet-panel: #1b1012;
+  --sheet-panel-strong: #251316;
+  --sheet-ink: #f1e4df;
+  --sheet-muted: #c6aaa4;
+  --sheet-accent: #b83f45;
+  --sheet-accent-bright: #e26b62;
+  --sheet-line: rgba(226, 107, 98, 0.28);
+  background-color: var(--sheet-bg);
+  background-image: radial-gradient(circle at 78% 10%, rgba(184, 63, 69, 0.12), transparent 28%), linear-gradient(120deg, rgba(255,255,255,.018), transparent 40%);
+}
+[data-system-theme="vampire"] input:focus,
+[data-system-theme="vampire"] select:focus,
+[data-system-theme="vampire"] textarea:focus { border-color: var(--sheet-accent-bright) !important; box-shadow: 0 0 0 2px rgba(226, 107, 98, 0.18); outline: none; }
+[data-system-theme="vampire"] input[type="range"] { accent-color: var(--sheet-accent-bright); }
+[data-system-theme="one-ring"] {
+  --sheet-bg: #e8d8b4;
+  --sheet-panel: #f1e5c9;
+  --sheet-panel-strong: #d7c093;
+  --sheet-ink: #332b20;
+  --sheet-muted: #665744;
+  --sheet-accent: #89643c;
+  --sheet-accent-bright: #b27b42;
+  --sheet-line: rgba(86, 61, 34, 0.28);
+  background-color: var(--sheet-bg);
+  background-image: linear-gradient(rgba(73, 52, 28, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(73, 52, 28, 0.035) 1px, transparent 1px), radial-gradient(circle at 20% 12%, rgba(178, 123, 66, 0.16), transparent 30%);
+  background-size: 26px 26px, 26px 26px, auto;
+}
+[data-system-theme="one-ring"] input:focus,
+[data-system-theme="one-ring"] select:focus,
+[data-system-theme="one-ring"] textarea:focus { border-color: var(--sheet-accent-bright) !important; box-shadow: 0 0 0 2px rgba(178, 123, 66, 0.2); outline: none; }
+[data-system-theme="one-ring"] input[type="range"] { accent-color: var(--sheet-accent-bright); }
+[data-system-theme="one-ring"] [class*="bg-[#171a18]"],
+[data-system-theme="one-ring"] [class*="bg-[#121412]"],
+[data-system-theme="one-ring"] [class*="bg-[#101211]"] { background-color: rgba(241, 229, 201, 0.86) !important; }
+[data-system-theme="one-ring"] [class*="text-[#eae3d5]"],
+[data-system-theme="one-ring"] [class*="text-[#f4eee4]"],
+[data-system-theme="one-ring"] [class*="text-[#c7c1b5]"],
+[data-system-theme="one-ring"] [class*="text-[#b8b3a8]"] { color: var(--sheet-ink) !important; }
+[data-system-theme="one-ring"] [class*="text-[#a9c7bb]"],
+[data-system-theme="one-ring"] [class*="text-[#83a89a]"] { color: var(--sheet-accent) !important; }
+[data-system-theme="one-ring"] [class*="border-white"] { border-color: var(--sheet-line) !important; }
+@media (prefers-reduced-motion: reduce) {
+  [data-system-theme="vampire"], [data-system-theme="one-ring"] { scroll-behavior: auto; }
+}
+
+[data-system-theme="vampire"] [class*="bg-[#171a18]"],
+[data-system-theme="vampire"] [class*="bg-[#121412]"],
+[data-system-theme="vampire"] [class*="bg-[#101211]"] { background-color: var(--sheet-panel) !important; }
+[data-system-theme="vampire"] [class*="bg-black/10"] { background-color: rgba(12, 7, 9, 0.42) !important; }
+[data-system-theme="vampire"] [class*="text-[#eae3d5]"],
+[data-system-theme="vampire"] [class*="text-[#f4eee4]"],
+[data-system-theme="vampire"] [class*="text-[#c7c1b5]"],
+[data-system-theme="vampire"] [class*="text-[#b8b3a8]"] { color: var(--sheet-ink) !important; }
+[data-system-theme="vampire"] [class*="text-[#a9c7bb]"],
+[data-system-theme="vampire"] [class*="text-[#83a89a]"] { color: #d99b91 !important; }
+[data-system-theme="vampire"] [class*="text-[#d27648]"],
+[data-system-theme="vampire"] [class*="text-[#ffb08e]"] { color: var(--sheet-accent-bright) !important; }
+[data-system-theme="vampire"] [class*="border-white"],
+[data-system-theme="vampire"] [class*="border-[#83a89a]"],
+[data-system-theme="vampire"] [class*="border-[#b55b32]"] { border-color: var(--sheet-line) !important; }
+[data-system-theme="vampire"] button[class*="bg-[#b55b32]"] { background-color: var(--sheet-accent) !important; color: #fff4f0 !important; }
