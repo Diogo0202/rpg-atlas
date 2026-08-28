@@ -5,8 +5,10 @@ import { toast } from "sonner";
 
 type PortraitCropEditorProps = {
   value?: string;
+  portraitUrl?: string;
+  name?: string;
   onChange: (value: string) => void;
-  accent?: "vampire" | "ring";
+  accent?: "vampire" | "ring" | "one-ring";
   label?: string;
 };
 
@@ -31,7 +33,9 @@ function loadImage(src: string) {
   });
 }
 
-export function PortraitCropEditor({ value, onChange, accent = "vampire", label = "Retrato do personagem" }: PortraitCropEditorProps) {
+export function PortraitCropEditor({ value, portraitUrl, name, onChange, accent = "vampire", label }: PortraitCropEditorProps) {
+  const currentValue = value ?? portraitUrl ?? "";
+  const resolvedLabel = label ?? (name ? `Retrato de ${name}` : "Retrato do personagem");
   const inputRef = useRef<HTMLInputElement>(null);
   const [source, setSource] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
@@ -40,7 +44,7 @@ export function PortraitCropEditor({ value, onChange, accent = "vampire", label 
   const [isProcessing, setIsProcessing] = useState(false);
   const accentClass = accent === "vampire" ? "border-[#b55b32]/60 bg-[#261313] text-[#f2d8d0]" : "border-[#b89462]/70 bg-[#eee0bd] text-[#332b20]";
 
-  useEffect(() => { setSource(null); setZoom(1); setOffsetX(50); setOffsetY(50); }, [value]);
+  useEffect(() => { setSource(null); setZoom(1); setOffsetX(50); setOffsetY(50); }, [currentValue]);
 
   const openFile = async (file?: File) => {
     if (!file) return;
@@ -69,12 +73,12 @@ export function PortraitCropEditor({ value, onChange, accent = "vampire", label 
     } catch (error) { toast.error(error instanceof Error ? error.message : "Não foi possível recortar o retrato."); } finally { setIsProcessing(false); }
   };
 
-  return <section className={`border p-4 ${accentClass}`} aria-label={label}>
-    <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.14em]"><ImagePlus className="h-4 w-4" /> {label}</p><p className="mt-1 text-xs opacity-75">Recorte quadrado em 640 × 640 px, armazenado junto à ficha.</p></div><div className="flex gap-2"><Button type="button" variant="outline" onClick={() => inputRef.current?.click()} className="h-9 rounded-none border-current bg-transparent text-[9px] font-bold uppercase tracking-[.1em]"><Upload className="mr-2 h-3.5 w-3.5" /> Escolher imagem</Button>{value ? <Button type="button" variant="outline" onClick={() => onChange("")} className="h-9 rounded-none border-current bg-transparent text-[9px] font-bold uppercase tracking-[.1em]"><Trash2 className="mr-2 h-3.5 w-3.5" /> Remover</Button> : null}</div></div>
-    <input ref={inputRef} className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => { void openFile(event.target.files?.[0]); event.target.value = ""; }} aria-label={`Escolher ${label.toLocaleLowerCase()}`} />
+  return <section className={`border p-4 ${accentClass}`} aria-label={resolvedLabel}>
+    <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.14em]"><ImagePlus className="h-4 w-4" /> {resolvedLabel}</p><p className="mt-1 text-xs opacity-75">Recorte quadrado em 640 × 640 px, armazenado junto à ficha.</p></div><div className="flex gap-2"><Button type="button" variant="outline" onClick={() => inputRef.current?.click()} className="h-9 rounded-none border-current bg-transparent text-[9px] font-bold uppercase tracking-[.1em]"><Upload className="mr-2 h-3.5 w-3.5" /> Escolher imagem</Button>{currentValue ? <Button type="button" variant="outline" onClick={() => onChange("")} className="h-9 rounded-none border-current bg-transparent text-[9px] font-bold uppercase tracking-[.1em]"><Trash2 className="mr-2 h-3.5 w-3.5" /> Remover</Button> : null}</div></div>
+    <input ref={inputRef} className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => { void openFile(event.target.files?.[0]); event.target.value = ""; }} aria-label="Escolher imagem de retrato" />
     {source ? <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,1fr)_240px]">
       <div className="overflow-hidden border border-current/30 bg-black/20 p-3"><div className="relative mx-auto aspect-square max-w-md overflow-hidden border-2 border-current/50 bg-black"><img src={source} alt="Pré-visualização do recorte" className="absolute h-full w-full object-cover" style={{ transform: `scale(${zoom})`, objectPosition: `${offsetX}% ${offsetY}%` }} /></div><div className="mt-3 flex items-center gap-3 text-xs"><span>Zoom</span><input aria-label="Zoom do retrato" className="w-full accent-current" type="range" min="1" max="3" step="0.05" value={zoom} onChange={(event) => setZoom(Number(event.target.value))} /><output>{zoom.toFixed(2)}×</output></div></div>
       <div className="space-y-3 text-xs"><label className="block">Posição horizontal<input aria-label="Posição horizontal do retrato" className="mt-1 w-full accent-current" type="range" min="0" max="100" value={offsetX} onChange={(event) => setOffsetX(Number(event.target.value))} /></label><label className="block">Posição vertical<input aria-label="Posição vertical do retrato" className="mt-1 w-full accent-current" type="range" min="0" max="100" value={offsetY} onChange={(event) => setOffsetY(Number(event.target.value))} /></label><div className="flex gap-2"><Button type="button" onClick={() => void crop()} disabled={isProcessing} className="h-9 flex-1 rounded-none bg-current text-[9px] font-bold uppercase tracking-[.1em] text-[#161715]">{isProcessing ? "Processando" : "Aplicar recorte"}</Button><Button type="button" variant="outline" onClick={() => setSource(null)} className="h-9 rounded-none border-current bg-transparent" aria-label="Cancelar edição do retrato"><RotateCcw className="h-3.5 w-3.5" /></Button></div></div>
-    </div> : <div className="mt-4 flex items-center gap-3">{value ? <img src={value} alt="Retrato atual do personagem" className="h-20 w-20 rounded-sm object-cover ring-1 ring-current/40" /> : <div className="grid h-20 w-20 place-items-center border border-current/30 bg-black/10"><ImagePlus className="h-5 w-5 opacity-60" /></div>}<p className="text-xs opacity-75">{value ? "O retrato atual será preservado ao salvar ou duplicar a ficha." : "Nenhum retrato definido. O símbolo do clã ou a marca da jornada será usado como fallback."}</p></div>}
+    </div> : <div className="mt-4 flex items-center gap-3">{currentValue ? <img src={currentValue} alt="Retrato atual do personagem" className="h-20 w-20 rounded-sm object-cover ring-1 ring-current/40" /> : <div className="grid h-20 w-20 place-items-center border border-current/30 bg-black/10"><ImagePlus className="h-5 w-5 opacity-60" /></div>}<p className="text-xs opacity-75">{currentValue ? "O retrato atual será preservado ao salvar ou duplicar a ficha." : "Nenhum retrato definido. O símbolo do clã ou a marca da jornada será usado como fallback."}</p></div>}
   </section>;
 }

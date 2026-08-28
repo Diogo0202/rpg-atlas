@@ -22,7 +22,7 @@ it("filtra os NPCs de Véspera do Vau pela relação com os Heróis", async () =
 it("encontra NPCs por nome e especialidade, preservando o filtro de relação", async () => {
   const user = userEvent.setup();
   render(<VeyraNpcCompendium />);
-  const search = screen.getByRole("searchbox", { name: "Buscar NPC por nome ou especialidade" });
+  const search = screen.getByRole("searchbox", { name: "Buscar NPC por nome, especialidade, descrição ou gancho" });
   await user.type(search, "contrainteligencia");
   expect(screen.getByText("Salamon Kane")).toBeTruthy();
   expect(screen.queryByText("Maela Varn")).toBeNull();

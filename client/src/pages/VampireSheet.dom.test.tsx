@@ -86,8 +86,8 @@ describe("VampireSheet — folha principal V5", () => {
     render(<VampireSheet />);
     expect(screen.getByRole("region", { name: "Folha principal de criação Vampiro V5" })).not.toBeNull();
     expect(document.querySelector('[data-system-theme="vampire"]')).not.toBeNull();
-    expect(screen.getByRole("region", { name: "Retrato do personagem" })).not.toBeNull();
-    expect(screen.getByRole("button", { name: /escolher imagem/i })).not.toBeNull();
+    expect(screen.getAllByRole("region", { name: /Retrato/ }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: /escolher imagem/i }).length).toBeGreaterThan(0);
     await user.selectOptions(screen.getByLabelText("Clã na folha principal"), "brujah");
     await user.clear(screen.getByLabelText("Fome na folha principal"));
     await user.type(screen.getByLabelText("Fome na folha principal"), "3");

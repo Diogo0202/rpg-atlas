@@ -4,6 +4,8 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+const createCharacterMutate = vi.hoisted(() => vi.fn());
+
 vi.mock("@/components/DashboardLayout", () => ({ default: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
 vi.mock("@/components/SystemRuleTooltip", () => ({ SystemRuleTooltip: () => <span>Regra do Um Anel</span>, AttributeRuleTooltip: () => <span>Regra de atributo</span> }));
 vi.mock("@/components/SheetSystemSwitcher", () => ({ SheetSystemSwitcher: () => <span>Seletor de sistema</span> }));
@@ -19,7 +21,7 @@ vi.mock("@/components/DiceStyleControl", () => ({ DiceStyleControl: () => null, 
 vi.mock("@/components/OneRingJourneyState", () => ({ OneRingJourneyState: ({ endurance, load }: { endurance: number; load: number }) => <div aria-label="Estado da jornada">Resistência {endurance} · Carga {load}</div> }));
 vi.mock("@/components/TemporaryModifiersPanel", () => ({ TemporaryModifiersPanel: () => <div>Modificadores temporários</div> }));
 vi.mock("@/components/ui/button", () => ({ Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => <button {...props}>{children}</button> }));
-vi.mock("@/lib/trpc", () => ({ trpc: { useUtils: () => ({ characters: { mine: { invalidate: vi.fn() } } }), characters: { mine: { useQuery: () => ({ data: [] }), }, create: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) }, update: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) }, recordRoll: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) } }, campaigns: { mine: { useQuery: () => ({ data: [] }) } } } }));
+vi.mock("@/lib/trpc", () => ({ trpc: { useUtils: () => ({ characters: { mine: { invalidate: vi.fn() } } }), characters: { mine: { useQuery: () => ({ data: [] }), }, create: { useMutation: () => ({ mutate: createCharacterMutate, isPending: false }) }, update: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) }, recordRoll: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) } }, campaigns: { mine: { useQuery: () => ({ data: [] }) } } } }));
 vi.mock("@/lib/oneRingPdf", () => ({ createOneRingPdfFile: vi.fn(), downloadOneRingPdf: vi.fn() }));
 vi.mock("wouter", () => ({ Link: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
@@ -33,8 +35,8 @@ describe("OneRingSheet — folha de jornada", () => {
     render(<OneRingSheet />);
     expect(screen.getByRole("heading", { name: "O companheiro na estrada" })).not.toBeNull();
     expect(document.querySelector('[data-system-theme="one-ring"]')).not.toBeNull();
-    expect(screen.getByRole("region", { name: "Retrato do companheiro" })).not.toBeNull();
-    expect(screen.getByRole("button", { name: /escolher imagem/i })).not.toBeNull();
+    expect(screen.getAllByRole("region", { name: /Retrato/ }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: /escolher imagem/i }).length).toBeGreaterThan(0);
     expect(screen.getByRole("navigation", { name: "Fluxo de criação de O Um Anel" })).not.toBeNull();
     expect(screen.getByText("A jornada é coletiva.")).not.toBeNull();
     fireEvent.change(screen.getByLabelText("Comunidade da companhia"), { target: { value: "Companhia do Norte" } });
@@ -64,4 +66,15 @@ it("exercita cofre, exportação JSON, compartilhamento e carregamento na ficha 
   const savedCharacterButtons = screen.getAllByRole("button").filter((button) => button.textContent?.trim() === "Balin");
   await user.click(savedCharacterButtons[savedCharacterButtons.length - 1]);
   expect((screen.getByLabelText("Nome do companheiro") as HTMLInputElement).value).toBe("Balin");
+});
+
+it("inclui ritos favoritos no payload persistido do companheiro", async () => {
+  const user = userEvent.setup();
+  createCharacterMutate.mockClear();
+  render(<OneRingSheet />);
+  await user.type(screen.getByLabelText("Nome do companheiro"), "Nimrodel");
+  await user.click(screen.getByRole("tab", { name: /Magias 0/ }));
+  await user.click(screen.getByRole("button", { name: "Favoritar Bênção de Abrigo" }));
+  await user.click(screen.getByRole("button", { name: "Preservar companheiro" }));
+  expect(createCharacterMutate).toHaveBeenCalledWith(expect.objectContaining({ sheetData: expect.objectContaining({ magicFavoriteIds: ["bencao-de-abrigo"] }) }));
 });

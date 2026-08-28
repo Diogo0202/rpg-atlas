@@ -45,7 +45,7 @@ export function filterVeyraNpcs(relation: VeyraNpcRelation | "all", search = "")
   const normalizedSearch = normalizeNpcSearch(search);
   return veyraNpcCompendium.filter((npc) => {
     const matchesRelation = relation === "all" || npc.relation === relation;
-    const matchesSearch = !normalizedSearch || [npc.name, npc.epithet, ...npc.specialties].some((value) => normalizeNpcSearch(value).includes(normalizedSearch));
+    const matchesSearch = !normalizedSearch || [npc.name, npc.epithet, npc.summary, npc.hook, ...npc.specialties].some((value) => normalizeNpcSearch(value).includes(normalizedSearch));
     return matchesRelation && matchesSearch;
   });
 }
