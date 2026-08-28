@@ -164,4 +164,4 @@
 - [x] Aplicar transições suaves com suporte a movimento reduzido nos filtros e favoritos de Magias.
 - [x] Testar, revisar visualmente e publicar ordenação, tags e transições.
 - [x] Confirmar a renderização de Biblioteca e Ficha de O Um Anel após as capturas em branco.
-- [ ] Salvar e publicar o checkpoint de ordenação por fonte, tags narrativas e transições de Magias.
+- [x] Salvar e publicar o checkpoint de ordenação por fonte, tags narrativas e transições de Magias.
