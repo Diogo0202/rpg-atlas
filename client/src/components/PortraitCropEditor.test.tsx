@@ -22,7 +22,7 @@ describe("PortraitCropEditor", () => {
     mockImage();
     const onChange = vi.fn();
     render(<PortraitCropEditor onChange={onChange} />);
-    const input = screen.getByLabelText(/escolher retrato/i) as HTMLInputElement;
+    const input = screen.getByLabelText("Escolher imagem de retrato") as HTMLInputElement;
     const file = new File(["image"], "portrait.png", { type: "image/png" });
     fireEvent.change(input, { target: { files: [file] } });
     expect(await screen.findByAltText("Pré-visualização do recorte")).toBeTruthy();
