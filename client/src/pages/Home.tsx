@@ -240,6 +240,9 @@ export default function Home() {
                 <Button onClick={() => setLocation("/modo-cena")} variant="outline" className="h-12 rounded-none border-[#b55b32]/60 bg-[#b55b32]/10 px-6 text-[12px] font-bold uppercase tracking-[0.13em] text-[#eae3d5] hover:bg-[#b55b32]/20">
                   Abrir modo de cena
                 </Button>
+                <Button onClick={() => setLocation("/mapa-shadowlords")} variant="outline" className="h-12 rounded-none border-[#83a89a]/60 bg-[#83a89a]/10 px-6 text-[12px] font-bold uppercase tracking-[0.13em] text-[#eae3d5] hover:bg-[#83a89a]/20">
+                  Mapa de Shadowlords
+                </Button>
               </div>
             </div>
               <div className="mt-14 justify-self-end border-l border-dashed border-[#eae3d5]/30 pl-6 lg:mt-0">

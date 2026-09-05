@@ -20,6 +20,7 @@ import LocalSheetManager from "./pages/LocalSheetManager";
 import SharedJsonCharacterSheet from "./pages/SharedJsonCharacterSheet";
 import ReferenceDetail from "./pages/ReferenceDetail";
 import SharedShoppingList from "./pages/SharedShoppingList";
+import ShadowlordsCampaignMap from "./pages/ShadowlordsCampaignMap";
 
 export const APP_ROUTES = {
   sceneMode: "/modo-cena",
@@ -31,7 +32,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/santuario" component={Sanctum} />
+      <Route path="/modo-cena" component={SceneMode} />
+      <Route path="/mapa-shadowlords" component={ShadowlordsCampaignMap} />
       <Route path="/biblioteca" component={AntagonistLibrary} />
       <Route path="/ficha-v5" component={VampireSheet} />
       <Route path="/ficha-um-anel" component={OneRingSheet} />
