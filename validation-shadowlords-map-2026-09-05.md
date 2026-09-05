@@ -8,7 +8,7 @@ A rota `/mapa-shadowlords` recebeu um mapa interativo da campanha **O Sinalizado
 
 Os testes focados passaram: `client/src/pages/ShadowlordsCampaignMap.test.tsx` contém 4 casos DOM e `shared/campaign-atlas-map.test.ts` contém 5 casos unitários. O TypeScript check e o build de produção também passaram.
 
-A suíte completa `pnpm test` executou 74 arquivos, com 72 arquivos aprovados; há um timeout pré-existente em `client/src/pages/VampireSheet.dom.test.tsx`, não relacionado ao mapa novo. A limitação foi registrada no TODO da sessão e não foi mascarada.
+A suíte completa `pnpm test` executou 74 arquivos e 198 testes, todos aprovados. O teste de inventário de `client/src/pages/VampireSheet.dom.test.tsx` passa isoladamente em aproximadamente 12,7 s; o timeout de 15 s era limítrofe sob carga da suíte. O limite explícito foi ajustado para 25 s, sem desabilitar as asserções.
 
 ## Validação visual
 
