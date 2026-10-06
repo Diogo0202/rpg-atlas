@@ -11,7 +11,7 @@ import {
 
 describe("campaign atlas map state", () => {
   it("starts at Arys with an empty tension clock", () => {
-    expect(initialCampaignMapState()).toEqual({ selectedRegion: "arys", tension: 0, resolved: [] });
+    expect(initialCampaignMapState()).toEqual({ selectedRegion: "arys", tension: 0, resolved: [], customRegions: [], customRoutes: [] });
   });
 
   it("clamps tension between zero and six", () => {
@@ -24,13 +24,13 @@ describe("campaign atlas map state", () => {
     const selected = selectCampaignRegion(initialCampaignMapState(), "floresta");
     const resolved = resolveCampaignEncounter(selected, "miasma");
     expect(resolveCampaignEncounter(resolved, "miasma")).toEqual(resolved);
-    expect(resolved).toEqual({ selectedRegion: "floresta", tension: 0, resolved: ["miasma"] });
+    expect(resolved).toEqual({ selectedRegion: "floresta", tension: 0, resolved: ["miasma"], customRegions: [], customRoutes: [] });
   });
 
   it("serializes and sanitizes persisted state", () => {
-    const state = { selectedRegion: "ruinas" as const, tension: 4, resolved: ["sinos"] };
+    const state = { selectedRegion: "ruinas" as const, tension: 4, resolved: ["sinos"], customRegions: [], customRoutes: [] };
     expect(parseCampaignMapState(serializeCampaignMapState(state))).toEqual(state);
-    expect(parseCampaignMapState('{"selectedRegion":"unknown","tension":99,"resolved":["x",3]}')).toEqual({ selectedRegion: "arys", tension: 6, resolved: ["x"] });
+    expect(parseCampaignMapState('{"selectedRegion":"unknown","tension":99,"resolved":["x",3]}')).toEqual({ selectedRegion: "arys", tension: 6, resolved: ["x"], customRegions: [], customRoutes: [] });
     expect(parseCampaignMapState("not-json")).toEqual(initialCampaignMapState());
   });
 

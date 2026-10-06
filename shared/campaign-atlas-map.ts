@@ -4,11 +4,13 @@ export type CampaignMapState = {
   selectedRegion: CampaignMapRegionId;
   tension: number;
   resolved: string[];
+  customRegions: Record<string, unknown>[];
+  customRoutes: Record<string, unknown>[];
 };
 
 export const CAMPAIGN_MAP_STORAGE_KEY = "rpg-atlas-shadowlords-map-state";
 
-export const initialCampaignMapState = (): CampaignMapState => ({ selectedRegion: "arys", tension: 0, resolved: [] });
+export const initialCampaignMapState = (): CampaignMapState => ({ selectedRegion: "arys", tension: 0, resolved: [], customRegions: [], customRoutes: [] });
 
 export function advanceCampaignTension(state: CampaignMapState, amount = 1): CampaignMapState {
   return { ...state, tension: Math.min(6, Math.max(0, state.tension + amount)) };
@@ -41,6 +43,8 @@ export function parseCampaignMapState(raw: string | null): CampaignMapState {
       selectedRegion: validRegions.includes(selectedRegion) ? selectedRegion : "arys",
       tension,
       resolved: Array.isArray(parsed.resolved) ? parsed.resolved.filter((value): value is string => typeof value === "string") : [],
+      customRegions: Array.isArray(parsed.customRegions) ? parsed.customRegions.filter((value): value is Record<string, unknown> => Boolean(value) && typeof value === "object") : [],
+      customRoutes: Array.isArray(parsed.customRoutes) ? parsed.customRoutes.filter((value): value is Record<string, unknown> => Boolean(value) && typeof value === "object") : [],
     };
   } catch {
     return initialCampaignMapState();

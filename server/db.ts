@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, gt, inArray, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomBytes } from "node:crypto";
-import { antagonistCharacters, antagonists, antagonistSessions, campaignEventFactions, campaignEvents, campaignFactions, campaignMapMarkers, campaignMaps, campaignMembers, campaignMusicCues, campaignSessions, campaigns, campaignShoppingListItems, campaignShoppingLists, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, storeFavorites, users } from "../drizzle/schema";
+import { antagonistCharacters, antagonists, antagonistSessions, campaignAtlasEncounters, campaignAtlasMaps, campaignBlessings, campaignEventFactions, campaignEvents, campaignFactions, campaignMapMarkers, campaignMaps, campaignMembers, campaignMusicCues, campaignSessions, campaigns, campaignShoppingListItems, campaignShoppingLists, characterArchetypes, characterShareLinks, characters, diceRolls, hunterCellAntagonists, hunterCellMembers, hunterCells, InsertUser, rpgSystems, sourceDocuments, storeFavorites, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { rankLibraryEntries } from "../shared/library-search";
 import { storagePut } from "./storage";
@@ -727,6 +727,105 @@ export async function removeCampaignMapMarkerForUser(input: { campaignId: number
   if (!db) throw new Error("Banco de dados indisponível.");
   await assertMapInCampaign(db, input.campaignId, input.mapId);
   await db.delete(campaignMapMarkers).where(and(eq(campaignMapMarkers.id, input.markerId), eq(campaignMapMarkers.mapId, input.mapId)));
+}
+
+type CampaignAtlasStatePayload = {
+  campaignId: number;
+  userId: number;
+  mapKey: string;
+  title: string;
+  tension: number;
+  selectedRegion: string;
+  resolvedEncounterIds: string[];
+  customRegions: Record<string, unknown>[];
+  customRoutes: Record<string, unknown>[];
+};
+
+async function assertAtlasMapInCampaign(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, campaignId: number, atlasMapId: number) {
+  const map = await db.select({ id: campaignAtlasMaps.id }).from(campaignAtlasMaps).where(and(eq(campaignAtlasMaps.id, atlasMapId), eq(campaignAtlasMaps.campaignId, campaignId))).limit(1);
+  if (!map[0]) throw new Error("Mapa narrativo não encontrado nesta campanha.");
+}
+
+export async function listCampaignAtlasForUser(input: { campaignId: number; userId: number; mapKey: string }) {
+  if (!await campaignBelongsToUser(input.campaignId, input.userId)) return null;
+  const db = await getDb();
+  if (!db) return null;
+  const map = await db.select().from(campaignAtlasMaps).where(and(eq(campaignAtlasMaps.campaignId, input.campaignId), eq(campaignAtlasMaps.mapKey, input.mapKey))).limit(1);
+  if (!map[0]) return { map: null, encounters: [], antagonists: await listAntagonistsForUser(input.userId, { campaignId: input.campaignId, systemId: "shadowlords" }), blessings: await listCampaignBlessingsForUser(input) };
+  const encounters = await db.select({ encounter: campaignAtlasEncounters, antagonistName: antagonists.name, blessingName: campaignBlessings.name }).from(campaignAtlasEncounters).leftJoin(antagonists, eq(campaignAtlasEncounters.antagonistId, antagonists.id)).leftJoin(campaignBlessings, eq(campaignAtlasEncounters.blessingId, campaignBlessings.id)).where(eq(campaignAtlasEncounters.atlasMapId, map[0].id)).orderBy(asc(campaignAtlasEncounters.createdAt));
+  return { map: map[0], encounters, antagonists: await listAntagonistsForUser(input.userId, { campaignId: input.campaignId, systemId: "shadowlords" }), blessings: await listCampaignBlessingsForUser(input) };
+}
+
+export async function saveCampaignAtlasStateForUser(input: CampaignAtlasStatePayload) {
+  if (!await campaignBelongsToUser(input.campaignId, input.userId)) throw new Error("Campanha não encontrada ou sem permissão.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  const values = {
+    campaignId: input.campaignId,
+    createdBy: input.userId,
+    mapKey: input.mapKey,
+    title: input.title,
+    tension: Math.min(6, Math.max(0, input.tension)),
+    selectedRegion: input.selectedRegion,
+    resolvedEncounterIds: input.resolvedEncounterIds,
+    customRegions: input.customRegions,
+    customRoutes: input.customRoutes,
+  };
+  const existing = await db.select({ id: campaignAtlasMaps.id }).from(campaignAtlasMaps).where(and(eq(campaignAtlasMaps.campaignId, input.campaignId), eq(campaignAtlasMaps.mapKey, input.mapKey))).limit(1);
+  if (existing[0]) await db.update(campaignAtlasMaps).set({ title: values.title, tension: values.tension, selectedRegion: values.selectedRegion, resolvedEncounterIds: values.resolvedEncounterIds, customRegions: values.customRegions, customRoutes: values.customRoutes }).where(eq(campaignAtlasMaps.id, existing[0].id));
+  else await db.insert(campaignAtlasMaps).values(values);
+  return (await db.select().from(campaignAtlasMaps).where(and(eq(campaignAtlasMaps.campaignId, input.campaignId), eq(campaignAtlasMaps.mapKey, input.mapKey))).limit(1))[0];
+}
+
+type CampaignAtlasEncounterPayload = {
+  campaignId: number;
+  userId: number;
+  atlasMapId: number;
+  id?: number;
+  encounterKey: string;
+  regionId: string;
+  title: string;
+  eventName: string;
+  difficulty: number;
+  threat: "baixo" | "médio" | "alto";
+  signal: string;
+  response: string;
+  consequence: string;
+  antagonistId?: number | null;
+  blessingId?: number | null;
+};
+
+export async function saveCampaignAtlasEncounterForUser(input: CampaignAtlasEncounterPayload) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem editar encontros do mapa.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  await assertAtlasMapInCampaign(db, input.campaignId, input.atlasMapId);
+  const values = { atlasMapId: input.atlasMapId, createdBy: input.userId, encounterKey: input.encounterKey, regionId: input.regionId, title: input.title, eventName: input.eventName, difficulty: input.difficulty, threat: input.threat, signal: input.signal, response: input.response, consequence: input.consequence, antagonistId: input.antagonistId ?? null, blessingId: input.blessingId ?? null };
+  if (input.id) {
+    const existing = await db.select({ id: campaignAtlasEncounters.id }).from(campaignAtlasEncounters).where(and(eq(campaignAtlasEncounters.id, input.id), eq(campaignAtlasEncounters.atlasMapId, input.atlasMapId))).limit(1);
+    if (!existing[0]) throw new Error("Encontro não encontrado neste mapa.");
+    await db.update(campaignAtlasEncounters).set(values).where(eq(campaignAtlasEncounters.id, input.id));
+    return (await db.select().from(campaignAtlasEncounters).where(eq(campaignAtlasEncounters.id, input.id)).limit(1))[0];
+  }
+  const inserted = await db.insert(campaignAtlasEncounters).values(values).$returningId();
+  const encounterId = inserted[0]?.id;
+  if (!encounterId) throw new Error("Não foi possível registrar o encontro.");
+  return (await db.select().from(campaignAtlasEncounters).where(eq(campaignAtlasEncounters.id, encounterId)).limit(1))[0];
+}
+
+export async function removeCampaignAtlasEncounterForUser(input: { campaignId: number; userId: number; atlasMapId: number; encounterId: number }) {
+  if (!await campaignIsNarratedByUser(input.campaignId, input.userId)) throw new Error("Apenas narradores podem remover encontros do mapa.");
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível.");
+  await assertAtlasMapInCampaign(db, input.campaignId, input.atlasMapId);
+  await db.delete(campaignAtlasEncounters).where(and(eq(campaignAtlasEncounters.id, input.encounterId), eq(campaignAtlasEncounters.atlasMapId, input.atlasMapId)));
+}
+
+export async function listCampaignBlessingsForUser(input: { campaignId: number; userId: number }) {
+  if (!await campaignBelongsToUser(input.campaignId, input.userId)) return [];
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(campaignBlessings).where(and(eq(campaignBlessings.systemId, "shadowlords"), or(eq(campaignBlessings.visibility, "public"), eq(campaignBlessings.ownerId, input.userId), eq(campaignBlessings.campaignId, input.campaignId)))).orderBy(asc(campaignBlessings.name));
 }
 
 export async function listAntagonistsForUser(userId: number, filters?: { campaignId?: number; systemId?: string }) {

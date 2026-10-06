@@ -13,3 +13,10 @@
 - [x] Investigar timeout legado em client/src/pages/VampireSheet.dom.test.tsx: o teste passa isoladamente em 12,7 s; o timeout de 15 s era limítrofe sob carga da suíte e foi ajustado para 25 s
 - [x] Reproduzir isoladamente o timeout em client/src/pages/VampireSheet.dom.test.tsx, identificar a causa e registrar diagnóstico ou correção
 - [x] Reexecutar pnpm test após a investigação do timeout legado: 74 arquivos e 198 testes passaram
+
+- [x] Modelar estado persistente do mapa Shadowlords, regiões, rotas, eventos e bênçãos.
+- [x] Criar helpers e contratos tRPC protegidos para o atlas de campanha.
+- [x] Migrar o mapa para sincronização tRPC com fallback local compatível.
+- [x] Criar editor simples de regiões, rotas e eventos com vínculos de antagonistas e bênçãos.
+- [x] Testar, validar desktop/mobile, gerar migração, aplicar SQL e publicar checkpoint.
+- [x] Registrar limitação externa: o teste de consulta Gemini retorna HTTP 401 no ambiente atual; os testes do atlas, tipos e build passam.

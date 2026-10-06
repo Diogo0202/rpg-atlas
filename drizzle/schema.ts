@@ -390,6 +390,69 @@ export const hunterCellAntagonists = mysqlTable("hunterCellAntagonists", {
   index("hunter_cell_antagonists_antagonist_idx").on(table.antagonistId),
 ]);
 
+/** Bênçãos homebrew catalogadas para uso em encontros de Shadowlords. */
+export const campaignBlessings = mysqlTable("campaignBlessings", {
+  id: int("id").autoincrement().primaryKey(),
+  ownerId: int("ownerId").references(() => users.id, { onDelete: "set null" }),
+  campaignId: int("campaignId").references(() => campaigns.id, { onDelete: "cascade" }),
+  systemId: varchar("systemId", { length: 64 }).notNull().references(() => rpgSystems.id),
+  name: varchar("name", { length: 160 }).notNull(),
+  summary: text("summary").notNull(),
+  effect: text("effect").notNull(),
+  sourceLabel: varchar("sourceLabel", { length: 255 }),
+  visibility: mysqlEnum("visibility", ["private", "campaign", "public"]).default("campaign").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  index("campaign_blessings_campaign_idx").on(table.campaignId),
+  index("campaign_blessings_system_idx").on(table.systemId),
+  index("campaign_blessings_owner_idx").on(table.ownerId),
+]);
+
+/** Estado e conteúdo customizado do mapa narrativo, separado dos mapas táticos. */
+export const campaignAtlasMaps = mysqlTable("campaignAtlasMaps", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
+  createdBy: int("createdBy").notNull().references(() => users.id, { onDelete: "cascade" }),
+  mapKey: varchar("mapKey", { length: 96 }).notNull(),
+  title: varchar("title", { length: 160 }).notNull(),
+  tension: int("tension").default(0).notNull(),
+  selectedRegion: varchar("selectedRegion", { length: 96 }).default("arys").notNull(),
+  resolvedEncounterIds: json("resolvedEncounterIds").$type<string[]>().notNull(),
+  customRegions: json("customRegions").$type<Record<string, unknown>[]>().notNull(),
+  customRoutes: json("customRoutes").$type<Record<string, unknown>[]>().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  uniqueIndex("campaign_atlas_maps_campaign_key_unique").on(table.campaignId, table.mapKey),
+  index("campaign_atlas_maps_campaign_idx").on(table.campaignId),
+]);
+
+/** Encontros fixos ou criados pelo Mestre no mapa narrativo. */
+export const campaignAtlasEncounters = mysqlTable("campaignAtlasEncounters", {
+  id: int("id").autoincrement().primaryKey(),
+  atlasMapId: int("atlasMapId").notNull().references(() => campaignAtlasMaps.id, { onDelete: "cascade" }),
+  createdBy: int("createdBy").notNull().references(() => users.id, { onDelete: "cascade" }),
+  encounterKey: varchar("encounterKey", { length: 96 }).notNull(),
+  regionId: varchar("regionId", { length: 96 }).notNull(),
+  title: varchar("title", { length: 160 }).notNull(),
+  eventName: varchar("eventName", { length: 160 }).notNull(),
+  difficulty: int("difficulty").default(13).notNull(),
+  threat: mysqlEnum("threat", ["baixo", "médio", "alto"]).default("médio").notNull(),
+  signal: text("signal").notNull(),
+  response: text("response").notNull(),
+  consequence: text("consequence").notNull(),
+  antagonistId: int("antagonistId").references(() => antagonists.id, { onDelete: "set null" }),
+  blessingId: int("blessingId").references(() => campaignBlessings.id, { onDelete: "set null" }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  uniqueIndex("campaign_atlas_encounters_map_key_unique").on(table.atlasMapId, table.encounterKey),
+  index("campaign_atlas_encounters_region_idx").on(table.atlasMapId, table.regionId),
+  index("campaign_atlas_encounters_antagonist_idx").on(table.antagonistId),
+  index("campaign_atlas_encounters_blessing_idx").on(table.blessingId),
+]);
+
 export type RpgSystem = typeof rpgSystems.$inferSelect;
 export type Campaign = typeof campaigns.$inferSelect;
 export type CampaignMember = typeof campaignMembers.$inferSelect;
@@ -397,3 +460,6 @@ export type Character = typeof characters.$inferSelect;
 export type InsertCharacter = typeof characters.$inferInsert;
 export type DiceRoll = typeof diceRolls.$inferSelect;
 export type HunterCell = typeof hunterCells.$inferSelect;
+export type CampaignBlessing = typeof campaignBlessings.$inferSelect;
+export type CampaignAtlasMap = typeof campaignAtlasMaps.$inferSelect;
+export type CampaignAtlasEncounter = typeof campaignAtlasEncounters.$inferSelect;
