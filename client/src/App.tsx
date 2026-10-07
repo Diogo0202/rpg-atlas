@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
+import GlobalCommandPalette from "./components/GlobalCommandPalette";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import AntagonistLibrary from "./pages/AntagonistLibrary";
@@ -33,6 +34,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/modo-cena" component={SceneMode} />
+      <Route path="/santuario" component={Sanctum} />
       <Route path="/mapa-shadowlords" component={ShadowlordsCampaignMap} />
       <Route path="/biblioteca" component={AntagonistLibrary} />
       <Route path="/ficha-v5" component={VampireSheet} />
@@ -59,6 +61,7 @@ export default function App() {
       <ThemeProvider defaultTheme="dark" switchable>
         <TooltipProvider>
           <Toaster />
+          <GlobalCommandPalette />
           <Router />
         </TooltipProvider>
       </ThemeProvider>

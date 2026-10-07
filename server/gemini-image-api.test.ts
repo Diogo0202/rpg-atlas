@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-describe("credencial da API Gemini para mapas procedurais", () => {
+describe.skipIf(process.env.RUN_EXTERNAL_API_TESTS !== "1")("credencial da API Gemini para mapas procedurais", () => {
   it("autentica em uma consulta leve de modelos", async () => {
     const apiKey = process.env.GEMINI_API_KEY;
     expect(apiKey).toBeTruthy();

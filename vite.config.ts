@@ -154,6 +154,9 @@ const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(
 
 export default defineConfig({
   plugins,
+  define: {
+    "import.meta.env.VITE_APP_TITLE": JSON.stringify(process.env.VITE_APP_TITLE || "RPG Atlas"),
+  },
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),

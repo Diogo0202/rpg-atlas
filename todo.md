@@ -165,3 +165,6 @@
 - [x] Testar, revisar visualmente e publicar ordenação, tags e transições.
 - [x] Confirmar a renderização de Biblioteca e Ficha de O Um Anel após as capturas em branco.
 - [x] Salvar e publicar o checkpoint de ordenação por fonte, tags narrativas e transições de Magias.
+- [x] Restaurar o checkout compartilhado e validar a paleta global após a reinicialização do ambiente.
+- [x] Tornar os testes de credenciais externas de imagem opt-in e preservar os contratos determinísticos com mocks.
+- [x] Capturar validação visual desktop/mobile da paleta global e registrar o resultado antes do próximo checkpoint.
